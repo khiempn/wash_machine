@@ -1,0 +1,96 @@
+Created time: 20:53:05 Time Zone 07:00:00
+Msg: One or more compilation failures occurred:
+C:\Users\KHIEM\Documents\Projects\Jobs\Transoft\WashMachine\WashMachine\WashMachine.Web\Areas\Administrator\Views\Setting\OctopusSetting.cshtml(117,37): error CS1061: 'SettingModel' does not contain a definition for 'BackLink' and no extension method 'BackLink' accepting a first argument of type 'SettingModel' could be found (are you missing a using directive or an assembly reference?) Time: 2024/12/24 20:53:05 IP: 0.0.0.0
+Url: http://localhost:51758/administrator/setting/OctopusSetting
+StackTrace:    at Microsoft.AspNetCore.Mvc.Razor.Internal.RazorViewCompiler.CompileAndEmit(RazorCodeDocument codeDocument, String generatedCode)
+   at Microsoft.AspNetCore.Mvc.Razor.Internal.RazorViewCompiler.CompileAndEmit(String relativePath)
+   at Microsoft.AspNetCore.Mvc.Razor.Internal.RazorViewCompiler.OnCacheMiss(String normalizedPath)
+--- End of stack trace from previous location where exception was thrown ---
+   at Microsoft.AspNetCore.Mvc.Razor.Internal.DefaultRazorPageFactoryProvider.CreateFactory(String relativePath)
+   at Microsoft.AspNetCore.Mvc.Razor.RazorViewEngine.CreateCacheResult(HashSet`1 expirationTokens, String relativePath, Boolean isMainPage)
+   at Microsoft.AspNetCore.Mvc.Razor.RazorViewEngine.OnCacheMiss(ViewLocationExpanderContext expanderContext, ViewLocationCacheKey cacheKey)
+   at Microsoft.AspNetCore.Mvc.Razor.RazorViewEngine.LocatePageFromViewLocations(ActionContext actionContext, String pageName, Boolean isMainPage)
+   at Microsoft.AspNetCore.Mvc.Razor.RazorViewEngine.FindView(ActionContext context, String viewName, Boolean isMainPage)
+   at Microsoft.AspNetCore.Mvc.ViewEngines.CompositeViewEngine.FindView(ActionContext context, String viewName, Boolean isMainPage)
+   at Microsoft.AspNetCore.Mvc.ViewFeatures.ViewResultExecutor.FindView(ActionContext actionContext, ViewResult viewResult)
+   at Microsoft.AspNetCore.Mvc.ViewFeatures.ViewResultExecutor.ExecuteAsync(ActionContext context, ViewResult result)
+   at Microsoft.AspNetCore.Mvc.ViewResult.ExecuteResultAsync(ActionContext context)
+   at Microsoft.AspNetCore.Mvc.Internal.ResourceInvoker.InvokeResultAsync(IActionResult result)
+   at Microsoft.AspNetCore.Mvc.Internal.ResourceInvoker.InvokeNextResultFilterAsync[TFilter,TFilterAsync]()
+   at Microsoft.AspNetCore.Mvc.Internal.ResourceInvoker.Rethrow(ResultExecutedContext context)
+   at Microsoft.AspNetCore.Mvc.Internal.ResourceInvoker.ResultNext[TFilter,TFilterAsync](State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Internal.ResourceInvoker.InvokeResultFilters()
+   at Microsoft.AspNetCore.Mvc.Internal.ResourceInvoker.InvokeNextResourceFilter()
+   at Microsoft.AspNetCore.Mvc.Internal.ResourceInvoker.Rethrow(ResourceExecutedContext context)
+   at Microsoft.AspNetCore.Mvc.Internal.ResourceInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Internal.ResourceInvoker.InvokeFilterPipelineAsync()
+   at Microsoft.AspNetCore.Mvc.Internal.ResourceInvoker.InvokeAsync()
+   at Microsoft.AspNetCore.Builder.RouterMiddleware.Invoke(HttpContext httpContext)
+   at Microsoft.AspNetCore.Diagnostics.ExceptionHandlerMiddleware.Invoke(HttpContext context)
+Msg: One or more compilation failures occurred:
+C:\Users\KHIEM\Documents\Projects\Jobs\Transoft\WashMachine\WashMachine\WashMachine.Web\Areas\Administrator\Views\Access\ListUsers.cshtml(55,42): Error RZ1025: The "a" element was not closed.  All elements must be either self-closing or have a matching end tag.
+C:\Users\KHIEM\Documents\Projects\Jobs\Transoft\WashMachine\WashMachine\WashMachine.Web\Areas\Administrator\Views\Access\ListUsers.cshtml(58,31): Error RZ1026: Encountered end tag "tr" with no matching start tag.  Are your start/end tags properly balanced?
+C:\Users\KHIEM\Documents\Projects\Jobs\Transoft\WashMachine\WashMachine\WashMachine.Web\Areas\Administrator\Views\Access\ListUsers.cshtml(45,30): Error RZ1025: The "tr" element was not closed.  All elements must be either self-closing or have a matching end tag.
+C:\Users\KHIEM\Documents\Projects\Jobs\Transoft\WashMachine\WashMachine\WashMachine.Web\Areas\Administrator\Views\Access\ListUsers.cshtml(61,19): Error RZ1026: Encountered end tag "table" with no matching start tag.  Are your start/end tags properly balanced?
+C:\Users\KHIEM\Documents\Projects\Jobs\Transoft\WashMachine\WashMachine\WashMachine.Web\Areas\Administrator\Views\Access\ListUsers.cshtml(62,15): Error RZ1026: Encountered end tag "div" with no matching start tag.  Are your start/end tags properly balanced?
+C:\Users\KHIEM\Documents\Projects\Jobs\Transoft\WashMachine\WashMachine\WashMachine.Web\Areas\Administrator\Views\Access\ListUsers.cshtml(63,11): Error RZ1026: Encountered end tag "div" with no matching start tag.  Are your start/end tags properly balanced?
+C:\Users\KHIEM\Documents\Projects\Jobs\Transoft\WashMachine\WashMachine\WashMachine.Web\Areas\Administrator\Views\Access\ListUsers.cshtml(65,7): Error RZ1026: Encountered end tag "div" with no matching start tag.  Are your start/end tags properly balanced?
+C:\Users\KHIEM\Documents\Projects\Jobs\Transoft\WashMachine\WashMachine\WashMachine.Web\Areas\Administrator\Views\Access\ListUsers.cshtml(67,3): Error RZ1026: Encountered end tag "div" with no matching start tag.  Are your start/end tags properly balanced?
+C:\Users\KHIEM\Documents\Projects\Jobs\Transoft\WashMachine\WashMachine\WashMachine.Web\Areas\Administrator\Views\Access\ListUsers.cshtml(43,26): Error RZ1006: The foreach block is missing a closing "}" character.  Make sure you have a matching "}" character for all the "{" characters within this block, and that none of the "}" characters are being interpreted as markup. Time: 2024/12/24 21:37:11 IP: 0.0.0.0
+Url: http://localhost:51758/administrator/access/listusers
+StackTrace:    at Microsoft.AspNetCore.Mvc.Razor.Internal.RazorViewCompiler.CompileAndEmit(String relativePath)
+   at Microsoft.AspNetCore.Mvc.Razor.Internal.RazorViewCompiler.OnCacheMiss(String normalizedPath)
+--- End of stack trace from previous location where exception was thrown ---
+   at Microsoft.AspNetCore.Mvc.Razor.Internal.DefaultRazorPageFactoryProvider.CreateFactory(String relativePath)
+   at Microsoft.AspNetCore.Mvc.Razor.RazorViewEngine.CreateCacheResult(HashSet`1 expirationTokens, String relativePath, Boolean isMainPage)
+   at Microsoft.AspNetCore.Mvc.Razor.RazorViewEngine.OnCacheMiss(ViewLocationExpanderContext expanderContext, ViewLocationCacheKey cacheKey)
+   at Microsoft.AspNetCore.Mvc.Razor.RazorViewEngine.LocatePageFromViewLocations(ActionContext actionContext, String pageName, Boolean isMainPage)
+   at Microsoft.AspNetCore.Mvc.Razor.RazorViewEngine.FindView(ActionContext context, String viewName, Boolean isMainPage)
+   at Microsoft.AspNetCore.Mvc.ViewEngines.CompositeViewEngine.FindView(ActionContext context, String viewName, Boolean isMainPage)
+   at Microsoft.AspNetCore.Mvc.ViewFeatures.ViewResultExecutor.FindView(ActionContext actionContext, ViewResult viewResult)
+   at Microsoft.AspNetCore.Mvc.ViewFeatures.ViewResultExecutor.ExecuteAsync(ActionContext context, ViewResult result)
+   at Microsoft.AspNetCore.Mvc.ViewResult.ExecuteResultAsync(ActionContext context)
+   at Microsoft.AspNetCore.Mvc.Internal.ResourceInvoker.InvokeResultAsync(IActionResult result)
+   at Microsoft.AspNetCore.Mvc.Internal.ResourceInvoker.InvokeNextResultFilterAsync[TFilter,TFilterAsync]()
+   at Microsoft.AspNetCore.Mvc.Internal.ResourceInvoker.Rethrow(ResultExecutedContext context)
+   at Microsoft.AspNetCore.Mvc.Internal.ResourceInvoker.ResultNext[TFilter,TFilterAsync](State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Internal.ResourceInvoker.InvokeResultFilters()
+   at Microsoft.AspNetCore.Mvc.Internal.ResourceInvoker.InvokeNextResourceFilter()
+   at Microsoft.AspNetCore.Mvc.Internal.ResourceInvoker.Rethrow(ResourceExecutedContext context)
+   at Microsoft.AspNetCore.Mvc.Internal.ResourceInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Internal.ResourceInvoker.InvokeFilterPipelineAsync()
+   at Microsoft.AspNetCore.Mvc.Internal.ResourceInvoker.InvokeAsync()
+   at Microsoft.AspNetCore.Builder.RouterMiddleware.Invoke(HttpContext httpContext)
+   at Microsoft.AspNetCore.Diagnostics.ExceptionHandlerMiddleware.Invoke(HttpContext context)
+Msg: One or more compilation failures occurred:
+C:\Users\KHIEM\Documents\Projects\Jobs\Transoft\WashMachine\WashMachine\WashMachine.Web\Areas\Administrator\Views\Shops\ListShops.cshtml(34,18): Error RZ1025: The "div" element was not closed.  All elements must be either self-closing or have a matching end tag.
+C:\Users\KHIEM\Documents\Projects\Jobs\Transoft\WashMachine\WashMachine\WashMachine.Web\Areas\Administrator\Views\Shops\ListShops.cshtml(51,35): Error RZ1026: Encountered end tag "span" with no matching start tag.  Are your start/end tags properly balanced?
+C:\Users\KHIEM\Documents\Projects\Jobs\Transoft\WashMachine\WashMachine\WashMachine.Web\Areas\Administrator\Views\Shops\ListShops.cshtml(52,31): Error RZ1026: Encountered end tag "div" with no matching start tag.  Are your start/end tags properly balanced?
+C:\Users\KHIEM\Documents\Projects\Jobs\Transoft\WashMachine\WashMachine\WashMachine.Web\Areas\Administrator\Views\Shops\ListShops.cshtml(53,27): Error RZ1026: Encountered end tag "div" with no matching start tag.  Are your start/end tags properly balanced?
+C:\Users\KHIEM\Documents\Projects\Jobs\Transoft\WashMachine\WashMachine\WashMachine.Web\Areas\Administrator\Views\Shops\ListShops.cshtml(54,23): Error RZ1026: Encountered end tag "div" with no matching start tag.  Are your start/end tags properly balanced?
+C:\Users\KHIEM\Documents\Projects\Jobs\Transoft\WashMachine\WashMachine\WashMachine.Web\Areas\Administrator\Views\Shops\ListShops.cshtml(55,19): Error RZ1026: Encountered end tag "div" with no matching start tag.  Are your start/end tags properly balanced? Time: 2024/12/24 22:22:38 IP: 0.0.0.0
+Url: http://localhost:51758/administrator/shops/listshops
+StackTrace:    at Microsoft.AspNetCore.Mvc.Razor.Internal.RazorViewCompiler.CompileAndEmit(String relativePath)
+   at Microsoft.AspNetCore.Mvc.Razor.Internal.RazorViewCompiler.OnCacheMiss(String normalizedPath)
+--- End of stack trace from previous location where exception was thrown ---
+   at Microsoft.AspNetCore.Mvc.Razor.Internal.DefaultRazorPageFactoryProvider.CreateFactory(String relativePath)
+   at Microsoft.AspNetCore.Mvc.Razor.RazorViewEngine.CreateCacheResult(HashSet`1 expirationTokens, String relativePath, Boolean isMainPage)
+   at Microsoft.AspNetCore.Mvc.Razor.RazorViewEngine.OnCacheMiss(ViewLocationExpanderContext expanderContext, ViewLocationCacheKey cacheKey)
+   at Microsoft.AspNetCore.Mvc.Razor.RazorViewEngine.LocatePageFromViewLocations(ActionContext actionContext, String pageName, Boolean isMainPage)
+   at Microsoft.AspNetCore.Mvc.Razor.RazorViewEngine.FindView(ActionContext context, String viewName, Boolean isMainPage)
+   at Microsoft.AspNetCore.Mvc.ViewEngines.CompositeViewEngine.FindView(ActionContext context, String viewName, Boolean isMainPage)
+   at Microsoft.AspNetCore.Mvc.ViewFeatures.ViewResultExecutor.FindView(ActionContext actionContext, ViewResult viewResult)
+   at Microsoft.AspNetCore.Mvc.ViewFeatures.ViewResultExecutor.ExecuteAsync(ActionContext context, ViewResult result)
+   at Microsoft.AspNetCore.Mvc.ViewResult.ExecuteResultAsync(ActionContext context)
+   at Microsoft.AspNetCore.Mvc.Internal.ResourceInvoker.InvokeResultAsync(IActionResult result)
+   at Microsoft.AspNetCore.Mvc.Internal.ResourceInvoker.InvokeNextResultFilterAsync[TFilter,TFilterAsync]()
+   at Microsoft.AspNetCore.Mvc.Internal.ResourceInvoker.Rethrow(ResultExecutedContext context)
+   at Microsoft.AspNetCore.Mvc.Internal.ResourceInvoker.ResultNext[TFilter,TFilterAsync](State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Internal.ResourceInvoker.InvokeResultFilters()
+   at Microsoft.AspNetCore.Mvc.Internal.ResourceInvoker.InvokeNextResourceFilter()
+   at Microsoft.AspNetCore.Mvc.Internal.ResourceInvoker.Rethrow(ResourceExecutedContext context)
+   at Microsoft.AspNetCore.Mvc.Internal.ResourceInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Internal.ResourceInvoker.InvokeFilterPipelineAsync()
+   at Microsoft.AspNetCore.Mvc.Internal.ResourceInvoker.InvokeAsync()
+   at Microsoft.AspNetCore.Builder.RouterMiddleware.Invoke(HttpContext httpContext)
+   at Microsoft.AspNetCore.Diagnostics.ExceptionHandlerMiddleware.Invoke(HttpContext context)

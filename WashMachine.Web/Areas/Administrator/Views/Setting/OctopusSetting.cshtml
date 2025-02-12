@@ -1,0 +1,145 @@
+﻿@model WashMachine.Business.Models.SettingModel
+@{
+    ViewData["Title"] = "Octopus settings";
+    ViewBag.PageType = PageTypes.OctopusSetting;
+}
+<div class="mannager-content">
+    <div class="manager-list">
+        <nav>
+            <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                <a class="nav-link active" data-toggle="tab" href="#" tab="#octopus_job_tab" role="tab" aria-controls="nav-home" aria-selected="true">Octopus job</a>
+                <a class="nav-link" data-toggle="tab" href="#" tab="#email_server_tab" role="tab" aria-controls="nav-profile" aria-selected="false">Email server</a>
+            </div>
+        </nav>
+        <div class="tab-content w-100" id="nav-tabContent" style="padding: 15px">
+            <form class="body-content" action="/administrator/setting/OctopusSetting" name="form" enctype="multipart/form-data" method="post">
+                <div class="tab-pane box-15" id="octopus_job_tab" role="tabpanel" aria-labelledby="nav-home-tab">
+                    <div class="wap-500">
+                        <div class="form-area form-editor">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label">Time XFile()</label>
+                                        <div class="col-sm-8 form-item">
+                                            <div class="time-group d-flex">
+                                                @Html.TextBoxFor(m => m.XFileHour, new { @maxlength = "2", placeholder = "HH", @type = "number", @class = "form-control numeric" })
+                                                <span style="align-content: center">:</span>
+                                                @Html.TextBoxFor(m => m.XFileMinute, new { @maxlength = "2", placeholder = "mm", @type = "number", @class = "form-control numeric" })
+                                            </div>
+                                            @Html.ValidationMessageFor(m => m.XFileHour)
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label">Time upload files</label>
+                                        <div class="col-sm-8 form-item">
+                                            <div class="time-group d-flex">
+                                                @Html.TextBoxFor(m => m.UploadHour, new { @maxlength = "2", placeholder = "HH", @type = "number", @class = "form-control numeric" })
+                                                <span style="align-content: center">:</span>
+                                                @Html.TextBoxFor(m => m.UploadMinute, new { @maxlength = "2", placeholder = "mm", @type = "number", @class = "form-control numeric" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label">Time download files</label>
+                                        <div class="col-sm-8 form-item">
+                                            <div class="time-group d-flex">
+                                                @Html.TextBoxFor(m => m.DownloadHour, new { @maxlength = "2", placeholder = "HH", @type = "number", @class = "form-control numeric" })
+                                                <span style="align-content: center">:</span>
+                                                @Html.TextBoxFor(m => m.DownloadMinute, new { @maxlength = "2", placeholder = "mm", @type = "number", @class = "form-control numeric" })
+                                            </div>
+                                            <span class="field-validation-valid" data-valmsg-for="DownloadHour" data-valmsg-replace="true"></span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label">Upload folder</label>
+                                        <div class="col-sm-8 form-item">
+                                            @Html.TextBoxFor(m => m.OctopusUploadFolder, new { @maxlength = "200", placeholder = "Ex.D:\\Upload", @class = "form-control" })
+                                            @Html.ValidationMessageFor(m => m.OctopusUploadFolder)
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label">Download folder</label>
+                                        <div class="col-sm-8 form-item">
+                                            @Html.TextBoxFor(m => m.OctopusDownloadFolder, new { @maxlength = "200", placeholder = "Ex.D:\\Downloads", @class = "form-control" })
+                                            @Html.ValidationMessageFor(m => m.OctopusUploadFolder)
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane" id="email_server_tab" role="tabpanel" aria-labelledby="nav-profile-tab" style="display: none">
+                    <div class="wap-500">
+                        <div class="form-area">
+                            <h5 class="group-title">Sender email</h5>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group row">
+                                        <label for="ServerEmailAddress" class="col-sm-4 col-form-label">Email address</label>
+                                        <div class="col-sm-8 form-item">
+                                            @Html.TextBoxFor(m => m.ServerEmailAddress, new { @maxlength = "100", placeholder = "Email address", @class = "form-control" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group row">
+                                        <label for="ServerEmailPassword" class="col-sm-4 col-form-label">Email password</label>
+                                        <div class="col-sm-8 form-item">
+                                            @Html.TextBoxFor(m => m.ServerEmailPassword, new { @maxlength = "100", placeholder = "Password", type = "password", @class = "form-control" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group row">
+                                        <label for="ServerEmailHost" class="col-sm-4 col-form-label">Host</label>
+                                        <div class="col-sm-8 form-item">
+                                            @Html.TextBoxFor(m => m.ServerEmailHost, new { @maxlength = "500", placeholder = "Host", @class = "form-control" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group row">
+                                        <label for="ServerEmailPort" class="col-sm-4 col-form-label">Port</label>
+                                        <div class="col-sm-8 form-item">
+                                            @Html.TextBoxFor(m => m.ServerEmailPort, new { @maxlength = "20", placeholder = "Port", @class = "form-control" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group row">
+                                        <label for="ServerEmailFrom" class="col-sm-4 col-form-label">From</label>
+                                        <div class="col-sm-8 form-item">
+                                            @Html.TextBoxFor(m => m.ServerEmailFrom, new { @maxlength = "500", placeholder = "From", @class = "form-control" })
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                        </div>
+                        <div class="top-20"></div>
+                        <div class="form-area">
+                            <h5 class="group-title">Receiver email</h5>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group row">
+                                        <label for="inputPassword" class="col-sm-4 col-form-label">Email receiver error</label>
+                                        <div class="col-sm-8 form-item">
+                                            @Html.TextBoxFor(m => m.ServerEmailReceiver, new { @maxlength = "100", placeholder = "Email address", @class = "form-control" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-button" style="float: right">
+                    <a class="btn btn-secondary" href="@Context.GetBaseUrl()">Back</a>
+                    <button type="submit" class="btn btn-primary"><i class="far fa-save"></i> Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

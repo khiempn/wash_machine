@@ -1,0 +1,59 @@
+Created time: 22:55:56 Time Zone 07:00:00
+Msg: One or more compilation failures occurred:
+C:\Users\KHIEM\Documents\Projects\Jobs\Transoft\WashMachine\WashMachine\WashMachine.Web\Views\Shared\_AdminLayout.cshtml(137,14): error CS1503: Argument 1: cannot convert from 'void' to 'object' Time: 2025/02/11 22:55:56 IP: 0.0.0.0
+Url: http://localhost:51758/administrator
+StackTrace:    at Microsoft.AspNetCore.Mvc.Razor.Internal.RazorViewCompiler.CompileAndEmit(RazorCodeDocument codeDocument, String generatedCode)
+   at Microsoft.AspNetCore.Mvc.Razor.Internal.RazorViewCompiler.CompileAndEmit(String relativePath)
+   at Microsoft.AspNetCore.Mvc.Razor.Internal.RazorViewCompiler.OnCacheMiss(String normalizedPath)
+--- End of stack trace from previous location where exception was thrown ---
+   at Microsoft.AspNetCore.Mvc.Razor.Internal.DefaultRazorPageFactoryProvider.CreateFactory(String relativePath)
+   at Microsoft.AspNetCore.Mvc.Razor.RazorViewEngine.CreateCacheResult(HashSet`1 expirationTokens, String relativePath, Boolean isMainPage)
+   at Microsoft.AspNetCore.Mvc.Razor.RazorViewEngine.OnCacheMiss(ViewLocationExpanderContext expanderContext, ViewLocationCacheKey cacheKey)
+   at Microsoft.AspNetCore.Mvc.Razor.RazorViewEngine.LocatePageFromViewLocations(ActionContext actionContext, String pageName, Boolean isMainPage)
+   at Microsoft.AspNetCore.Mvc.Razor.RazorViewEngine.FindPage(ActionContext context, String pageName)
+   at Microsoft.AspNetCore.Mvc.Razor.RazorView.GetLayoutPage(ViewContext context, String executingFilePath, String layoutPath)
+   at Microsoft.AspNetCore.Mvc.Razor.RazorView.RenderLayoutAsync(ViewContext context, ViewBufferTextWriter bodyWriter)
+   at Microsoft.AspNetCore.Mvc.Razor.RazorView.RenderAsync(ViewContext context)
+   at Microsoft.AspNetCore.Mvc.ViewFeatures.ViewExecutor.ExecuteAsync(ViewContext viewContext, String contentType, Nullable`1 statusCode)
+   at Microsoft.AspNetCore.Mvc.ViewFeatures.ViewExecutor.ExecuteAsync(ActionContext actionContext, IView view, ViewDataDictionary viewData, ITempDataDictionary tempData, String contentType, Nullable`1 statusCode)
+   at Microsoft.AspNetCore.Mvc.ViewFeatures.ViewResultExecutor.ExecuteAsync(ActionContext context, ViewResult result)
+   at Microsoft.AspNetCore.Mvc.ViewResult.ExecuteResultAsync(ActionContext context)
+   at Microsoft.AspNetCore.Mvc.Internal.ResourceInvoker.InvokeResultAsync(IActionResult result)
+   at Microsoft.AspNetCore.Mvc.Internal.ResourceInvoker.InvokeNextResultFilterAsync[TFilter,TFilterAsync]()
+   at Microsoft.AspNetCore.Mvc.Internal.ResourceInvoker.Rethrow(ResultExecutedContext context)
+   at Microsoft.AspNetCore.Mvc.Internal.ResourceInvoker.ResultNext[TFilter,TFilterAsync](State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Internal.ResourceInvoker.InvokeResultFilters()
+   at Microsoft.AspNetCore.Mvc.Internal.ResourceInvoker.InvokeNextResourceFilter()
+   at Microsoft.AspNetCore.Mvc.Internal.ResourceInvoker.Rethrow(ResourceExecutedContext context)
+   at Microsoft.AspNetCore.Mvc.Internal.ResourceInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Internal.ResourceInvoker.InvokeFilterPipelineAsync()
+   at Microsoft.AspNetCore.Mvc.Internal.ResourceInvoker.InvokeAsync()
+   at Microsoft.AspNetCore.Builder.RouterMiddleware.Invoke(HttpContext httpContext)
+   at Microsoft.AspNetCore.Diagnostics.ExceptionHandlerMiddleware.Invoke(HttpContext context)
+Msg: The network connection was aborted by the local system Time: 2025/02/11 22:56:38 IP: 0.0.0.0
+Url: http://localhost:51758/administrator/reports/coupon
+StackTrace: 
+Msg: An attempt was made to access a socket in a way forbidden by its access permissions Time: 2025/02/11 22:56:57 IP: 0.0.0.0
+Url: http://localhost:51758/administrator/access/listusers
+StackTrace: 
+Msg: A socket operation was attempted to an unreachable network Time: 2025/02/11 23:09:29 IP: 0.0.0.0
+Url: http://localhost:51758/administrator/shops/listshops
+StackTrace: 
+Msg: An attempt was made to access a socket in a way forbidden by its access permissions Time: 2025/02/11 23:10:57 IP: 0.0.0.0
+Url: http://localhost:51758/administrator/shops/listshops
+StackTrace: 
+Msg: An attempt was made to access a socket in a way forbidden by its access permissions Time: 2025/02/11 23:11:04 IP: 0.0.0.0
+Url: http://localhost:51758/administrator/shops/listshops
+StackTrace: 
+Msg: The semaphore timeout period has expired Time: 2025/02/11 23:15:19 IP: 0.0.0.0
+Url: http://localhost:51758/administrator
+StackTrace: 
+Msg: The wait operation timed out Time: 2025/02/11 23:29:13 IP: 0.0.0.0
+Url: http://localhost:51758/administrator
+StackTrace: 
+Msg: The wait operation timed out Time: 2025/02/11 23:29:17 IP: 0.0.0.0
+Url: http://localhost:51758/administrator
+StackTrace: 
+Msg: The wait operation timed out Time: 2025/02/11 23:29:18 IP: 0.0.0.0
+Url: http://localhost:51758/administrator
+StackTrace: 

@@ -1,0 +1,95 @@
+﻿@{
+    ViewData["Title"] = "Profile";
+}
+
+@model WashMachine.Business.Models.UserModel
+@{
+    ViewData["Title"] = "Profile";
+    ViewBag.PageType = PageTypes.Profile;
+}
+<div class="manager-list">
+    <nav>
+        <div class="nav nav-tabs" id="nav-tab" role="tablist">
+            <a class="nav-link active" data-toggle="tab" href="#information_tab" role="tab" aria-controls="nav-home" aria-selected="true">Information</a>
+        </div>
+    </nav>
+    <div class="tab-content w-100" id="nav-tabContent" style="padding: 15px">
+        <div class="form-editor" data-id="@Model.Id">
+            <form class="form-area" autocomplete="off" enctype="multipart/form-data" method="post" action="@Html.GetUri()" novalidate="novalidate">
+                <div class="tab-pane box-15" id="information_tab" role="tabpanel" aria-labelledby="nav-home-tab">
+                    @Html.HiddenFor(m => m.Id)
+                    @Html.HiddenFor(m => m.ShopCode)
+                    @Html.HiddenFor(m => m.Status)
+                    @Html.HiddenFor(m => m.UserType)
+                    @Html.HiddenFor(m => m.Email)
+                    <input type="hidden" name="BackLink" value="@Html.GetUri()" />
+
+                    <div class="col-md-12">
+                        <div class="form-group row">
+                            <label for="inputPassword" class="col-sm-2 col-form-label">Avatar</label>
+                            <div class="col-sm-10 form-item">
+                                <div class="image-selecting">
+                                    <div id="list-images"><div class="select-images img-cover"><img src="@Model.Image" onclick="selectFile()"></div></div>
+                                    <input class="file-images none" id="ImageFile" name="ImageFile" onchange="showImage()" type="file">
+                                </div>
+                                <strong>@Model.Email</strong>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label for="inputPassword" class="col-sm-4 col-form-label">Full name</label>
+                                <div class="col-sm-8 form-item">
+                                    @Html.TextBoxFor(model => model.FullName, new { @class = "form-control", autocomplete = "off", placeholder = "Full Name" })
+                                    @Html.ValidationMessageFor(model => model.FullName)
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label for="inputPassword" class="col-sm-4 col-form-label">Birthday</label>
+                                <div class="col-sm-8 form-item">
+                                    @Html.TextBoxFor(model => model.BirthdayText, new { @class = "form-control datepicker", autocomplete = "off", placeholder = "Birthday" })
+                                    @Html.ValidationMessageFor(model => model.BirthdayText)
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label for="inputPassword" class="col-sm-4 col-form-label">Address</label>
+                                <div class="col-sm-8 form-item">
+                                    @Html.TextBoxFor(model => model.Address, new { @class = "form-control", autocomplete = "off", placeholder = "Address" })
+                                    @Html.ValidationMessageFor(model => model.Address)
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label for="inputPassword" class="col-sm-4 col-form-label">Phone</label>
+                                <div class="col-sm-8 form-item">
+                                    @Html.TextBoxFor(model => model.Phone, new { @class = "form-control", autocomplete = "off", placeholder = "Phone number", data_val_number = "the phone number must be a sequence of numbers" })
+                                    @Html.ValidationMessageFor(model => model.Phone)
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group row">
+                                <label for="inputPassword" class="col-sm-2 col-form-label">Notes</label>
+                                <div class="col-sm-10 form-item">
+                                    @Html.TextAreaFor(model => model.Notes, new { @class = "form-control", autocomplete = "off", placeholder = "Notes" })
+                                    @Html.ValidationMessageFor(model => model.Notes)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-button" style="float: right;">
+                        <a class="btn btn-secondary" class="btn-form" href="/">Back</a>
+                        <button type="submit" class="btn btn-primary"><i class="far fa-save"></i> Save</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+

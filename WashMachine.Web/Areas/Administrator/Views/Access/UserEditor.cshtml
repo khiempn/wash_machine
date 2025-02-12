@@ -1,0 +1,147 @@
+﻿@model WashMachine.Business.Models.UserModel
+@{
+    ViewData["Title"] = Model.Id > 0 ? "User Editor" : "Create New User";
+    ViewBag.PageType = PageTypes.ListUsers;
+}
+
+<div class="manager-list">
+    <nav>
+        <div class="nav nav-tabs" id="nav-tab" role="tablist">
+            <a class="nav-link active" data-toggle="tab" href="#user_info_tab" role="tab" aria-controls="nav-home" aria-selected="true">User information</a>
+@*             <a class="nav-link" data-toggle="tab" href="#reset_password_tab" role="tab" aria-controls="nav-home" aria-selected="true">Reset Password</a>
+ *@        </div>
+    </nav>
+    <div class="tab-content w-100" id="nav-tabContent" style="padding: 15px">
+        <form class="form-area" autocomplete="off" enctype="multipart/form-data" method="post" action="/administrator/access/usereditor/@Model.Id" novalidate="novalidate">
+            <div class="tab-pane box-15" id="user_info_tab" role="tabpanel" aria-labelledby="nav-home-tab">
+                @Html.HiddenFor(m => m.Id)
+                @Html.HiddenFor(m => m.ShopCode)
+                @Html.HiddenFor(m => m.BackLink)
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group row">
+                            <label for="inputPassword" class="col-sm-4 col-form-label">Email</label>
+                            <div class="col-sm-8 form-item">
+                                @if (Model.Id > 0)
+                                {
+                                    @Html.TextBoxFor(model => model.Email, new { @class = "form-control", @autocomplete = "off", ReadOnly = "true", placeholder = "Duplication Email" })
+                                    @Html.ValidationMessageFor(model => model.Email)
+                                }
+                                else
+                                {
+                                    @Html.TextBoxFor(model => model.Email, new { @class = "form-control", @autocomplete = "off", placeholder = "Email" })
+                                    @Html.ValidationMessageFor(model => model.Email)
+                                }
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6"></div>
+                    <div class="col-md-6">
+                        <div class="form-group row">
+                            <label for="inputPassword" class="col-sm-4 col-form-label">Full name</label>
+                            <div class="col-sm-8 form-item">
+                                @Html.TextBoxFor(model => model.FullName, new { @class = "form-control", @autocomplete = "off", placeholder = "Full name" })
+                                @Html.ValidationMessageFor(model => model.FullName)
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group row">
+                            <label for="inputPassword" class="col-sm-4 col-form-label">Phone</label>
+                            <div class="col-sm-8 form-item">
+                                @Html.TextBoxFor(model => model.Phone, new { @class = "form-control", @autocomplete = "off", placeholder = "Phone" })
+                                @Html.ValidationMessageFor(model => model.Phone)
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group row">
+                            <label for="inputPassword" class="col-sm-4 col-form-label">Address</label>
+                            <div class="col-sm-8 form-item">
+                                @Html.TextBoxFor(model => model.Address, new { @class = "form-control", @autocomplete = "off", placeholder = "Address" })
+                                @Html.ValidationMessageFor(model => model.Address)
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group row">
+                            <label for="inputPassword" class="col-sm-4 col-form-label">Birthday</label>
+                            <div class="col-sm-8 form-item">
+                                @Html.TextBoxFor(model => model.BirthdayText, new { @class = "form-control datepicker", @autocomplete = "off", placeholder = "Birthday" })
+                                @Html.ValidationMessageFor(model => model.BirthdayText)
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group row">
+                            <label for="inputPassword" class="col-sm-4 col-form-label">Status</label>
+                            <div class="col-sm-8 form-item">
+                                <div class="select-types " tabindex="0">
+                                    @Html.DropDownList("Status", new List<SelectListItem> {
+                                    new SelectListItem { Value = "1", Text = "Active", Selected = (Model.Status == 1) },
+                                    new SelectListItem { Value = "2", Text = "Inactive", Selected = (Model.Status == 2) }
+                                    }, "---Select an option---", new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(model => model.Status)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group row">
+                            <label for="inputPassword" class="col-sm-4 col-form-label">User type</label>
+                            <div class="col-sm-8 form-item">
+                                <div class="select-types " tabindex="0">
+                                    @Html.DropDownList("UserType", new List<SelectListItem> {
+                                    new SelectListItem { Value = "1", Text = "Admin", Selected = (Model.UserType == 1) },
+                                    new SelectListItem { Value = "2", Text = "Normal", Selected = (Model.UserType == 2) }
+                                    }, "---Select an option---", new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(model => model.UserType)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group row">
+                            <label for="inputPassword" class="col-sm-4 col-form-label">Testing Mode</label>
+                            <div class="col-sm-8 form-item">
+                                <div class="select-types " tabindex="0">
+                                    @Html.DropDownList("TestingMode", new List<SelectListItem> {
+                                    new SelectListItem { Value = "0", Text = "OFF", Selected = (Model.TestingMode == 0) },
+                                    new SelectListItem { Value = "1", Text = "ON", Selected = (Model.TestingMode == 1) }
+                                    }, "---Select an option---", new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(model => model.TestingMode)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @if (Model.Id == 0)
+                    {
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label for="inputPassword" class="col-sm-4 col-form-label">Password initial </label>
+                                <div class="col-sm-8 form-item">
+                                    @Html.TextBoxFor(model => model.Password, new { @class = "form-control", @autocomplete = "off", placeholder = "Password" })
+                                    @Html.ValidationMessageFor(model => model.Password)
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    <div class="col-md-12">
+                        <div class="form-group row">
+                            <label for="inputPassword" class="col-sm-2 col-form-label">Notes</label>
+                            <div class="col-sm-10 form-item">
+                                @Html.TextAreaFor(model => model.Notes, new { @class = "form-control", @autocomplete = "off", placeholder = "Notes" })
+                                @Html.ValidationMessageFor(model => model.Notes)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-button" style="float: right">
+                <a class="btn btn-secondary" href="@Model.BackLink">Back</a>
+                <button type="submit" class="btn btn-primary"><i class="far fa-save"></i> Save</button>
+            </div>
+        </form>
+    </div>
+</div>

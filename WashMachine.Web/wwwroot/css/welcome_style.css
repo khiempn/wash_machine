@@ -1,0 +1,103 @@
+﻿body {
+    margin: 0;
+    padding: 0;
+    background: #bbefc2;
+    background-image: linear-gradient(#fff,#bbefc2);
+    color: #fff;
+}
+
+.main {
+    position: relative;
+    height: 100vh;
+    width: 100%;
+    top: 0;
+    left: 0;
+    right: 0;
+}
+    .main .heading {
+        position: absolute;
+        height: auto;
+        width: 100%;
+        top: 50%;
+        transform: translateY(-50%);
+        text-align: center;
+        text-shadow: 0px 0.5px 5px rgba(0, 0, 0, 0.2);
+    }
+
+        .main .heading .head {
+            position: relative;
+            font-family: 'RacingSansOne',sans-serif;
+            font-size: 48px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+            .main .heading .head span {
+                color: #017fb5;
+            }
+
+        .main .heading .sub {
+            position: relative;
+            font-family: 'cinzel',sans-serif;
+            font-size: 22px;
+            font-weight: 300;
+            color: #a29696;
+            margin: -1% 0 1% 0;
+        }
+
+        .main .heading .body {
+            height: auto;
+            width: 100%;
+            display: flex;
+            text-align: center;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+
+            .main .heading .body input , .main .heading .body button {
+                text-align: center;
+                font-family: 'cinzel',sans-serif;
+                font-size: 15px;
+                font-weight: 700;
+                display: block;
+                border: 1px solid rgba(255, 255, 255, 0.5);
+                height: auto;
+                width: 150px;
+                padding: 10px;
+                display: flex;
+                text-align: center;
+                margin-left: 1%;
+                border-radius: 2px;
+                transition: 0.5s ease-in-out;
+            }
+            .main .heading .body button {
+                color: #fff;
+                text-decoration: none;
+                font-family: 'cinzel',sans-serif;
+                font-weight: 300;
+                display: flex;
+                text-align: center;
+                align-items: center;
+                justify-content: center;
+            }
+        .main .heading .body .btn1 {
+            background: #017fb5;
+            border: 1px solid #017fb5;
+        }
+
+            .main .heading .body .btn1:hover {
+                background: #017fb5;
+                border: 1px solid #017fb5;
+                color: rgba(255, 255, 255, 0.95);
+            }
+            .main .heading .body .input_code:focus {
+                outline: none !important;
+                border: 1px solid red;
+                box-shadow: 0 0 10px #719ECE;
+            }
+.text-danger {
+    color: #de5320;
+    font-size: 18px;
+}

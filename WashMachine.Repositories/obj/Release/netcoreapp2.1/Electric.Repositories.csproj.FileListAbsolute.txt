@@ -1,0 +1,14 @@
+C:\Users\KHIEM\Documents\Projects\Jobs\Transoft\WashMachine\WashMachine\WashMachinet.Repositories\bin\Release\netcoreapp2.1\WashMachine.Repositories.deps.json
+C:\Users\KHIEM\Documents\Projects\Jobs\Transoft\WashMachine\WashMachine\WashMachinet.Repositories\bin\Release\netcoreapp2.1\WashMachine.Repositories.runtimeconfig.json
+C:\Users\KHIEM\Documents\Projects\Jobs\Transoft\WashMachine\WashMachine\WashMachinet.Repositories\bin\Release\netcoreapp2.1\WashMachine.Repositories.runtimeconfig.dev.json
+C:\Users\KHIEM\Documents\Projects\Jobs\Transoft\WashMachine\WashMachine\WashMachinet.Repositories\bin\Release\netcoreapp2.1\WashMachine.Repositories.dll
+C:\Users\KHIEM\Documents\Projects\Jobs\Transoft\WashMachine\WashMachine\WashMachinet.Repositories\bin\Release\netcoreapp2.1\WashMachine.Repositories.pdb
+C:\Users\KHIEM\Documents\Projects\Jobs\Transoft\WashMachine\WashMachine\WashMachinet.Repositories\obj\Release\netcoreapp2.1\WashMachine.Repositories.csproj.AssemblyReference.cache
+C:\Users\KHIEM\Documents\Projects\Jobs\Transoft\WashMachine\WashMachine\WashMachinet.Repositories\obj\Release\netcoreapp2.1\WashMachine.Repositories.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\KHIEM\Documents\Projects\Jobs\Transoft\WashMachine\WashMachine\WashMachinet.Repositories\obj\Release\netcoreapp2.1\WashMachine.Repositories.AssemblyInfoInputs.cache
+C:\Users\KHIEM\Documents\Projects\Jobs\Transoft\WashMachine\WashMachine\WashMachinet.Repositories\obj\Release\netcoreapp2.1\WashMachine.Repositories.AssemblyInfo.cs
+C:\Users\KHIEM\Documents\Projects\Jobs\Transoft\WashMachine\WashMachine\WashMachinet.Repositories\obj\Release\netcoreapp2.1\WashMachine.Repositories.csproj.CoreCompileInputs.cache
+C:\Users\KHIEM\Documents\Projects\Jobs\Transoft\WashMachine\WashMachine\WashMachinet.Repositories\obj\Release\netcoreapp2.1\WashMachine.Repositories.sourcelink.json
+C:\Users\KHIEM\Documents\Projects\Jobs\Transoft\WashMachine\WashMachine\WashMachinet.Repositories\obj\Release\netcoreapp2.1\WashMachine.Repositories.dll
+C:\Users\KHIEM\Documents\Projects\Jobs\Transoft\WashMachine\WashMachine\WashMachinet.Repositories\obj\Release\netcoreapp2.1\WashMachine.Repositories.pdb
+C:\Users\KHIEM\Documents\Projects\Jobs\Transoft\WashMachine\WashMachine\WashMachinet.Repositories\obj\Release\netcoreapp2.1\WashMachine.Repositories.genruntimeconfig.cache

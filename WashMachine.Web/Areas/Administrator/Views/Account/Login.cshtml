@@ -1,0 +1,74 @@
+﻿@model WashMachine.Business.Models.LoginModel
+@{
+    ViewData["Title"] = "Login";
+    Layout = "_LoginLayout";
+}
+<link href="@BotDetect.Web.CaptchaUrls.Absolute.LayoutStyleSheetUrl"
+      rel="stylesheet" type="text/css" />
+<style>
+    .field-validation-error {
+        color: red;
+    }
+</style>
+<div class="main-wrapper">
+    <div class="preloader">
+        <div class="lds-ripple">
+            <div class="lds-pos"></div>
+            <div class="lds-pos"></div>
+        </div>
+    </div>
+    <div class="auth-wrapper d-flex no-block justify-content-center align-items-center bg-light">
+        <div class="auth-box bg-light border-top border-secondary">
+            <div id="loginform">
+                <div class="text-center pt-3 pb-3">
+                    <h2 class="text-center">LOGIN</h2>
+                </div>
+                <!-- Form -->
+                <form class="form-horizontal mt-3" autocomplete="off" method="post" action="/login" novalidate="novalidate">
+                    @Html.HiddenFor(c => c.ReturnUrl)
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="mb-3">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text bg-success text-white h-100" id="basic-addon1"><i class="ti-user"></i></span>
+                                    </div>
+                                    @Html.TextBoxFor(m => m.Username, new { @class = "form-control form-control-lg", placeholder = "User name" })
+                                </div>
+                                @Html.ValidationMessageFor(m => m.Username)
+                            </div>
+                            <div class="mb-3">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text bg-warning text-white h-100" id="basic-addon2"><i class="ti-pencil"></i></span>
+                                    </div>
+                                    @Html.TextBoxFor(m => m.Password, new { @class = "form-control form-control-lg", type = "password", placeholder = "Enter password" })
+                                </div>
+                                @Html.ValidationMessageFor(m => m.Password)
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row pb-4">
+                        <div class="col-12">
+                            <div class="login-capcha">
+                                <captcha id="CaptchaLogin" user-input-id="CaptchaCode" />
+                                <div class="actions">
+                                    <input asp-for="CaptchaCode" class="form-control form-control-lg" placeholder="capcha" />
+                                    <span asp-validation-for="CaptchaCode"></span>
+                                    @if ((Context.Request.Method == "POST") && ViewData.ModelState.IsValid)
+                                    {
+                                        <span class="correct">Correct!</span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-c">
+                        <button style="width:100%" class="btn btn-success float-end text-white" type="submit">Login</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+

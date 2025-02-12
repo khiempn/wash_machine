@@ -1,0 +1,270 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{BC9FBA63-1763-4C09-9E3C-235B93C4E69D}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>WashMachine.Forms</RootNamespace>
+    <AssemblyName>WashMachine.Forms</AssemblyName>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+    <TargetFrameworkProfile />
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EFTPaymentsServer, Version=4.0.5.72, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>lib\EFTPaymentsServer.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.SQLite, Version=1.0.115.5, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>lib\System.Data.SQLite.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AppConfigModel.cs" />
+    <Compile Include="Common\Http\HttpService.cs" />
+    <Compile Include="Common\Http\IHttpService.cs" />
+    <Compile Include="Common\Http\ResponseModel.cs" />
+    <Compile Include="Common\UI\CardButtonRoundedUI.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Common\UI\ButtonRoundedUI.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Common\UI\GlassyPanelUI.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Common\UI\PanelRoundedUI.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Common\UI\ProgressUI.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="CryptLibrary.cs" />
+    <Compile Include="Logger.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ShopConfigModel.cs" />
+    <Compile Include="Views\Login\Account\AccountService.cs" />
+    <Compile Include="Views\Login\Account\IAccountService.cs" />
+    <Compile Include="Views\Login\FollowType.cs" />
+    <Compile Include="Views\Login\LoginForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\Login\LoginForm.Designer.cs">
+      <DependentUpon>LoginForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Main\CardItemProperty.cs" />
+    <Compile Include="Views\Main\Coupon\CouponService.cs" />
+    <Compile Include="Views\Main\Coupon\Dialog\ScanWaitingUI.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Views\Main\Coupon\ICouponService.cs" />
+    <Compile Include="Views\Main\Coupon\Machine\IMachineService.cs" />
+    <Compile Include="Views\Main\Coupon\Machine\MachineService.cs" />
+    <Compile Include="Views\Main\Coupon\Machine\MachineType.cs" />
+    <Compile Include="Views\Main\IMainItem.cs" />
+    <Compile Include="Views\Main\MainForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\Main\MainForm.Designer.cs">
+      <DependentUpon>MainForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Main\MainItems\CouponMainItem.cs" />
+    <Compile Include="Views\Main\MainItems\Hkd5CoinExchangeMainItem.cs" />
+    <Compile Include="Views\PaidBy\CardItemProperty.cs" />
+    <Compile Include="Views\PaidBy\Dialog\AlertSuccessfullyUI.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Views\PaidBy\Dialog\ScanWaitingUI.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Views\PaidBy\IPaidByItem.cs" />
+    <Compile Include="Views\PaidBy\IPaidByOctopusItem.cs" />
+    <Compile Include="Views\PaidBy\Machine\IMachineService.cs" />
+    <Compile Include="Views\PaidBy\Machine\MachineService.cs" />
+    <Compile Include="Views\PaidBy\Machine\MachineType.cs" />
+    <Compile Include="Views\PaidBy\Machine\Octopus\Email\EmailService.cs" />
+    <Compile Include="Views\PaidBy\Machine\Octopus\Email\IEmailService.cs" />
+    <Compile Include="Views\PaidBy\Machine\Octopus\IOctopusService.cs" />
+    <Compile Include="Views\PaidBy\Machine\Octopus\OctopusConfigModel.cs" />
+    <Compile Include="Views\PaidBy\Machine\Octopus\OctopusPaymentResponseModel.cs" />
+    <Compile Include="Views\PaidBy\Machine\Octopus\OctopusService.cs" />
+    <Compile Include="Views\PaidBy\Machine\Octopus\OctopusLibrary.cs" />
+    <Compile Include="Views\PaidBy\Machine\Octopus\ResponseCodeModel.cs" />
+    <Compile Include="Views\PaidBy\PaidByForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\PaidBy\PaidByForm.Designer.cs">
+      <DependentUpon>PaidByForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Views\PaidBy\PaidByItems\Enum\PaymentType.cs" />
+    <Compile Include="Views\PaidBy\Service\Eft\EftPayRequestModel.cs" />
+    <Compile Include="Views\PaidBy\Service\Eft\EftPayResponseModel.cs" />
+    <Compile Include="Views\PaidBy\PaidByItems\Model\StatisticsModel.cs" />
+    <Compile Include="Views\PaidBy\PaidByItems\PayMePaidByItem.cs" />
+    <Compile Include="Views\PaidBy\PaidByItems\AliPayPaidByItem.cs" />
+    <Compile Include="Views\PaidBy\PaidByItems\OctopusPaidByItem.cs" />
+    <Compile Include="Views\PaidBy\Service\Eft\ErrorCodeModel.cs" />
+    <Compile Include="Views\PaidBy\Service\Eft\ResponseCodeModel.cs" />
+    <Compile Include="Views\PaidBy\Service\IShopService.cs" />
+    <Compile Include="Views\PaidBy\Service\Model\OrderModel.cs" />
+    <Compile Include="Views\PaidBy\Service\OctopusService.cs" />
+    <Compile Include="Views\PaidBy\Service\Octopus\OctopusRequestModel.cs" />
+    <Compile Include="Views\PaidBy\Service\Octopus\OctopusResponseModel.cs" />
+    <Compile Include="Views\PaidBy\Service\Octopus\PaymentModel.cs" />
+    <Compile Include="Views\PaidBy\Service\PaymeService.cs" />
+    <Compile Include="Views\PaidBy\Service\AlipayService.cs" />
+    <Compile Include="Views\PaidBy\Service\Eft\EftPayService.cs" />
+    <Compile Include="Views\PaidBy\Service\Eft\IEftPayService.cs" />
+    <Compile Include="Views\PaidBy\Service\IPaidByService.cs" />
+    <Compile Include="Views\PaidBy\Service\ShopService.cs" />
+    <Compile Include="Views\Payment\CardItemProperty.cs" />
+    <Compile Include="Views\Payment\IPaymentItem.cs" />
+    <Compile Include="Views\Payment\IPaymentService.cs" />
+    <Compile Include="Views\Payment\Machine\IMachineService.cs" />
+    <Compile Include="Views\Payment\Machine\MachineService.cs" />
+    <Compile Include="Views\Payment\PaymentForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\Payment\PaymentForm.Designer.cs">
+      <DependentUpon>PaymentForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Payment\PaymentItems\Hkd10PaymentItem.cs" />
+    <Compile Include="Views\Payment\PaymentItems\Hkd500PaymentItem.cs" />
+    <Compile Include="Views\Payment\PaymentItems\Hkd100PaymentItem.cs" />
+    <Compile Include="Views\Payment\PaymentItems\Hkd50PaymentItem.cs" />
+    <Compile Include="Views\Payment\PaymentItems\Hkd20PaymentItem.cs" />
+    <Compile Include="Views\Payment\PaymentService.cs" />
+    <Compile Include="Views\Shop\Model\ShopModel.cs" />
+    <Compile Include="Views\Shop\Model\ShopSettingModel.cs" />
+    <Compile Include="Views\Shop\Service\IShopService.cs" />
+    <Compile Include="Views\Shop\Service\ShopService.cs" />
+    <Compile Include="Views\Shop\SignInShopForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\Shop\SignInShopForm.Designer.cs">
+      <DependentUpon>SignInShopForm.cs</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <EmbeddedResource Include="Views\Login\LoginForm.resx">
+      <DependentUpon>LoginForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <None Include="Database\money2coins.db">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="lib\EFTPaymentsServer.dll.config" />
+    <None Include="lib\System.Data.SQLite.dll.config" />
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="lib\EFTPaymentsServer.dll" />
+    <Content Include="lib\EFTPaymentsServer.pdb" />
+    <Content Include="lib\System.Data.SQLite.dll" />
+    <Content Include="SecurityKeys\rsaPrivateKey.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SecurityKeys\rsaPublicKey.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.6">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4.6 %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Microsoft.Web.WebView2.1.0.1210.39\build\Microsoft.Web.WebView2.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Web.WebView2.1.0.1210.39\build\Microsoft.Web.WebView2.targets'))" />
+  </Target>
+</Project>

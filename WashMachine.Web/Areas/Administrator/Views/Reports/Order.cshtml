@@ -1,0 +1,163 @@
+﻿@using WashMachine.Business
+@using WashMachine.Business.Models
+@model OrderReportDataModel
+@{
+    ViewData["Title"] = "Order Reports";
+}
+<style>
+    #order_list_wrapper {
+        padding: 0px !important;
+    }
+</style>
+<div class="mannager-content">
+    <div class="row">
+        <div class="col-md-12">
+            <form id="filter_form" action="/administrator/reports/order" method="get">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Search criteria</h5>
+                        <div class="row" style="margin-top: 15px;">
+                            <div class="col-md-12">
+                                <input class="form-control" name="Filter.@(nameof(Model.Filter.SearchCriteria))" maxlength="500" value="@Model.Filter.SearchCriteria" placeholder="Payment Method, Shop Name, Shop Code..." />
+                            </div>
+                        </div>
+                        <div class="row" style="margin-top: 15px;">
+                            <div class="col-md-6">
+                                <label for="FromDate">From Date</label>
+                                <input id="FromDate" name="Filter.@(nameof(Model.Filter.FromDate))" class="form-control datepicker" type="text" value="@Model.Filter.FromDate" placeholder="From date" autocomplete="off" />
+                            </div>
+                            <div class="col-md-6">
+                                <label for="FromDate">To Date</label>
+                                <input id="ToDate" name="Filter.@(nameof(Model.Filter.ToDate))" class="form-control datepicker" type="text" value="@Model.Filter.ToDate" placeholder="To date" autocomplete="off" />
+                            </div>
+                        </div>
+                        <div class="row" style="margin-top: 15px;">
+                            <div class="col-md-6">
+                                <label for="ShopCode">Shop Code</label>
+                                @Html.DropDownList($"Filter.{nameof(Model.Filter.ShopCode)}", Model.Filter.ShopCodeList.Select(s => new SelectListItem()
+                           {
+                               Text = s,
+                               Value = s,
+                               Selected = s.Equals(Model.Filter.ShopCode)
+                           }).ToList(), "---Select an option---", new { @class = "form-control" })
+                            </div>
+                            <div class="col-md-6">
+                                <label for="ShopCode">Payment Method</label>
+                                @Html.DropDownList($"Filter.{nameof(Model.Filter.PaymentMethod)}", new List<SelectListItem>(){
+                                new SelectListItem() { Value = "Alipay", Text = "Alipay", Selected = "Alipay".Equals(Model.Filter.PaymentMethod) },
+                                new SelectListItem() { Value = "Octopus", Text = "Octopus", Selected = "Octopus".Equals(Model.Filter.PaymentMethod) },
+                                new SelectListItem() { Value = "Payme", Text = "Payme", Selected = "Payme".Equals(Model.Filter.PaymentMethod) },
+                                }, "---Select an option---", new { @class = "form-control" })
+                            </div>
+                        </div>
+                        <div class="row" style="margin-top: 15px;">
+                            <div class="col-md-12">
+                                <div style="float:right;" class="pull-right">
+                                    <button type="button" onclick="clearFilter()" class="btn btn-secondary"><i class="fa fa-redo"></i> Clear </button>
+                                    <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i> Search </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5><i class="far fa-money-bill-alt"></i> Orders</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Total: @(Model.Total)</h6>
+                        </div>
+                        <div class="col-md-6" style="text-align: right;">
+                            <button type="button" class="btn btn-success text-white" id="btn_export_excel"><i class="fas fa-file-excel"></i> Export </button>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <table class="table" id="order_list">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Shop Code</th>
+                                        <th>Shop Name</th>
+                                        <th>Machine Code</th>
+                                        <th>Date</th>
+                                        <th>Location</th>
+                                        <th>Payment Method</th>
+                                        <th>Amount</th>
+                                        <th>Status</th>
+                                        <th>Messenger</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @{
+                                        int index = 1;
+                                        foreach (OrderModel order in Model.Orders)
+                                        {
+                                            <tr>
+                                                <td>@index</td>
+                                                <td>@order.ShopCode</td>
+                                                <td>@order.ShopName</td>
+                                                <td>@order.DeviceId</td>
+                                                <td>@order.InsertTime.Value.ToString("MM/dd/yyyy hh:mm:ss tt")</td>
+                                                <td>@order.Location</td>
+                                                <td>@order.PaymentTypeName</td>
+                                                <td>@order.Amount</td>
+                                                <td>@(order.PaymentStatus == (int)(PaymentStatus.Paid) ? "Success" : "Failed")</td>
+                                                <td>@(order.PaymentStatus == (int)(PaymentStatus.Paid) ? "OK" : "")</td>
+                                            </tr>
+                                            index += 1;
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('#order_list').DataTable({
+            searching: false,
+            dom: 'rtip',
+            info: false
+        });
+
+        $('#btn_export_excel').click(function () {
+            var data = $('#filter_form').serializeArray();
+
+            $.ajax({
+                type: "POST",
+                url: "/administrator/reports/OrderExportToExcel",
+                xhrFields: {
+                    responseType: 'blob'
+                },
+                data: data,
+                success: function (data) {
+                    var a = document.createElement('a');
+                    var url = window.URL.createObjectURL(data);
+                    a.href = url;
+                    a.download = 'OrderReport.xlsx';
+                    document.body.append(a);
+                    a.click();
+                    a.remove();
+                    window.URL.revokeObjectURL(url);
+                }
+            });
+        });
+    });
+
+    function clearFilter() {
+        $('#filter_form input').val('');
+        $('#filter_form select').val('');
+        $('#filter_form').submit();
+    }
+</script>

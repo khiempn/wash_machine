@@ -1,0 +1,172 @@
+﻿@media not print {
+    .print {
+        border: 1px dashed #ebebf3;
+        margin: auto;
+        max-width: 100%;
+    }
+}
+@media print {
+    body > div{
+        display: none !important;
+    }
+    body > .print {
+        display: block !important;
+        max-width: unset;
+    }
+    body {
+        padding: 0;
+        margin:0;
+        /*border: solid 1px blue;*/
+        min-width: unset !important;
+        max-width: 100px;
+    }
+    @page {
+        size: auto; /* auto is the current printer page size */
+        margin: 0px; /* this affects the margin in the printer settings */
+    }
+    @page :footer {
+        display: none
+    }
+    @page :header {
+        display: none
+    }
+
+    .invoice-black {
+        display: inline-block;
+        border: 2px solid #000;
+        font-size: larger;
+        font-weight: bold;
+        background-color: #000 !important;
+        -webkit-print-color-adjust: exact;
+        color: white !important;
+        padding: 4px;
+    }
+}
+
+td, th {
+    border: 1px solid black;
+}
+.notborder td, .notborder th {
+    border: none;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+img{max-width: 100%;}
+.print {
+    /*border: 1px dotted blue;*/
+    width: 115mm;
+    text-align: center;
+    box-sizing: border-box;
+    background: #fff;
+}
+.print-wap {
+    /*border: dashed 1px #567;*/
+    /*max-width: 300px;
+    margin-left: 50px;
+    box-sizing: border-box;*/
+}
+.invoice-header {
+    font-size: x-large;
+    text-align: center;
+    margin: auto;
+    max-width: 150px;
+}
+.invoice-time{
+    text-align: center;
+}
+.invoice-shop{
+    padding: 4px;
+    text-align: center;
+    font-size:larger;
+}
+.invoice-queue {
+    text-align: center;
+    font-size: 90px;
+    line-height: 70px;
+    padding-top: 20px;
+}
+.queue-number {
+    font-size: 80px;
+    display: inline-block;
+    margin: 10px;
+}
+.invoice-notes {
+    text-align: center;
+    font-style: italic;
+    font-size: smaller;
+    padding: 20px 0;
+}
+.invoice-no {
+    font-style: italic;
+    font-size: smaller;
+    text-align: right;
+    padding: 6px;
+}
+.invoice-table{
+    margin: 10px 0;
+}
+.invoice-table th{
+    font-weight: bold;
+}
+.invoice-table th, .invoice-table td{
+    padding: 6px;
+}
+.invoice-qr{
+    width: 200px;
+    margin: auto;
+}
+.note-01 {
+    padding: 6px 0;
+}
+.note-03 {
+    border-top: 1px dashed #000;
+    border-bottom: 1px dashed #000;
+    padding: 12px 0;
+    margin: 12px auto;
+    text-align: left;
+}
+.note-05 {
+    border-bottom: 1px dashed #000;
+    margin: auto;
+    text-align: left;
+    padding: 4px 0;
+    padding-bottom: 12px;
+    margin-bottom: 12px
+}
+.note-04 {
+    margin: auto;
+    text-align: left;
+    padding: 4px 0;
+}
+
+.note-06 {
+    border-top: 1px dashed #000;
+    padding: 12px 0;
+    margin: 12px auto;
+    text-align: left;
+    font-size: small;
+}
+.invoice-black{
+    display: inline-block;
+    background: #000;
+    color: #fff;
+    padding: 4px;
+}
+.invoice-item{
+    padding: 4px 0;
+}
+.preview-print > div{
+    display: none;
+}
+.preview-print .print, .preview-print .boomer {
+    display: block;
+    position: relative;
+}
+.preview-print .boom  {
+    position: relative;
+}
+.preview-print .boom-cover {
+    display: none;
+}

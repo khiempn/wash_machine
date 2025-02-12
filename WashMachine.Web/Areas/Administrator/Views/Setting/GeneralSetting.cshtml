@@ -1,0 +1,111 @@
+﻿@model WashMachine.Business.Models.SettingModel
+@{
+    ViewData["Title"] = "System settings";
+    ViewBag.PageType = PageTypes.Setting;
+}
+<style>
+    .module-item {
+        height: 100px;
+        display: flex;
+    }
+</style>
+<div class="mannager-content">
+    <div class="manager-list">
+        <nav>
+            <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                <a class="nav-link active" data-toggle="tab" href="#nav-01" role="tab" aria-controls="nav-home" aria-selected="true">Image for application</a>
+                @* <a class="nav-link" data-toggle="tab" href="#nav-04" role="tab" aria-controls="nav-profile" aria-selected="false">Other setting</a> *@
+            </div>
+        </nav>
+        <div class="tab-content w-100" id="nav-tabContent" style="padding: 15px">
+            <form class="body-content" action="/administrator/setting/GeneralSetting" name="form" enctype="multipart/form-data" method="post">
+                <div class="tab-pane box-15 fade show active" id="nav-01" role="tabpanel" aria-labelledby="nav-home-tab">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="group-title">Main screen</h5>
+                                <div class="">
+                                    <div class="row">
+                                        <div class="col-sm-4">
+                                            <div class="image-selecting">
+                                                <p>Coupon Scan Image</p>
+                                                <div class="module-item" onclick="selectFile()">
+                                                    <img src="@Model.CouponScanPath" />
+                                                </div>
+                                                <input style="margin-top: 5px" class="none" name="@(nameof(Model.CouponScanFile))" onchange="showImage()" type="file">
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <div class="image-selecting">
+                                                <p>Alipay Scan Image</p>
+                                                <div class="module-item" onclick="selectFile()">
+                                                    <img src="@Model.AlipayScanPath" />
+                                                </div>
+                                                <input style="margin-top: 5px" class="none" name="@(nameof(Model.AlipayScanFile))" onchange="showImage()" type="file">
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <div class="image-selecting">
+                                                <p>Octopus Scan Image</p>
+                                                <div class="module-item" onclick="selectFile()">
+                                                    <img src="@Model.OctopusScanPath" />
+                                                </div>
+                                                <input style="margin-top: 5px" class="none" name="@(nameof(Model.OctopusScanFile))" onchange="showImage()" type="file">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row" style="padding-top: 20px;">
+                                        <div class="col-sm-4">
+                                            <div class="image-selecting">
+                                                <p>Payme Scan Image</p>
+                                                <div class="module-item" onclick="selectFile()">
+                                                    <img src="@Model.PaymeScanPath" />
+                                                </div>
+                                                <input style="margin-top: 5px" class="none" name="@(nameof(Model.PaymeScanFile))" onchange="showImage()" type="file">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row" style="padding-top: 20px;">
+                                        <div class="col-sm-4">
+                                            <div class="image-selecting">
+                                                <p>Alipay Payment Image</p>
+                                                <div class="module-item" onclick="selectFile()">
+                                                    <img src="@Model.AlipayPaymentnPath" />
+                                                </div>
+                                                <input style="margin-top: 5px" class="none" name="@(nameof(Model.AlipayPaymentFile))" onchange="showImage()" type="file">
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <div class="image-selecting">
+                                                <p>Octopus Payment Image</p>
+                                                <div class="module-item" onclick="selectFile()">
+                                                    <img src="@Model.OctopusPaymentPath" />
+                                                </div>
+                                                <input style="margin-top: 5px" class="none" name="@(nameof(Model.OctopusPaymentFile))" onchange="showImage()" type="file">
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <div class="image-selecting">
+                                                <p>Payme Payment Image</p>
+                                                <div class="module-item" onclick="selectFile()">
+                                                    <img src="@Model.PaymePaymentPath" />
+                                                </div>
+                                                <input style="margin-top: 5px" class="none" name="@(nameof(Model.PaymePaymentFile))" onchange="showImage()" type="file">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-button" style="float:right">
+                    <a class="btn btn-secondary" href="@Context.GetBaseUrl()">Back</a>
+                    <button class="btn btn-primary"><i class="far fa-save"></i> Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="form-editor wap-500">
+    </div>
+</div>

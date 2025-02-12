@@ -1,0 +1,117 @@
+﻿@model ShopManagerModel
+@{
+    ViewData["Title"] = "Shops";
+    var systemInfo = Context.GetSystemInfo();
+}
+<style>
+    #shop_list_wrapper {
+        padding: 0px !important;
+    }
+</style>
+<div class="mannager-content">
+    <div class="row">
+        <div class="col-md-12">
+            <form id="filter_form" action="/administrator/shops/listshops" method="get">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Search criteria</h5>
+                        <div class="row" style="margin-top: 15px;">
+                            <div class="col-md-12">
+                                <input class="form-control" name="Filter.@(nameof(Model.Filter.SearchCriteria))" maxlength="500" value="@Model.Filter.SearchCriteria" placeholder="Shop Name, Shop Code..." />
+                            </div>
+                        </div>
+                        <div class="row" style="margin-top: 15px;">
+                            <div class="col-md-6">
+                                <label for="FromDate">From Date</label>
+                                <input id="FromDate" name="Filter.@(nameof(Model.Filter.FromDate))" class="form-control datepicker" type="text" value="@Model.Filter.FromDate" placeholder="From date" autocomplete="off" />
+                            </div>
+                            <div class="col-md-6">
+                                <label for="FromDate">To Date</label>
+                                <input id="ToDate" name="Filter.@(nameof(Model.Filter.ToDate))" class="form-control datepicker" type="text" value="@Model.Filter.ToDate" placeholder="To date" autocomplete="off" />
+                            </div>
+                        </div>
+                        <div class="row" style="margin-top: 15px;">
+                            <div class="col-md-12">
+                                <div style="float:right;" class="pull-right">
+                                    <button type="button" onclick="clearFilter()" class="btn btn-secondary"><i class="fa fa-redo"></i> Clear </button>
+                                    <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i> Search </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5><i class="fas fa-shopping-cart"></i> Shops</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Total: @(Model.Total)</h6>
+                        </div>
+                        <div class="col-md-6" style="text-align: right;">
+                            @if (systemInfo.User.IsAdmin)
+                            {
+                                <button class="btn btn-primary text-white" onclick="location.href='/administrator/shops/shopeditor?backlink=@Html.GetUriEncode()'"><i class="fas fa-plus-circle"></i> Create shop</button>
+                            }
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <table class="table" id="shop_list">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Shop Code</th>
+                                        <th>Shop Name</th>
+                                        <th>Status</th>
+                                        <th>Created Date</th>
+                                        <th width="120">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @{
+                                        int index = 1;
+                                        foreach (var item in Model.Shops)
+                                        {
+                                            <tr>
+                                                <td>@index</td>
+                                                <td>@item.Code</td>
+                                                <td>@item.Name</td>
+                                                <td>@(item.Status == 1 ? "Active" : "Inactive")</td>
+                                                <td>@(item.InsertTime?.ToString("MM/dd/yyyy hh:mm:ss tt"))</td>
+                                                <td>
+                                                    <a class="grid-button" title="Edit Shop" href="/administrator/shops/shopeditor?id=@item.Id&backlink=@Html.GetUriEncode()"><i class="fas fa-edit"></i></a>
+                                                </td>
+                                            </tr>
+                                            index++;
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('#shop_list').DataTable({
+            searching: false,
+            dom: 'rtip',
+            info: false
+        });
+    });
+
+    function clearFilter() {
+        $('#filter_form input').val('');
+        $('#filter_form select').val('');
+        $('#filter_form').submit();
+    }
+</script>

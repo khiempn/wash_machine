@@ -1,0 +1,397 @@
+﻿@model WashMachine.Business.Models.ShopModel
+@{
+    ViewData["Title"] = Model.Id > 0 ? "Shop Editor" : "Create New Shop";
+    if (Model.ShopUsers == null)
+    {
+        Model.ShopUsers = new List<WashMachine.Business.Models.UserModel>();
+    }
+    var systemInfo = Context.GetSystemInfo();
+}
+
+<div class="manager-list">
+    <nav>
+        <div class="nav nav-tabs" id="nav-tab" role="tablist">
+            <a class="nav-link active" data-toggle="tab" href="#nav-01" role="tab" aria-controls="nav-home" aria-selected="true">Information</a>
+        </div>
+    </nav>
+    <div class="tab-content w-100" id="nav-tabContent" style="padding: 15px">
+        <form class="body-content" action="@Html.GetUri()" name="form" enctype="multipart/form-data" method="post">
+            <div class="tab-pane box-15 fade show active" id="nav-01" role="tabpanel" aria-labelledby="nav-home-tab">
+
+                <div class="form-group row">
+                    <label class="col-sm-2 col-form-label">Shop name</label>
+                    <div class="col-sm-10 form-item">
+                        @Html.TextBoxFor(model => model.Name, new { @class = "form-control", autocomplete = "off", placeholder = "Shop name" })
+                        @Html.ValidationMessageFor(model => model.Name)
+                        @Html.HiddenFor(m => m.Id)
+                    </div>
+                </div>
+                <div class="row">
+
+                    <div class="col-md-6 none">
+                        <div class="form-group row">
+                            <label class="col-sm-4 col-form-label">Short name</label>
+                            <div class="col-sm-8 form-item">
+                                @Html.TextBoxFor(model => model.ShortName, new { @class = "form-control", autocomplete = "off", placeholder = "Short name" })
+                                @Html.ValidationMessageFor(model => model.ShortName)
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-form-label">Shop code</label>
+                            <div class="col-sm-10 form-item">
+                                @if (Model.Id == 0 || true)
+                                {
+                                    @Html.TextBoxFor(model => model.Code, new { @class = "form-control alphanumeric", @type = "number", maxlength = "3", autocomplete = "off", placeholder = "Shop code" })
+                                    @Html.ValidationMessageFor(model => model.Code)
+                                }
+                                else
+                                {
+                                    @Html.TextBoxFor(model => model.Code, new { @class = "form-control alphanumeric", @type = "number", @readonly = "true", autocomplete = "off", placeholder = "Shop code" })
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group row">
+                            <label class="col-sm-4 col-form-label">Address</label>
+                            <div class="col-sm-8 form-item">
+                                @Html.TextBoxFor(model => model.Address, new { @class = "form-control", autocomplete = "off", placeholder = "Shop address" })
+                                @Html.ValidationMessageFor(model => model.Address)
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group row">
+                            <label class="col-sm-4 col-form-label">Email</label>
+                            <div class="col-sm-8 form-item">
+                                @Html.TextBoxFor(model => model.Email, new { @class = "form-control", autocomplete = "off", placeholder = "Email's owner" })
+                                @Html.ValidationMessageFor(model => model.Email)
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-form-label">Phone</label>
+                            <div class="col-sm-10 form-item">
+                                @Html.TextBoxFor(model => model.Phone, new { @class = "form-control", autocomplete = "off", placeholder = "Phone number" })
+                                @Html.ValidationMessageFor(model => model.Phone)
+                            </div>
+                        </div>
+                    </div>
+
+                    @if (systemInfo.User.IsAdmin)
+                    {
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label class="col-sm-4 col-form-label">Status</label>
+                                <div class="col-sm-8 form-item">
+                                    @Html.DropDownList("Status", new List<SelectListItem> {
+                                new SelectListItem { Value = "1", Text = "Active", Selected = (Model.Status == 1) },
+                                new SelectListItem { Value = "2", Text = "Inactive", Selected = (Model.Status == 2) }
+                                }, "---Select an option---", new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(model => model.Status)
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    <div class="col-md-12">
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-form-label">Notes</label>
+                            <div class="col-sm-10 form-item">
+                                @Html.TextAreaFor(model => model.Notes, new { @class = "form-control", autocomplete = "off", placeholder = "Notes" })
+                                @Html.ValidationMessageFor(model => model.Notes)
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="row">
+
+                    <div class="col-md-6 none">
+                        <div class="form-group row">
+                            <label class="col-sm-4 col-form-label">Machine Code</label>
+                            <div class="col-sm-8 form-item">
+                                @Html.TextBoxFor(model => model.MachineCode, new { @class = "form-control", autocomplete = "off", placeholder = "Machine Code" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group row">
+                            <label class="col-sm-4 col-form-label">Location</label>
+                            <div class="col-sm-8 form-item">
+                                @Html.TextBoxFor(model => model.Location, new { @class = "form-control", autocomplete = "off", placeholder = "Location" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Dollar COM</h5>
+                                <input hidden name="DollarCom.ComType" value="DollarCom" />
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group row">
+                                            <label class="col-sm-4 col-form-label">COM Name</label>
+                                            <div class="col-sm-8 form-item">
+                                                @Html.TextBoxFor(model => model.DollarCom.ComName, new { @class = "form-control", autocomplete = "off", placeholder = "COM Name" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group row">
+                                            <label class="col-sm-4 col-form-label">Baud Rate</label>
+                                            <div class="col-sm-8 form-item">
+                                                @Html.TextBoxFor(model => model.DollarCom.BaudRate, new { @class = "form-control", autocomplete = "off", placeholder = "Baud Rate" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group row">
+                                            <label class="col-sm-4 col-form-label">Parity</label>
+                                            <div class="col-sm-8 form-item">
+                                                @Html.DropDownList("DollarCom.Parity", new List<SelectListItem> {
+                                                new SelectListItem { Value = "None", Text = "None", Selected = (Model.DollarCom.Parity == "None") },
+                                                new SelectListItem { Value = "Odd", Text = "Odd", Selected = (Model.DollarCom.Parity == "Odd") },
+                                                new SelectListItem { Value = "Even", Text = "Even", Selected = (Model.DollarCom.Parity == "Even") },
+                                                new SelectListItem { Value = "Mark", Text = "Mark", Selected = (Model.DollarCom.Parity == "Mark") },
+                                                new SelectListItem { Value = "Space", Text = "Space", Selected = (Model.DollarCom.Parity == "Space") }
+                                                }, "---Select an option---", new { @class = "form-control" })
+                                                @Html.ValidationMessageFor(model => model.DollarCom.Parity)
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group row">
+                                            <label class="col-sm-4 col-form-label">Data</label>
+                                            <div class="col-sm-8 form-item">
+                                                @Html.TextBoxFor(model => model.DollarCom.Data, new { @class = "form-control", autocomplete = "off", placeholder = "Data" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group row">
+                                            <label class="col-sm-4 col-form-label">StopBits</label>
+                                            <div class="col-sm-8 form-item">
+                                                @Html.DropDownList("DollarCom.StopBits", new List<SelectListItem> {
+                                                new SelectListItem { Value = "None", Text = "None", Selected = (Model.DollarCom.StopBits == "None") },
+                                                new SelectListItem { Value = "One", Text = "One", Selected = (Model.DollarCom.StopBits == "One") },
+                                                new SelectListItem { Value = "Two", Text = "Two", Selected = (Model.DollarCom.StopBits == "Two") },
+                                                new SelectListItem { Value = "OnePointFive", Text = "OnePointFive", Selected = (Model.DollarCom.StopBits == "OnePointFive") }
+                                                }, "---Select an option---", new { @class = "form-control" })
+                                                @Html.ValidationMessageFor(model => model.DollarCom.StopBits)
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Coupon COM</h5>
+                                <input hidden name="CouponCom.ComType" value="CouponCom" />
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group row">
+                                            <label class="col-sm-4 col-form-label">COM Name</label>
+                                            <div class="col-sm-8 form-item">
+                                                @Html.TextBoxFor(model => model.CouponCom.ComName, new { @class = "form-control", autocomplete = "off", placeholder = "COM Name" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group row">
+                                            <label class="col-sm-4 col-form-label">Baud Rate</label>
+                                            <div class="col-sm-8 form-item">
+                                                @Html.TextBoxFor(model => model.CouponCom.BaudRate, new { @class = "form-control", autocomplete = "off", placeholder = "Baud Rate" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group row">
+                                            <label class="col-sm-4 col-form-label">Parity</label>
+                                            <div class="col-sm-8 form-item">
+                                                @Html.DropDownList("CouponCom.Parity", new List<SelectListItem>
+                                                {
+                                                new SelectListItem { Value = "None", Text = "None", Selected = (Model.CouponCom.Parity == "None") },
+                                                new SelectListItem { Value = "Odd", Text = "Odd", Selected = (Model.CouponCom.Parity == "Odd") },
+                                                new SelectListItem { Value = "Even", Text = "Even", Selected = (Model.CouponCom.Parity == "Even") },
+                                                new SelectListItem { Value = "Mark", Text = "Mark", Selected = (Model.CouponCom.Parity == "Mark") },
+                                                new SelectListItem { Value = "Space", Text = "Space", Selected = (Model.CouponCom.Parity == "Space") }
+                                                }, "---Select an option---", new { @class = "form-control" })
+                                                @Html.ValidationMessageFor(model => model.CouponCom.Parity)
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group row">
+                                            <label class="col-sm-4 col-form-label">Data</label>
+                                            <div class="col-sm-8 form-item">
+                                                @Html.TextBoxFor(model => model.CouponCom.Data, new { @class = "form-control", autocomplete = "off", placeholder = "Data" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group row">
+                                            <label class="col-sm-4 col-form-label">StopBits</label>
+                                            <div class="col-sm-8 form-item">
+                                                @Html.DropDownList("CouponCom.StopBits", new List<SelectListItem> {
+                                                new SelectListItem { Value = "None", Text = "None", Selected = (Model.CouponCom.StopBits == "None") },
+                                                new SelectListItem { Value = "One", Text = "One", Selected = (Model.CouponCom.StopBits == "One") },
+                                                new SelectListItem { Value = "Two", Text = "Two", Selected = (Model.CouponCom.StopBits == "Two") },
+                                                new SelectListItem { Value = "OnePointFive", Text = "OnePointFive", Selected = (Model.CouponCom.StopBits == "OnePointFive") }
+                                                }, "---Select an option---", new { @class = "form-control" })
+                                                @Html.ValidationMessageFor(model => model.CouponCom.StopBits)
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Octopus COM</h5>
+                                <input hidden name="OctopusCom.ComType" value="OctopusCom" />
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group row">
+                                            <label class="col-sm-4 col-form-label">COM Name</label>
+                                            <div class="col-sm-8 form-item">
+                                                @Html.TextBoxFor(model => model.OctopusCom.ComName, new { @class = "form-control", autocomplete = "off", placeholder = "COM Name" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group row">
+                                            <label class="col-sm-4 col-form-label">Baud Rate</label>
+                                            <div class="col-sm-8 form-item">
+                                                @Html.TextBoxFor(model => model.OctopusCom.BaudRate, new { @class = "form-control", autocomplete = "off", placeholder = "Baud Rate" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group row">
+                                            <label class="col-sm-4 col-form-label">Parity</label>
+                                            <div class="col-sm-8 form-item">
+                                                @Html.DropDownList("OctopusCom.Parity", new List<SelectListItem> {
+                                                new SelectListItem { Value = "None", Text = "None", Selected = (Model.OctopusCom.Parity == "None") },
+                                                new SelectListItem { Value = "Odd", Text = "Odd", Selected = (Model.OctopusCom.Parity == "Odd") },
+                                                new SelectListItem { Value = "Even", Text = "Even", Selected = (Model.OctopusCom.Parity == "Even") },
+                                                new SelectListItem { Value = "Mark", Text = "Mark", Selected = (Model.OctopusCom.Parity == "Mark") },
+                                                new SelectListItem { Value = "Space", Text = "Space", Selected = (Model.OctopusCom.Parity == "Space") }
+                                                }, "---Select an option---", new { @class = "form-control" })
+                                                @Html.ValidationMessageFor(model => model.OctopusCom.Parity)
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group row">
+                                            <label class="col-sm-4 col-form-label">Data</label>
+                                            <div class="col-sm-8 form-item">
+                                                @Html.TextBoxFor(model => model.OctopusCom.Data, new { @class = "form-control", autocomplete = "off", placeholder = "Data" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group row">
+                                            <label class="col-sm-4 col-form-label">StopBits</label>
+                                            <div class="col-sm-8 form-item">
+                                                @Html.DropDownList("OctopusCom.StopBits", new List<SelectListItem> {
+                                                new SelectListItem { Value = "None", Text = "None", Selected = (Model.OctopusCom.StopBits == "None") },
+                                                new SelectListItem { Value = "One", Text = "One", Selected = (Model.OctopusCom.StopBits == "One") },
+                                                new SelectListItem { Value = "Two", Text = "Two", Selected = (Model.OctopusCom.StopBits == "Two") },
+                                                new SelectListItem { Value = "OnePointFive", Text = "OnePointFive", Selected = (Model.OctopusCom.StopBits == "OnePointFive") }
+                                                }, "---Select an option---", new { @class = "form-control" })
+                                                @Html.ValidationMessageFor(model => model.OctopusCom.StopBits)
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">List users</h5>
+                                <p>Total: <b>@Model.ShopUsers.Count</b></p>
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">#</th>
+                                            <th scope="col">Email</th>
+                                            <th scope="col">Phone</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{
+                                            int index = 1;
+                                        }
+                                        @foreach (var item in Model.ShopUsers)
+                                        {
+                                            <tr>
+                                                <th scope="row">@index</th>
+                                                <td>@item.Email</td>
+                                                <td>@item.Phone</td>
+                                            </tr>
+                                            index++;
+                                        }
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td rowspan="3">
+                                                @if (systemInfo.User.IsAdmin)
+                                                {
+                                                    <a href="javascript:;" class="shop-adduser" onclick="openPopupForm('/administrator/shops/shopusers?id=@Model.Id')">
+                                                        <i class="far fa-edit"></i> Edit
+                                                    </a>
+                                                }
+                                            </td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-button" style="float: right">
+                <a class="btn btn-secondary" href="@Context.GetBaseUrl()@Model.BackLink">Back</a>
+                <button class="btn btn-primary" type="submit"><i class="far fa-save"></i> Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+

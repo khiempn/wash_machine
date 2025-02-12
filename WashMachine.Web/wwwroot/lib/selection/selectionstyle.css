@@ -1,0 +1,70 @@
+﻿.select-types:before {
+    position: absolute;
+    content: "\f107";
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    right: 8px;
+    top: 6px;
+    cursor: pointer;
+}
+.select-types > ul {
+    position: absolute;
+    background: #fff;
+    border: 1px solid #9eb1ef;
+    list-style: none;
+    padding: 0 6px;
+    width: 210px;
+    z-index: 2;
+    text-align: left;
+    color: #5d6e80;
+    border-top: none;
+}
+.select-types input{
+    padding-right: 18px;
+    width: 100%;
+}
+.scroll-460 {
+    max-height: 460px;
+    overflow-y: scroll;
+}
+.select-types li {
+    border-top: 1px dashed #bdadad;
+}
+    .select-types li span {
+        display: block;
+        padding: 6px 0;
+    }
+    .select-types li span:hover {
+        background: #eaecf3;
+    }
+.select-types > ul > li:first-child {
+    border-top: none;
+}
+.select-types li li:last-child {
+    padding-bottom: 0;
+}
+.select-types label{
+    position: absolute;
+    border: 1px dotted #666;
+    z-index: -1;
+}
+.select-types img {
+    max-width: 16px;
+    margin-right: 6px;
+}
+.select-types {
+    position: relative;
+    cursor: pointer;
+    outline: none;
+    max-width: 100%;
+}
+.select-types .active > span{
+    font-weight: 600;
+}
+
+.input-extend {
+    width: 60%;
+}
+.button-search{
+    margin-left: 10px;
+}

@@ -1,6 +1,6 @@
-﻿using WashMachine.Forms.Views.Login;
-using WashMachine.Forms.Views.PaidBy.Dialog;
-using WashMachine.Forms.Views.Shop;
+﻿using WashMachine.Forms.Modules.Login;
+using WashMachine.Forms.Modules.PaidBy.Dialog;
+using WashMachine.Forms.Modules.Shop;
 using System;
 using System.IO;
 using System.Windows.Forms;

@@ -1,8 +1,6 @@
-﻿using WashMachine.Forms.Modules.Shop.Model;
-
-namespace WashMachine.Forms
+﻿namespace WashMachine.Forms.Modules.Shop.Model
 {
-    public class ShopConfigModel
+    public class ShopModel
     {
         public int Id { get; set; }
         public string Code { get; set; }
@@ -12,6 +10,5 @@ namespace WashMachine.Forms
         public string Phone { get; set; }
         public string Email { get; set; }
         public ShopSettingModel ShopSetting { get; set; } = new ShopSettingModel();
-
     }
 }

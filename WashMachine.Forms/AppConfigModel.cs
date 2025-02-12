@@ -98,12 +98,12 @@ namespace WashMachine.Forms
                     ShopConfigModel shopConfig = JsonConvert.DeserializeObject<ShopConfigModel>(shopConfigText);
                     if (shopConfig.ShopSetting == null)
                     {
-                        shopConfig.ShopSetting = new Views.Shop.Model.ShopSettingModel();
+                        shopConfig.ShopSetting = new Modules.Shop.Model.ShopSettingModel();
                     }
                     return shopConfig;
                 }
             }
-            return new ShopConfigModel() { ShopSetting = new Views.Shop.Model.ShopSettingModel() };
+            return new ShopConfigModel() { ShopSetting = new Modules.Shop.Model.ShopSettingModel() };
         }
     }
 }

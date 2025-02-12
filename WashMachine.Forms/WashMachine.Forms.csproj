@@ -101,110 +101,113 @@
     </Compile>
     <Compile Include="CryptLibrary.cs" />
     <Compile Include="Logger.cs" />
+    <Compile Include="Modules\Login\Account\AccountService.cs" />
+    <Compile Include="Modules\Login\Account\IAccountService.cs" />
+    <Compile Include="Modules\Login\FollowType.cs" />
+    <Compile Include="Modules\Login\LoginForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Modules\Login\LoginForm.Designer.cs">
+      <DependentUpon>LoginForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Main\CardItemProperty.cs" />
+    <Compile Include="Modules\Main\Coupon\CouponService.cs" />
+    <Compile Include="Modules\Main\Coupon\Dialog\ScanWaitingUI.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Modules\Main\Coupon\ICouponService.cs" />
+    <Compile Include="Modules\Main\Coupon\Machine\IMachineService.cs" />
+    <Compile Include="Modules\Main\Coupon\Machine\MachineService.cs" />
+    <Compile Include="Modules\Main\Coupon\Machine\MachineType.cs" />
+    <Compile Include="Modules\Main\IMainItem.cs" />
+    <Compile Include="Modules\Main\MainForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Modules\Main\MainForm.Designer.cs">
+      <DependentUpon>MainForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Main\MainItems\CouponMainItem.cs" />
+    <Compile Include="Modules\Main\MainItems\Hkd5CoinExchangeMainItem.cs" />
+    <Compile Include="Modules\PaidBy\CardItemProperty.cs" />
+    <Compile Include="Modules\PaidBy\Dialog\AlertSuccessfullyUI.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Modules\PaidBy\Dialog\ScanWaitingUI.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Modules\PaidBy\IPaidByItem.cs" />
+    <Compile Include="Modules\PaidBy\IPaidByOctopusItem.cs" />
+    <Compile Include="Modules\PaidBy\Machine\IMachineService.cs" />
+    <Compile Include="Modules\PaidBy\Machine\MachineService.cs" />
+    <Compile Include="Modules\PaidBy\Machine\MachineType.cs" />
+    <Compile Include="Modules\PaidBy\Machine\Octopus\Email\EmailService.cs" />
+    <Compile Include="Modules\PaidBy\Machine\Octopus\Email\IEmailService.cs" />
+    <Compile Include="Modules\PaidBy\Machine\Octopus\IOctopusService.cs" />
+    <Compile Include="Modules\PaidBy\Machine\Octopus\OctopusConfigModel.cs" />
+    <Compile Include="Modules\PaidBy\Machine\Octopus\OctopusLibrary.cs" />
+    <Compile Include="Modules\PaidBy\Machine\Octopus\OctopusPaymentResponseModel.cs" />
+    <Compile Include="Modules\PaidBy\Machine\Octopus\OctopusService.cs" />
+    <Compile Include="Modules\PaidBy\Machine\Octopus\ResponseCodeModel.cs" />
+    <Compile Include="Modules\PaidBy\PaidByForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Modules\PaidBy\PaidByForm.Designer.cs">
+      <DependentUpon>PaidByForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\PaidBy\PaidByItems\AliPayPaidByItem.cs" />
+    <Compile Include="Modules\PaidBy\PaidByItems\Enum\PaymentType.cs" />
+    <Compile Include="Modules\PaidBy\PaidByItems\Model\StatisticsModel.cs" />
+    <Compile Include="Modules\PaidBy\PaidByItems\OctopusPaidByItem.cs" />
+    <Compile Include="Modules\PaidBy\PaidByItems\PayMePaidByItem.cs" />
+    <Compile Include="Modules\PaidBy\Service\AlipayService.cs" />
+    <Compile Include="Modules\PaidBy\Service\Eft\EftPayRequestModel.cs" />
+    <Compile Include="Modules\PaidBy\Service\Eft\EftPayResponseModel.cs" />
+    <Compile Include="Modules\PaidBy\Service\Eft\EftPayService.cs" />
+    <Compile Include="Modules\PaidBy\Service\Eft\ErrorCodeModel.cs" />
+    <Compile Include="Modules\PaidBy\Service\Eft\IEftPayService.cs" />
+    <Compile Include="Modules\PaidBy\Service\Eft\ResponseCodeModel.cs" />
+    <Compile Include="Modules\PaidBy\Service\IPaidByService.cs" />
+    <Compile Include="Modules\PaidBy\Service\IShopService.cs" />
+    <Compile Include="Modules\PaidBy\Service\Model\OrderModel.cs" />
+    <Compile Include="Modules\PaidBy\Service\OctopusService.cs" />
+    <Compile Include="Modules\PaidBy\Service\Octopus\OctopusRequestModel.cs" />
+    <Compile Include="Modules\PaidBy\Service\Octopus\OctopusResponseModel.cs" />
+    <Compile Include="Modules\PaidBy\Service\Octopus\PaymentModel.cs" />
+    <Compile Include="Modules\PaidBy\Service\PaymeService.cs" />
+    <Compile Include="Modules\PaidBy\Service\ShopService.cs" />
+    <Compile Include="Modules\Payment\CardItemProperty.cs" />
+    <Compile Include="Modules\Payment\IPaymentItem.cs" />
+    <Compile Include="Modules\Payment\IPaymentService.cs" />
+    <Compile Include="Modules\Payment\Machine\IMachineService.cs" />
+    <Compile Include="Modules\Payment\Machine\MachineService.cs" />
+    <Compile Include="Modules\Payment\PaymentForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Modules\Payment\PaymentForm.Designer.cs">
+      <DependentUpon>PaymentForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Payment\PaymentItems\Hkd100PaymentItem.cs" />
+    <Compile Include="Modules\Payment\PaymentItems\Hkd10PaymentItem.cs" />
+    <Compile Include="Modules\Payment\PaymentItems\Hkd20PaymentItem.cs" />
+    <Compile Include="Modules\Payment\PaymentItems\Hkd500PaymentItem.cs" />
+    <Compile Include="Modules\Payment\PaymentItems\Hkd50PaymentItem.cs" />
+    <Compile Include="Modules\Payment\PaymentService.cs" />
+    <Compile Include="Modules\Shop\Model\ShopModel.cs" />
+    <Compile Include="Modules\Shop\Model\ShopSettingModel.cs" />
+    <Compile Include="Modules\Shop\Service\IShopService.cs" />
+    <Compile Include="Modules\Shop\Service\ShopService.cs" />
+    <Compile Include="Modules\Shop\SignInShopForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Modules\Shop\SignInShopForm.Designer.cs">
+      <DependentUpon>SignInShopForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ShopConfigModel.cs" />
-    <Compile Include="Views\Login\Account\AccountService.cs" />
-    <Compile Include="Views\Login\Account\IAccountService.cs" />
-    <Compile Include="Views\Login\FollowType.cs" />
-    <Compile Include="Views\Login\LoginForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Views\Login\LoginForm.Designer.cs">
+    <EmbeddedResource Include="Modules\Login\LoginForm.resx">
       <DependentUpon>LoginForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Views\Main\CardItemProperty.cs" />
-    <Compile Include="Views\Main\Coupon\CouponService.cs" />
-    <Compile Include="Views\Main\Coupon\Dialog\ScanWaitingUI.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Views\Main\Coupon\ICouponService.cs" />
-    <Compile Include="Views\Main\Coupon\Machine\IMachineService.cs" />
-    <Compile Include="Views\Main\Coupon\Machine\MachineService.cs" />
-    <Compile Include="Views\Main\Coupon\Machine\MachineType.cs" />
-    <Compile Include="Views\Main\IMainItem.cs" />
-    <Compile Include="Views\Main\MainForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Views\Main\MainForm.Designer.cs">
-      <DependentUpon>MainForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Views\Main\MainItems\CouponMainItem.cs" />
-    <Compile Include="Views\Main\MainItems\Hkd5CoinExchangeMainItem.cs" />
-    <Compile Include="Views\PaidBy\CardItemProperty.cs" />
-    <Compile Include="Views\PaidBy\Dialog\AlertSuccessfullyUI.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Views\PaidBy\Dialog\ScanWaitingUI.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Views\PaidBy\IPaidByItem.cs" />
-    <Compile Include="Views\PaidBy\IPaidByOctopusItem.cs" />
-    <Compile Include="Views\PaidBy\Machine\IMachineService.cs" />
-    <Compile Include="Views\PaidBy\Machine\MachineService.cs" />
-    <Compile Include="Views\PaidBy\Machine\MachineType.cs" />
-    <Compile Include="Views\PaidBy\Machine\Octopus\Email\EmailService.cs" />
-    <Compile Include="Views\PaidBy\Machine\Octopus\Email\IEmailService.cs" />
-    <Compile Include="Views\PaidBy\Machine\Octopus\IOctopusService.cs" />
-    <Compile Include="Views\PaidBy\Machine\Octopus\OctopusConfigModel.cs" />
-    <Compile Include="Views\PaidBy\Machine\Octopus\OctopusPaymentResponseModel.cs" />
-    <Compile Include="Views\PaidBy\Machine\Octopus\OctopusService.cs" />
-    <Compile Include="Views\PaidBy\Machine\Octopus\OctopusLibrary.cs" />
-    <Compile Include="Views\PaidBy\Machine\Octopus\ResponseCodeModel.cs" />
-    <Compile Include="Views\PaidBy\PaidByForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Views\PaidBy\PaidByForm.Designer.cs">
-      <DependentUpon>PaidByForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Views\PaidBy\PaidByItems\Enum\PaymentType.cs" />
-    <Compile Include="Views\PaidBy\Service\Eft\EftPayRequestModel.cs" />
-    <Compile Include="Views\PaidBy\Service\Eft\EftPayResponseModel.cs" />
-    <Compile Include="Views\PaidBy\PaidByItems\Model\StatisticsModel.cs" />
-    <Compile Include="Views\PaidBy\PaidByItems\PayMePaidByItem.cs" />
-    <Compile Include="Views\PaidBy\PaidByItems\AliPayPaidByItem.cs" />
-    <Compile Include="Views\PaidBy\PaidByItems\OctopusPaidByItem.cs" />
-    <Compile Include="Views\PaidBy\Service\Eft\ErrorCodeModel.cs" />
-    <Compile Include="Views\PaidBy\Service\Eft\ResponseCodeModel.cs" />
-    <Compile Include="Views\PaidBy\Service\IShopService.cs" />
-    <Compile Include="Views\PaidBy\Service\Model\OrderModel.cs" />
-    <Compile Include="Views\PaidBy\Service\OctopusService.cs" />
-    <Compile Include="Views\PaidBy\Service\Octopus\OctopusRequestModel.cs" />
-    <Compile Include="Views\PaidBy\Service\Octopus\OctopusResponseModel.cs" />
-    <Compile Include="Views\PaidBy\Service\Octopus\PaymentModel.cs" />
-    <Compile Include="Views\PaidBy\Service\PaymeService.cs" />
-    <Compile Include="Views\PaidBy\Service\AlipayService.cs" />
-    <Compile Include="Views\PaidBy\Service\Eft\EftPayService.cs" />
-    <Compile Include="Views\PaidBy\Service\Eft\IEftPayService.cs" />
-    <Compile Include="Views\PaidBy\Service\IPaidByService.cs" />
-    <Compile Include="Views\PaidBy\Service\ShopService.cs" />
-    <Compile Include="Views\Payment\CardItemProperty.cs" />
-    <Compile Include="Views\Payment\IPaymentItem.cs" />
-    <Compile Include="Views\Payment\IPaymentService.cs" />
-    <Compile Include="Views\Payment\Machine\IMachineService.cs" />
-    <Compile Include="Views\Payment\Machine\MachineService.cs" />
-    <Compile Include="Views\Payment\PaymentForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Views\Payment\PaymentForm.Designer.cs">
-      <DependentUpon>PaymentForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Views\Payment\PaymentItems\Hkd10PaymentItem.cs" />
-    <Compile Include="Views\Payment\PaymentItems\Hkd500PaymentItem.cs" />
-    <Compile Include="Views\Payment\PaymentItems\Hkd100PaymentItem.cs" />
-    <Compile Include="Views\Payment\PaymentItems\Hkd50PaymentItem.cs" />
-    <Compile Include="Views\Payment\PaymentItems\Hkd20PaymentItem.cs" />
-    <Compile Include="Views\Payment\PaymentService.cs" />
-    <Compile Include="Views\Shop\Model\ShopModel.cs" />
-    <Compile Include="Views\Shop\Model\ShopSettingModel.cs" />
-    <Compile Include="Views\Shop\Service\IShopService.cs" />
-    <Compile Include="Views\Shop\Service\ShopService.cs" />
-    <Compile Include="Views\Shop\SignInShopForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Views\Shop\SignInShopForm.Designer.cs">
-      <DependentUpon>SignInShopForm.cs</DependentUpon>
-    </Compile>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -215,9 +218,6 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
-    <EmbeddedResource Include="Views\Login\LoginForm.resx">
-      <DependentUpon>LoginForm.cs</DependentUpon>
-    </EmbeddedResource>
     <None Include="Database\money2coins.db">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

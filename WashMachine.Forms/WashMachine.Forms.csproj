@@ -218,7 +218,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
-    <None Include="Database\money2coins.db">
+    <None Include="Database\washmachine.db">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="lib\EFTPaymentsServer.dll.config" />

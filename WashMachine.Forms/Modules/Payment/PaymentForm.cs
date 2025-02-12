@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
+using WashMachine.Forms.Modules.Payment;
 
 namespace WashMachine.Forms.Modules.Payment
 {

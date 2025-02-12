@@ -16,7 +16,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.1.1" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\WashMachinet.Repositories\WashMachine.Repositories.csproj" />
+    <ProjectReference Include="..\WashMachine.Repositories\WashMachine.Repositories.csproj" />
     <ProjectReference Include="..\Libraries\Libraries.csproj" />
   </ItemGroup>
 </Project>

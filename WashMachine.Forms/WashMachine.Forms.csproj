@@ -126,6 +126,10 @@
     <Compile Include="Modules\Main\MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Modules\Main\MainItems\VendingMachineMainItem.cs" />
+    <Compile Include="Modules\Main\MainItems\BuyeVoucherMainItem.cs" />
+    <Compile Include="Modules\Main\MainItems\DropOffServiceMainItem.cs" />
+    <Compile Include="Modules\Main\MainItems\SelfServiceLaundryMainItem.cs" />
     <Compile Include="Modules\Main\MainItems\CouponMainItem.cs" />
     <Compile Include="Modules\Main\MainItems\Hkd5CoinExchangeMainItem.cs" />
     <Compile Include="Modules\PaidBy\CardItemProperty.cs" />

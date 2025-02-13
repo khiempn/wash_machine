@@ -23,11 +23,12 @@ namespace WashMachine.Forms.Modules.Main
             WindowState = FormWindowState.Maximized;
             StartPosition = FormStartPosition.CenterParent;
             Resize += MainForm_Resize;
+            BackColor = Color.White;
 
             tblMainForm = new TableLayoutPanel()
             {
-                Width = 550,
-                Height = 250
+                Width = (int)(0.7 * Screen.PrimaryScreen.WorkingArea.Width),
+                Height = (int)(0.45 * Screen.PrimaryScreen.WorkingArea.Height)
             };
 
             tblMainForm.Font = new Font(Font.FontFamily, 14f, FontStyle.Regular);
@@ -36,8 +37,10 @@ namespace WashMachine.Forms.Modules.Main
            
             List <IMainItem> cardItems = new List<IMainItem>
             {
-                new Hkd5CoinExchangeMainItem(this, FollowType),
-                new CouponMainItem(this)
+                new SelfServiceLaundryMainItem(this),
+                new DropOffServiceMainItem(this),
+                new BuyeVoucherMainItem(this),
+                new VendingMachineMainItem(this),
             };
 
             for (int i = 0; i < cardItems.Count; i++)

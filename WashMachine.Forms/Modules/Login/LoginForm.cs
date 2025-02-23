@@ -10,6 +10,7 @@ using System.Drawing;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using WashMachine.Forms.Modules.Laundry;
 
 namespace WashMachine.Forms.Modules.Login
 {
@@ -92,7 +93,7 @@ namespace WashMachine.Forms.Modules.Login
                 ShapeBorderColor = Color.Black
             };
             btnPayment.Click += BtnPayment_Click;
-            tlpLoginForm.Controls.Add(btnPayment, 0, 2);
+            tlpLoginForm.Controls.Add(btnPayment, 0, 4);
 
             ButtonRoundedUI btnMachineWithoutPayment = new ButtonRoundedUI()
             {
@@ -103,7 +104,7 @@ namespace WashMachine.Forms.Modules.Login
                 ShapeBorderColor = Color.Black
             };
             btnMachineWithoutPayment.Click += BtnMachine_Click;
-            tlpLoginForm.Controls.Add(btnMachineWithoutPayment, 0, 2);
+            tlpLoginForm.Controls.Add(btnMachineWithoutPayment, 0, 3);
 
             Controls.Add(tlpLoginForm);
             LoadSettingImagesAsync();
@@ -147,9 +148,9 @@ namespace WashMachine.Forms.Modules.Login
 
             if (string.IsNullOrWhiteSpace(error))
             {
-                PaymentForm paymentForm = new PaymentForm(FollowType.TestMachineWithoutPayment);
-                paymentForm.Show();
-                paymentForm.FormClosed += PaymentForm_FormClosed;
+                LaundryForm laundryForm = new LaundryForm(FollowType.TestMachineWithoutPayment);
+                laundryForm.FormClosed += LaundryForm_FormClosed;
+                laundryForm.Show();
                 Hide();
             }
             else
@@ -158,7 +159,7 @@ namespace WashMachine.Forms.Modules.Login
             }
         }
 
-        private void PaymentForm_FormClosed(object sender, FormClosedEventArgs e)
+        private void LaundryForm_FormClosed(object sender, FormClosedEventArgs e)
         {
             Show();
         }

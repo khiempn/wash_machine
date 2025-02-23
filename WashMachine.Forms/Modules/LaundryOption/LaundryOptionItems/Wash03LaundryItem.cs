@@ -2,42 +2,32 @@
 using System.Drawing;
 using System.Windows.Forms;
 using WashMachine.Forms.Common.UI;
-using WashMachine.Forms.Modules.LaundryOption;
-using WashMachine.Forms.Modules.Login;
+using WashMachine.Forms.Modules.Laundry;
 
-namespace WashMachine.Forms.Modules.Laundry.LaundryItems
+namespace WashMachine.Forms.Modules.LaundryOption.LaundryOptionItems
 {
-    public class Dryer02LaundryItem : ILaundryItem
+    public class Wash03LaundryItem : ILaundryOptionItem
     {
-        public string Name => nameof(Dryer02LaundryItem);
-        Form mainForm;
-        FollowType followType;
+        public string Name => nameof(Wash03LaundryItem);
 
-        public Dryer02LaundryItem(FollowType _followType, Form parent)
+        Form mainForm;
+
+        public Wash03LaundryItem(ILaundryItem laundryItem, Form parent)
         {
             mainForm = parent;
-            followType = _followType;
         }
 
         public async void Click()
         {
-            LaundryOptionForm laundryOptionForm = new LaundryOptionForm(this, followType);
-            laundryOptionForm.Show();
-            laundryOptionForm.FormClosed += LaundryOptionForm_FormClosed;
-            mainForm.Hide();
-        }
-
-        private void LaundryOptionForm_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            mainForm.Show();
+           
         }
 
         public Control GetTemplate()
         {
             CardItemProperty cardItem = new CardItemProperty()
             {
-                Title = "乾衣 Dryer\n 02",
-                BackgroundColor = "#8cd872",
+                Title = "洗衣 Washing\n03",
+                BackgroundColor = "#4892dc",
                 CoverImageBase64 = ""
             };
 
@@ -82,7 +72,6 @@ namespace WashMachine.Forms.Modules.Laundry.LaundryItems
             lbTitle.Paint += LbTitle_Paint;
             pnCover.Controls.Add(lbTitle);
             tblCardItem.Controls.Add(pnCover, 0, 0);
-
             cardButton.Controls.Add(tblCardItem);
 
             return cardButton;
@@ -104,6 +93,11 @@ namespace WashMachine.Forms.Modules.Laundry.LaundryItems
         private void CardItem_Click(object sender, EventArgs e)
         {
             Click();
+        }
+
+        public void DisableItem(Control control)
+        {
+            control.Enabled = false;
         }
     }
 }

@@ -3,17 +3,18 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using WashMachine.Forms.Common.UI;
-using WashMachine.Forms.Modules.Laundry.LaundryItems;
+using WashMachine.Forms.Modules.Laundry;
+using WashMachine.Forms.Modules.LaundryOption.LaundryOptionItems;
 using WashMachine.Forms.Modules.Login;
 
-namespace WashMachine.Forms.Modules.Laundry
+namespace WashMachine.Forms.Modules.LaundryOption
 {
-    public partial class LaundryForm : Form
+    public partial class LaundryOptionForm : Form
     {
         public FollowType FollowType { get; set; }
         TableLayoutPanel tblLaundryForm;
 
-        public LaundryForm(FollowType followType)
+        public LaundryOptionForm(ILaundryItem laundryItem, FollowType followType)
         {
             InitializeComponent();
 
@@ -53,38 +54,46 @@ namespace WashMachine.Forms.Modules.Laundry
             tblLaundryItemsForm.RowStyles.Add(new RowStyle() { Height = 100, SizeType = SizeType.Percent });
             tblLaundryItemsForm.RowStyles.Add(new RowStyle() { Height = 70, SizeType = SizeType.Absolute });
 
-            List<ILaundryItem> cardItems = new List<ILaundryItem>
+            List<ILaundryOptionItem> cardItems = new List<ILaundryOptionItem>
             {
-                new Dryer01LaundryItem(followType, this),
-                new Dryer02LaundryItem(followType, this),
-                new Dryer03LaundryItem(followType, this),
-                new Dryer04LaundryItem(followType, this),
+                new Dryer01LaundryItem(laundryItem, this),
+                new Dryer02LaundryItem(laundryItem, this),
+                new Dryer03LaundryItem(laundryItem, this),
+                new Dryer04LaundryItem(laundryItem, this),
             };
 
             for (int i = 0; i < cardItems.Count; i++)
             {
                 tblLaundryItemsForm.ColumnStyles.Add(new ColumnStyle() { Width = 70, SizeType = SizeType.Percent });
 
-                ILaundryItem cardItem = cardItems[i];
+                ILaundryOptionItem cardItem = cardItems[i];
                 Control cardItemTemplate = cardItem.GetTemplate();
                 cardItemTemplate.Margin = new Padding(5, 0, 5, 5);
                 tblLaundryItemsForm.Controls.Add(cardItemTemplate, i, 0);
+                if (!cardItem.Name.Equals(laundryItem.Name))
+                {
+                    cardItem.DisableItem(cardItemTemplate);
+                }
             }
 
-            cardItems = new List<ILaundryItem>
+            cardItems = new List<ILaundryOptionItem>
             {
-                new Wash01LaundryItem(followType, this),
-                new Wash02LaundryItem(followType, this),
-                new Wash03LaundryItem(followType, this),
-                new Wash04LaundryItem(followType, this),
+                new Wash01LaundryItem(laundryItem, this),
+                new Wash02LaundryItem(laundryItem, this),
+                new Wash03LaundryItem(laundryItem, this),
+                new Wash04LaundryItem(laundryItem, this),
             };
 
             for (int i = 0; i < cardItems.Count; i++)
             {
-                ILaundryItem cardItem = cardItems[i];
+                ILaundryOptionItem cardItem = cardItems[i];
                 Control cardItemTemplate = cardItem.GetTemplate();
                 cardItemTemplate.Margin = new Padding(5, 5, 5, 0);
                 tblLaundryItemsForm.Controls.Add(cardItemTemplate, i, 1);
+                if (!cardItem.Name.Equals(laundryItem.Name))
+                {
+                    cardItem.DisableItem(cardItemTemplate);
+                }
             }
 
             tblLaundryBody.Controls.Add(tblLaundryItemsForm, 0, 0);
@@ -145,12 +154,26 @@ namespace WashMachine.Forms.Modules.Laundry
             tblCardReturn.Controls.Add(pnReturn, 1, 0);
             cardReturnUI.Controls.Add(tblCardReturn);
 
-            Panel pnReturnItems = new Panel()
+            ButtonRoundedUI btnPaymentItem = new ButtonRoundedUI()
             {
-                Dock = DockStyle.Fill
+                Height = 65,
+                Width = 150,
+                Text = "付款 Payment",
+                ShapeBackgroudColor = ColorTranslator.FromHtml("#3a7d22"),
+                ShapeBorderColor = Color.Black,
+                CornerRadius = 30,
+                ForeColor = Color.White
             };
-            pnReturnItems.Controls.Add(cardReturnUI);
-            tblLaundryFooter.Controls.Add(pnReturnItems, 0, 0);
+            FlowLayoutPanel flowLayoutFooter = new FlowLayoutPanel()
+            {
+                Dock = DockStyle.Fill,
+                FlowDirection = FlowDirection.RightToLeft,
+                Height = 70
+            };
+            flowLayoutFooter.Controls.Add(btnPaymentItem);
+            flowLayoutFooter.Controls.Add(cardReturnUI);
+
+            tblLaundryFooter.Controls.Add(flowLayoutFooter, 0, 0);
             tblLaundryForm.Controls.Add(tblLaundryFooter, 0, 1);
 
             Controls.Add(tblLaundryForm);

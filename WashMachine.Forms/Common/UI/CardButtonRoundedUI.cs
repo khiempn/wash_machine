@@ -43,13 +43,28 @@ namespace WashMachine.Forms.Common.UI
             using (GraphicsPath path = GetGraphicsPath(ClientRectangle))
             {
                 e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
-                SolidBrush solidBrush = new SolidBrush(ShapeBackgroudColor);
+                Color bgColor = Enabled ? ShapeBackgroudColor : Color.LightGray;
+                SolidBrush solidBrush = new SolidBrush(bgColor);
                 Pen borderColor = new Pen(ShapeBorderColor, BorderWidth);
 
                 e.Graphics.FillPath(solidBrush, path);
                 e.Graphics.DrawPath(borderColor, path);
 
                 TextRenderer.DrawText(e.Graphics, Text, Font, ClientRectangle, ForeColor);
+
+                SetBackgroundControl(Controls, bgColor);
+            }
+        }
+
+        private void SetBackgroundControl(ControlCollection collection, Color bgColor)
+        {
+            foreach (Control control in collection)
+            {
+                if (control.Controls.Count > 0)
+                {
+                    SetBackgroundControl(control.Controls, bgColor);
+                }
+                control.BackColor = bgColor;
             }
         }
 

@@ -2,21 +2,35 @@
 using System.Drawing;
 using System.Windows.Forms;
 using WashMachine.Forms.Common.UI;
+using WashMachine.Forms.Modules.LaundryOption;
+using WashMachine.Forms.Modules.Login;
 
 namespace WashMachine.Forms.Modules.Laundry.LaundryItems
 {
     public class Wash04LaundryItem : ILaundryItem
     {
-        Form mainForm;
+        public string Name => nameof(Wash04LaundryItem);
 
-        public Wash04LaundryItem(Form parent)
+        Form mainForm;
+        FollowType followType;
+
+        public Wash04LaundryItem(FollowType _followType, Form parent)
         {
             mainForm = parent;
+            followType = _followType;
         }
 
         public async void Click()
         {
-           
+            LaundryOptionForm laundryOptionForm = new LaundryOptionForm(this, followType);
+            laundryOptionForm.Show();
+            laundryOptionForm.FormClosed += LaundryOptionForm_FormClosed;
+            mainForm.Hide();
+        }
+
+        private void LaundryOptionForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            mainForm.Close();
         }
 
         public Control GetTemplate()

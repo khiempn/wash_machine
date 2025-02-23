@@ -101,6 +101,11 @@
     </Compile>
     <Compile Include="CryptLibrary.cs" />
     <Compile Include="Logger.cs" />
+    <Compile Include="Modules\Laundry\CardItemProperty.cs" />
+    <Compile Include="Modules\Laundry\LaundryItems\Dryer04LaundryItem.cs" />
+    <Compile Include="Modules\Laundry\LaundryItems\Dryer03LaundryItem.cs" />
+    <Compile Include="Modules\Laundry\LaundryItems\Dryer02LaundryItem.cs" />
+    <Compile Include="Modules\Laundry\LaundryItems\Dryer01LaundryItem.cs" />
     <Compile Include="Modules\Login\Account\AccountService.cs" />
     <Compile Include="Modules\Login\Account\IAccountService.cs" />
     <Compile Include="Modules\Login\FollowType.cs" />
@@ -206,6 +211,17 @@
     <Compile Include="Modules\Shop\SignInShopForm.Designer.cs">
       <DependentUpon>SignInShopForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Modules\Laundry\ILaundryItem.cs" />
+    <Compile Include="Modules\Laundry\LaundryForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Modules\Laundry\LaundryForm.Designer.cs">
+      <DependentUpon>LaundryForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Laundry\LaundryItems\Wash04LaundryItem.cs" />
+    <Compile Include="Modules\Laundry\LaundryItems\Wash03LaundryItem.cs" />
+    <Compile Include="Modules\Laundry\LaundryItems\Wash02LaundryItem.cs" />
+    <Compile Include="Modules\Laundry\LaundryItems\Wash01LaundryItem.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ShopConfigModel.cs" />

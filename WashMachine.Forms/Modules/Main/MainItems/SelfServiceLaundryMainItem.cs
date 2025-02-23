@@ -2,7 +2,7 @@
 using System.Drawing;
 using System.Windows.Forms;
 using WashMachine.Forms.Common.UI;
-using static System.Net.Mime.MediaTypeNames;
+using WashMachine.Forms.Modules.Laundry;
 
 namespace WashMachine.Forms.Modules.Main.MainItems
 {
@@ -17,7 +17,15 @@ namespace WashMachine.Forms.Modules.Main.MainItems
 
         public async void Click()
         {
-           
+            LaundryForm washMachineForm = new LaundryForm(Login.FollowType.Normal);
+            washMachineForm.Show();
+            washMachineForm.FormClosed += WashMachineForm_FormClosed;
+            mainForm.Hide();
+        }
+
+        private void WashMachineForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            mainForm.Show();
         }
 
         public Control GetTemplate()

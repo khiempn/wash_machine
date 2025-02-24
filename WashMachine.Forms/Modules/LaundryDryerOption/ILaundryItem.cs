@@ -1,6 +1,6 @@
 ﻿using System.Windows.Forms;
 
-namespace WashMachine.Forms.Modules.LaundryOption
+namespace WashMachine.Forms.Modules.LaundryDryerOption
 {
     public interface ILaundryOptionItem
     {

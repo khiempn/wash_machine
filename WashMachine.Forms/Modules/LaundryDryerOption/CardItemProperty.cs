@@ -2,7 +2,7 @@
 using System.Drawing;
 using System.IO;
 
-namespace WashMachine.Forms.Modules.LaundryOption
+namespace WashMachine.Forms.Modules.LaundryDryerOption
 {
     public class CardItemProperty
     {

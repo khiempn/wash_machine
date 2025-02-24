@@ -2,7 +2,7 @@
 using System.Drawing;
 using System.Windows.Forms;
 using WashMachine.Forms.Common.UI;
-using WashMachine.Forms.Modules.LaundryOption;
+using WashMachine.Forms.Modules.LaundryWashOption;
 using WashMachine.Forms.Modules.Login;
 
 namespace WashMachine.Forms.Modules.Laundry.LaundryItems
@@ -21,13 +21,13 @@ namespace WashMachine.Forms.Modules.Laundry.LaundryItems
 
         public async void Click()
         {
-            LaundryOptionForm laundryOptionForm = new LaundryOptionForm(this, followType);
-            laundryOptionForm.Show();
-            laundryOptionForm.FormClosed += LaundryOptionForm_FormClosed;
+            LaundryWashOptionForm laundryWashOptionForm = new LaundryWashOptionForm(this, followType);
+            laundryWashOptionForm.Show();
+            laundryWashOptionForm.FormClosed += LaundryWashOptionForm_FormClosed;
             mainForm.Hide();
         }
 
-        private void LaundryOptionForm_FormClosed(object sender, FormClosedEventArgs e)
+        private void LaundryWashOptionForm_FormClosed(object sender, FormClosedEventArgs e)
         {
             mainForm.Show();
         }

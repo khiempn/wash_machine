@@ -14,6 +14,8 @@ namespace WashMachine.Forms.Common.UI
         public bool IsFillTopRight { get; set; } = false;
         public Color ShapeBackgroudColor { get; set; }
         public Color ShapeBorderColor { get; set; }
+        public bool IsSelected { get; set; }
+        public Color ShapeSelectedBackgroudColor { get; set; }
 
         public ButtonRoundedUI()
         {
@@ -41,13 +43,16 @@ namespace WashMachine.Forms.Common.UI
             using (GraphicsPath path = GetGraphicsPath(ClientRectangle))
             {
                 e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
-                SolidBrush solidBrush = new SolidBrush(ShapeBackgroudColor);
+                Color bgColor = IsSelected ? ShapeSelectedBackgroudColor : ShapeBackgroudColor;
+
+                SolidBrush solidBrush = new SolidBrush(bgColor);
                 Pen borderColor = new Pen(ShapeBorderColor, BorderWidth);
 
                 e.Graphics.FillPath(solidBrush, path);
                 e.Graphics.DrawPath(borderColor, path);
+                Color txtColor = IsSelected ? Color.White : ForeColor;
 
-                TextRenderer.DrawText(e.Graphics, Text, Font, ClientRectangle, ForeColor);
+                TextRenderer.DrawText(e.Graphics, Text, Font, ClientRectangle, txtColor);
             }
         }
 

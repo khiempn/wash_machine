@@ -4,15 +4,15 @@ using System.Windows.Forms;
 using WashMachine.Forms.Common.UI;
 using WashMachine.Forms.Modules.Laundry;
 
-namespace WashMachine.Forms.Modules.LaundryOption.LaundryOptionItems
+namespace WashMachine.Forms.Modules.LaundryWashOption.LaundryOptionItems
 {
-    public class Dryer04LaundryItem : ILaundryOptionItem
+    public class Wash03LaundryItem : ILaundryOptionItem
     {
-        public string Name => nameof(Dryer04LaundryItem);
+        public string Name => nameof(Wash03LaundryItem);
 
         Form mainForm;
 
-        public Dryer04LaundryItem(ILaundryItem laundryItem, Form parent)
+        public Wash03LaundryItem(ILaundryItem laundryItem, Form parent)
         {
             mainForm = parent;
         }
@@ -26,8 +26,8 @@ namespace WashMachine.Forms.Modules.LaundryOption.LaundryOptionItems
         {
             CardItemProperty cardItem = new CardItemProperty()
             {
-                Title = "乾衣 Dryer\n 04",
-                BackgroundColor = "#8cd872",
+                Title = "洗衣 Washing\n03",
+                BackgroundColor = "#4892dc",
                 CoverImageBase64 = ""
             };
 

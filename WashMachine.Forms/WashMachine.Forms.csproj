@@ -101,22 +101,52 @@
     </Compile>
     <Compile Include="CryptLibrary.cs" />
     <Compile Include="Logger.cs" />
-    <Compile Include="Modules\LaundryOption\CardItemProperty.cs" />
-    <Compile Include="Modules\LaundryOption\ILaundryItem.cs" />
-    <Compile Include="Modules\LaundryOption\LaundryOptionForm.cs">
+    <Compile Include="Modules\LaundryDryerOption\CardItemProperty.cs" />
+    <Compile Include="Modules\LaundryDryerOption\ILaundryItem.cs" />
+    <Compile Include="Modules\LaundryDryerOption\LaundryOptionItems\Dryer01LaundryItem.cs" />
+    <Compile Include="Modules\LaundryDryerOption\LaundryOptionItems\Dryer02LaundryItem.cs" />
+    <Compile Include="Modules\LaundryDryerOption\LaundryOptionItems\Dryer03LaundryItem.cs" />
+    <Compile Include="Modules\LaundryDryerOption\LaundryOptionItems\Dryer04LaundryItem.cs" />
+    <Compile Include="Modules\LaundryDryerOption\LaundryOptionItems\Wash01LaundryItem.cs" />
+    <Compile Include="Modules\LaundryDryerOption\LaundryOptionItems\Wash02LaundryItem.cs" />
+    <Compile Include="Modules\LaundryDryerOption\LaundryOptionItems\Wash03LaundryItem.cs" />
+    <Compile Include="Modules\LaundryDryerOption\LaundryOptionItems\Wash04LaundryItem.cs" />
+    <Compile Include="Modules\LaundryDryerOption\LaundryDryerOptionForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Modules\LaundryOption\LaundryOptionForm.Designer.cs">
-      <DependentUpon>LaundryOptionForm.cs</DependentUpon>
+    <Compile Include="Modules\LaundryDryerOption\LaundryDryerOptionForm.Designer.cs">
+      <DependentUpon>LaundryDryerOptionForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Modules\LaundryOption\LaundryOptionItems\Dryer01LaundryItem.cs" />
-    <Compile Include="Modules\LaundryOption\LaundryOptionItems\Dryer02LaundryItem.cs" />
-    <Compile Include="Modules\LaundryOption\LaundryOptionItems\Dryer03LaundryItem.cs" />
-    <Compile Include="Modules\LaundryOption\LaundryOptionItems\Dryer04LaundryItem.cs" />
-    <Compile Include="Modules\LaundryOption\LaundryOptionItems\Wash01LaundryItem.cs" />
-    <Compile Include="Modules\LaundryOption\LaundryOptionItems\Wash02LaundryItem.cs" />
-    <Compile Include="Modules\LaundryOption\LaundryOptionItems\Wash03LaundryItem.cs" />
-    <Compile Include="Modules\LaundryOption\LaundryOptionItems\Wash04LaundryItem.cs" />
+    <Compile Include="Modules\LaundryDryerOption\TempOptionItems\ITempOptionItem.cs" />
+    <Compile Include="Modules\LaundryDryerOption\TempOptionItems\MidTempOptionItem.cs" />
+    <Compile Include="Modules\LaundryDryerOption\TempOptionItems\HighTempOptionItem.cs" />
+    <Compile Include="Modules\LaundryDryerOption\TempOptionItems\LowTempOptionItem.cs" />
+    <Compile Include="Modules\LaundryDryerOption\TimeOptionItems\ITimeOptionItem.cs" />
+    <Compile Include="Modules\LaundryDryerOption\TimeOptionItems\Minute15TimeOptionItem.cs" />
+    <Compile Include="Modules\LaundryDryerOption\TimeOptionItems\Minute30TimeOptionItem.cs" />
+    <Compile Include="Modules\LaundryDryerOption\TimeOptionItems\Minute40TimeOptionItem.cs" />
+    <Compile Include="Modules\LaundryDryerOption\TimeOptionItems\Minute45TimeOptionItem.cs" />
+    <Compile Include="Modules\LaundryWashOption\CardItemProperty.cs" />
+    <Compile Include="Modules\LaundryWashOption\ILaundryItem.cs" />
+    <Compile Include="Modules\LaundryWashOption\LaundryWashOptionForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Modules\LaundryWashOption\LaundryWashOptionForm.Designer.cs">
+      <DependentUpon>LaundryWashOptionForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\LaundryWashOption\LaundryOptionItems\Dryer01LaundryItem.cs" />
+    <Compile Include="Modules\LaundryWashOption\LaundryOptionItems\Dryer02LaundryItem.cs" />
+    <Compile Include="Modules\LaundryWashOption\LaundryOptionItems\Dryer03LaundryItem.cs" />
+    <Compile Include="Modules\LaundryWashOption\LaundryOptionItems\Dryer04LaundryItem.cs" />
+    <Compile Include="Modules\LaundryWashOption\LaundryOptionItems\Wash01LaundryItem.cs" />
+    <Compile Include="Modules\LaundryWashOption\LaundryOptionItems\Wash02LaundryItem.cs" />
+    <Compile Include="Modules\LaundryWashOption\LaundryOptionItems\Wash03LaundryItem.cs" />
+    <Compile Include="Modules\LaundryWashOption\LaundryOptionItems\Wash04LaundryItem.cs" />
+    <Compile Include="Modules\LaundryWashOption\TimeOptionItems\ITimeOptionItem.cs" />
+    <Compile Include="Modules\LaundryWashOption\TimeOptionItems\Minute45TimeOptionItem.cs" />
+    <Compile Include="Modules\LaundryWashOption\TimeOptionItems\Minute40TimeOptionItem.cs" />
+    <Compile Include="Modules\LaundryWashOption\TimeOptionItems\Minute30TimeOptionItem.cs" />
+    <Compile Include="Modules\LaundryWashOption\TimeOptionItems\Minute15TimeOptionItem.cs" />
     <Compile Include="Modules\Laundry\CardItemProperty.cs" />
     <Compile Include="Modules\Laundry\LaundryItems\Dryer04LaundryItem.cs" />
     <Compile Include="Modules\Laundry\LaundryItems\Dryer03LaundryItem.cs" />

@@ -1,6 +1,6 @@
-﻿namespace WashMachine.Forms.Modules.LaundryOption
+﻿namespace WashMachine.Forms.Modules.LaundryDryerOption
 {
-    partial class LaundryOptionForm
+    partial class LaundryDryerOptionForm
     {
         /// <summary>
         /// Required designer variable.

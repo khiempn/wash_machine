@@ -4,29 +4,29 @@ using System.Windows.Forms;
 using WashMachine.Forms.Common.UI;
 using WashMachine.Forms.Modules.Laundry;
 
-namespace WashMachine.Forms.Modules.LaundryOption.LaundryOptionItems
+namespace WashMachine.Forms.Modules.LaundryWashOption.LaundryOptionItems
 {
-    public class Wash01LaundryItem : ILaundryOptionItem
+    public class Wash04LaundryItem : ILaundryOptionItem
     {
-        public string Name => nameof(Wash01LaundryItem);
+        public string Name => nameof(Wash04LaundryItem);
 
         Form mainForm;
 
-        public Wash01LaundryItem(ILaundryItem laundryItem, Form parent)
+        public Wash04LaundryItem(ILaundryItem laundryItem, Form parent)
         {
             mainForm = parent;
         }
 
         public async void Click()
         {
-           
+
         }
 
         public Control GetTemplate()
         {
             CardItemProperty cardItem = new CardItemProperty()
             {
-                Title = "洗衣 Washing\n01",
+                Title = "洗衣 Washing\n04",
                 BackgroundColor = "#4892dc",
                 CoverImageBase64 = ""
             };
@@ -73,7 +73,6 @@ namespace WashMachine.Forms.Modules.LaundryOption.LaundryOptionItems
             pnCover.Controls.Add(lbTitle);
             tblCardItem.Controls.Add(pnCover, 0, 0);
             cardButton.Controls.Add(tblCardItem);
-
             return cardButton;
         }
 

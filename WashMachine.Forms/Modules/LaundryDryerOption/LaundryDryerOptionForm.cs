@@ -4,17 +4,19 @@ using System.Drawing;
 using System.Windows.Forms;
 using WashMachine.Forms.Common.UI;
 using WashMachine.Forms.Modules.Laundry;
-using WashMachine.Forms.Modules.LaundryOption.LaundryOptionItems;
+using WashMachine.Forms.Modules.LaundryDryerOption.LaundryOptionItems;
+using WashMachine.Forms.Modules.LaundryDryerOption.TempOptionItems;
+using WashMachine.Forms.Modules.LaundryDryerOption.TimeOptionItems;
 using WashMachine.Forms.Modules.Login;
 
-namespace WashMachine.Forms.Modules.LaundryOption
+namespace WashMachine.Forms.Modules.LaundryDryerOption
 {
-    public partial class LaundryOptionForm : Form
+    public partial class LaundryDryerOptionForm : Form
     {
         public FollowType FollowType { get; set; }
         TableLayoutPanel tblLaundryForm;
 
-        public LaundryOptionForm(ILaundryItem laundryItem, FollowType followType)
+        public LaundryDryerOptionForm(ILaundryItem laundryItem, FollowType followType)
         {
             InitializeComponent();
 
@@ -44,6 +46,7 @@ namespace WashMachine.Forms.Modules.LaundryOption
             };
             tblLaundryBody.RowStyles.Add(new RowStyle() { Height = 100, SizeType = SizeType.Percent });
             tblLaundryBody.ColumnStyles.Add(new ColumnStyle() { Width = 70, SizeType = SizeType.Percent });
+            tblLaundryBody.ColumnStyles.Add(new ColumnStyle() { Width = 310, SizeType = SizeType.Absolute });
 
             TableLayoutPanel tblLaundryItemsForm = new TableLayoutPanel()
             {
@@ -98,6 +101,68 @@ namespace WashMachine.Forms.Modules.LaundryOption
 
             tblLaundryBody.Controls.Add(tblLaundryItemsForm, 0, 0);
             tblLaundryForm.Controls.Add(tblLaundryBody, 0, 0);
+
+            TableLayoutPanel tblLaundryOptionItems = new TableLayoutPanel()
+            {
+                Dock = DockStyle.Fill
+            };
+            tblLaundryOptionItems.RowStyles.Add(new RowStyle() { Height = 100, SizeType = SizeType.Absolute });
+            tblLaundryOptionItems.RowStyles.Add(new RowStyle() { Height = 100, SizeType = SizeType.Percent });
+            tblLaundryOptionItems.ColumnStyles.Add(new ColumnStyle() { Width = 70, SizeType = SizeType.Percent });
+
+
+            TableLayoutPanel tblLaundryTempOption = new TableLayoutPanel()
+            {
+                Dock = DockStyle.Fill
+            };
+            tblLaundryTempOption.RowStyles.Add(new RowStyle() { Height = 100, SizeType = SizeType.Percent });
+
+            List<ITempOptionItem> tempOptionItems = new List<ITempOptionItem>()
+            {
+                new LowTempOptionItem(this),
+                new MidTempOptionItem(this),
+                new HighTempOptionItem(this),
+            };
+
+            for (int i = 0; i < tempOptionItems.Count; i++)
+            {
+                tblLaundryTempOption.ColumnStyles.Add(new ColumnStyle() { Width = 70, SizeType = SizeType.Percent });
+
+                ITempOptionItem tempOptionItem = tempOptionItems[i];
+                Control tempItemTemplate = tempOptionItem.GetTemplate();
+                tblLaundryTempOption.Controls.Add(tempItemTemplate, i, 0);
+            }
+
+            tblLaundryOptionItems.Controls.Add(tblLaundryTempOption, 0, 0);
+
+            TableLayoutPanel tblLaundryTimeOption = new TableLayoutPanel()
+            {
+                Dock = DockStyle.Fill
+            };
+            tblLaundryTimeOption.RowStyles.Add(new RowStyle() { Height = 100, SizeType = SizeType.Percent });
+            tblLaundryTimeOption.RowStyles.Add(new RowStyle() { Height = 100, SizeType = SizeType.Percent });
+            tblLaundryTimeOption.RowStyles.Add(new RowStyle() { Height = 100, SizeType = SizeType.Percent });
+            tblLaundryTimeOption.RowStyles.Add(new RowStyle() { Height = 100, SizeType = SizeType.Percent });
+            tblLaundryTimeOption.ColumnStyles.Add(new ColumnStyle() { Width = 70, SizeType = SizeType.Percent });
+
+            List<ITimeOptionItem> timeOptionItems = new List<ITimeOptionItem>()
+            {
+                new Minute15TimeOptionItem(),
+                new Minute30TimeOptionItem(),
+                new Minute40TimeOptionItem(),
+                new Minute45TimeOptionItem(),
+            };
+
+            for (int i = 0; i < timeOptionItems.Count; i++)
+            {
+                ITimeOptionItem timeOptionItem = timeOptionItems[i];
+                Control timeItemTemplate = timeOptionItem.GetTemplate();
+                timeItemTemplate.Margin = new Padding(5, 5, 5, 0);
+                tblLaundryTimeOption.Controls.Add(timeItemTemplate, 0, i);
+            }
+
+            tblLaundryOptionItems.Controls.Add(tblLaundryTimeOption, 0, 1);
+            tblLaundryBody.Controls.Add(tblLaundryOptionItems, 1, 0);
 
             TableLayoutPanel tblLaundryFooter = new TableLayoutPanel()
             {

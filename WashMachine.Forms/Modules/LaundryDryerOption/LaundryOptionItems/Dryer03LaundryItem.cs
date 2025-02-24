@@ -2,34 +2,24 @@
 using System.Drawing;
 using System.Windows.Forms;
 using WashMachine.Forms.Common.UI;
-using WashMachine.Forms.Modules.LaundryDryerOption;
-using WashMachine.Forms.Modules.Login;
+using WashMachine.Forms.Modules.Laundry;
 
-namespace WashMachine.Forms.Modules.Laundry.LaundryItems
+namespace WashMachine.Forms.Modules.LaundryDryerOption.LaundryOptionItems
 {
-    public class Dryer03LaundryItem : ILaundryItem
+    public class Dryer03LaundryItem : ILaundryOptionItem
     {
         public string Name => nameof(Dryer03LaundryItem);
-        Form mainForm;
-        FollowType followType;
 
-        public Dryer03LaundryItem(FollowType _followType, Form parent)
+        Form mainForm;
+
+        public Dryer03LaundryItem(ILaundryItem laundryItem, Form parent)
         {
             mainForm = parent;
-            followType = _followType;
         }
 
         public async void Click()
         {
-            LaundryDryerOptionForm laundryDryerOptionForm = new LaundryDryerOptionForm(this, followType);
-            laundryDryerOptionForm.Show();
-            laundryDryerOptionForm.FormClosed += LaundryDryerOptionForm_FormClosed;
-            mainForm.Hide();
-        }
-
-        private void LaundryDryerOptionForm_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            mainForm.Show();
+           
         }
 
         public Control GetTemplate()
@@ -82,7 +72,6 @@ namespace WashMachine.Forms.Modules.Laundry.LaundryItems
             lbTitle.Paint += LbTitle_Paint;
             pnCover.Controls.Add(lbTitle);
             tblCardItem.Controls.Add(pnCover, 0, 0);
-
             cardButton.Controls.Add(tblCardItem);
 
             return cardButton;
@@ -104,6 +93,11 @@ namespace WashMachine.Forms.Modules.Laundry.LaundryItems
         private void CardItem_Click(object sender, EventArgs e)
         {
             Click();
+        }
+
+        public void DisableItem(Control control)
+        {
+            control.Enabled = false;
         }
     }
 }

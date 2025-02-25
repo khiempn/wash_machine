@@ -15,9 +15,13 @@ namespace WashMachine.Forms.Modules.LaundryWashOption.LaundryOptionItems
         public Wash04LaundryItem(ILaundryItem laundryItem, Form parent)
         {
             mainForm = parent;
+            if (laundryItem.Name.Equals(Name))
+            {
+                ((LaundryWashOptionForm)mainForm).LaundryOptionItemSelected = this;
+            }
         }
 
-        public async void Click()
+        public void Click()
         {
 
         }

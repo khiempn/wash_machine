@@ -5,6 +5,7 @@ using System.Windows.Forms;
 using WashMachine.Forms.Common.UI;
 using WashMachine.Forms.Modules.Laundry;
 using WashMachine.Forms.Modules.LaundryWashOption.LaundryOptionItems;
+using WashMachine.Forms.Modules.LaundryWashOption.PaymentItems;
 using WashMachine.Forms.Modules.LaundryWashOption.TimeOptionItems;
 using WashMachine.Forms.Modules.Login;
 
@@ -14,6 +15,8 @@ namespace WashMachine.Forms.Modules.LaundryWashOption
     {
         public FollowType FollowType { get; set; }
         TableLayoutPanel tblLaundryForm;
+        public ILaundryOptionItem LaundryOptionItemSelected { get; set; }
+        public ITimeOptionItem TimeOptionItemSelected { get; set; }
 
         public LaundryWashOptionForm(ILaundryItem laundryItem, FollowType followType)
         {
@@ -113,10 +116,10 @@ namespace WashMachine.Forms.Modules.LaundryWashOption
 
             List<ITimeOptionItem> timeOptionItems = new List<ITimeOptionItem>()
             {
-                new Minute15TimeOptionItem(),
-                new Minute30TimeOptionItem(),
-                new Minute40TimeOptionItem(),
-                new Minute45TimeOptionItem(),
+                new Minute15TimeOptionItem(this),
+                new Minute30TimeOptionItem(this),
+                new Minute40TimeOptionItem(this),
+                new Minute45TimeOptionItem(this),
             };
 
             for (int i = 0; i < timeOptionItems.Count; i++)
@@ -183,23 +186,16 @@ namespace WashMachine.Forms.Modules.LaundryWashOption
             tblCardReturn.Controls.Add(pnReturn, 1, 0);
             cardReturnUI.Controls.Add(tblCardReturn);
 
-            ButtonRoundedUI btnPaymentItem = new ButtonRoundedUI()
-            {
-                Height = 65,
-                Width = 150,
-                Text = "付款 Payment",
-                ShapeBackgroudColor = ColorTranslator.FromHtml("#3a7d22"),
-                ShapeBorderColor = Color.Black,
-                CornerRadius = 30,
-                ForeColor = Color.White
-            };
+            IPaymentItem paymentItem = new PaymentItem(this);
+
             FlowLayoutPanel flowLayoutFooter = new FlowLayoutPanel()
             {
                 Dock = DockStyle.Fill,
                 FlowDirection = FlowDirection.RightToLeft,
                 Height = 70
             };
-            flowLayoutFooter.Controls.Add(btnPaymentItem);
+
+            flowLayoutFooter.Controls.Add(paymentItem.GetTemplate());
             flowLayoutFooter.Controls.Add(cardReturnUI);
 
             tblLaundryFooter.Controls.Add(flowLayoutFooter, 0, 0);
@@ -207,6 +203,7 @@ namespace WashMachine.Forms.Modules.LaundryWashOption
 
             Controls.Add(tblLaundryForm);
         }
+
         private void CardReturnUI_Click(object sender, EventArgs e)
         {
             Close();

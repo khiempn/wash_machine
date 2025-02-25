@@ -3,7 +3,6 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using WashMachine.Forms.Common.UI;
-using WashMachine.Forms.Modules.Main;
 
 namespace WashMachine.Forms.Modules.LaundryDryerOption.TempOptionItems
 {
@@ -17,7 +16,26 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.TempOptionItems
 
         public void Click()
         {
-            
+            if (mainForm.Controls.Find(nameof(LowTempOptionItem), true).Any())
+            {
+                ButtonRoundedUI buttonRounded = (ButtonRoundedUI)mainForm.Controls.Find(nameof(LowTempOptionItem), true).First();
+                buttonRounded.IsSelected = false;
+            }
+
+            if (mainForm.Controls.Find(nameof(MidTempOptionItem), true).Any())
+            {
+                ButtonRoundedUI buttonRounded = (ButtonRoundedUI)mainForm.Controls.Find(nameof(MidTempOptionItem), true).First();
+                buttonRounded.IsSelected = true;
+            }
+
+            if (mainForm.Controls.Find(nameof(HighTempOptionItem), true).Any())
+            {
+                ButtonRoundedUI buttonRounded = (ButtonRoundedUI)mainForm.Controls.Find(nameof(HighTempOptionItem), true).First();
+                buttonRounded.IsSelected = false;
+            }
+
+            LaundryDryerOptionForm laundryDryerOptionForm = (LaundryDryerOptionForm)mainForm;
+            laundryDryerOptionForm.Refresh();
         }
 
         public Control GetTemplate()
@@ -42,26 +60,6 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.TempOptionItems
         private void Btn_Click(object sender, EventArgs e)
         {
             Click();
-            if (mainForm.Controls.Find(nameof(LowTempOptionItem), true).Any())
-            {
-                ButtonRoundedUI buttonRounded = (ButtonRoundedUI)mainForm.Controls.Find(nameof(LowTempOptionItem), true).First();
-                buttonRounded.IsSelected = false;
-                buttonRounded.Refresh();
-            }
-
-            if (mainForm.Controls.Find(nameof(MidTempOptionItem), true).Any())
-            {
-                ButtonRoundedUI buttonRounded = (ButtonRoundedUI)mainForm.Controls.Find(nameof(MidTempOptionItem), true).First();
-                buttonRounded.IsSelected = true;
-                buttonRounded.Refresh();
-            }
-
-            if (mainForm.Controls.Find(nameof(HighTempOptionItem), true).Any())
-            {
-                ButtonRoundedUI buttonRounded = (ButtonRoundedUI)mainForm.Controls.Find(nameof(HighTempOptionItem), true).First();
-                buttonRounded.IsSelected = false;
-                buttonRounded.Refresh();
-            }
         }
     }
 }

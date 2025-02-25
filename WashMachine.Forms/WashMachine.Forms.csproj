@@ -142,6 +142,10 @@
     <Compile Include="Modules\LaundryWashOption\LaundryOptionItems\Wash02LaundryItem.cs" />
     <Compile Include="Modules\LaundryWashOption\LaundryOptionItems\Wash03LaundryItem.cs" />
     <Compile Include="Modules\LaundryWashOption\LaundryOptionItems\Wash04LaundryItem.cs" />
+    <Compile Include="Modules\LaundryWashOption\Machine\IMachineService.cs" />
+    <Compile Include="Modules\LaundryWashOption\Machine\MachineService.cs" />
+    <Compile Include="Modules\LaundryWashOption\PaymentItems\IPaymentItem.cs" />
+    <Compile Include="Modules\LaundryWashOption\PaymentItems\PaymentItem.cs" />
     <Compile Include="Modules\LaundryWashOption\TimeOptionItems\ITimeOptionItem.cs" />
     <Compile Include="Modules\LaundryWashOption\TimeOptionItems\Minute45TimeOptionItem.cs" />
     <Compile Include="Modules\LaundryWashOption\TimeOptionItems\Minute40TimeOptionItem.cs" />

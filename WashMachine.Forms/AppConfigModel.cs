@@ -49,18 +49,7 @@ namespace WashMachine.Forms
             }
             return obj;
         }
-
-        public bool DisableBackground { get; set; }
-        public string OtopusHost { get; set; }
         public string AppHost { get; set; }
-
-        public string CoinmachinePath { get; set; }
-        public string CoinmachinePort { get; set; }
-
-
-        public bool IsDevelopment { get; set; }
-
-        public string OctopusCom { get; set; }
         public string DollarCom { get; set; }
         public int DollarBaudRate { get; set; }
         public Parity DollarParity { get; set; }
@@ -87,6 +76,11 @@ namespace WashMachine.Forms
         public string ShopConfigPath { get; set; }
         public int ScanTimeout { get; set; }
 
+        public string WashMachineCom { get; set; }
+        public int WashMachineBaudRate { get; set; }
+        public Parity WashMachineParity { get; set; }
+        public int WashMachineData { get; set; }
+        public StopBits WashMachineStopBits { get; set; }
         public ShopConfigModel GetShopConfig()
         {
             string shopConfigPath = Path.Combine(Directory.GetCurrentDirectory(), "shop.config");

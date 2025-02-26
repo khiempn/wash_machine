@@ -1,9 +1,14 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
 using System.Drawing;
-using System.IO;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using WashMachine.Forms.Common.UI;
 using WashMachine.Forms.Modules.Laundry;
+using WashMachine.Forms.Modules.LaundryDryerOption.Machine;
+using WashMachine.Forms.Modules.LaundryDryerOption.TempOptionItems;
+using WashMachine.Forms.Modules.LaundryDryerOption.TimeOptionItems;
 
 namespace WashMachine.Forms.Modules.LaundryDryerOption.LaundryOptionItems
 {
@@ -11,14 +16,34 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.LaundryOptionItems
     {
         public string Name => nameof(Dryer01LaundryItem);
 
+        public Dictionary<string, string> TemperatureCommands => new Dictionary<string, string>()
+        {
+            { nameof(HighTempOptionItem), "01 06 01 66 00 01 A9 E9" },
+            { nameof(MidTempOptionItem), "01 06 01 66 00 01 E9 E8" },
+            { nameof(LowTempOptionItem), "01 06 01 66 00 01 28 28" },
+        };
+
+        public Dictionary<string, string> TimeCommands => new Dictionary<string, string>()
+        {
+            { nameof(Minute30TimeOptionItem), "01 06 01 67 00 1E B9 E1" },
+            { nameof(Minute40TimeOptionItem), "01 06 01 67 00 3C 39 F8" },
+            { nameof(Minute50TimeOptionItem), "01 06 01 67 00 5A B9 D2" },
+            { nameof(Minute60TimeOptionItem), "01 06 01 67 00 78 39 CB" }
+        };
+
+        public string ImplementCommand => "01 06 01 68 00 01 C8 2A";
+
         Form mainForm;
+
+        MachineService machineService;
 
         public Dryer01LaundryItem(ILaundryItem laundryItem, Form parent)
         {
             mainForm = parent;
+            machineService = new MachineService();
         }
 
-        public async void Click()
+        public void Click()
         {
         }
 
@@ -98,6 +123,42 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.LaundryOptionItems
         public void DisableItem(Control control)
         {
             control.Enabled = false;
+        }
+
+        public async Task Start()
+        {
+            await Task.Run(async () =>
+            {
+                System.Threading.Thread.Sleep(2000);
+                Logger.Log($"{nameof(Dryer01LaundryItem)} Step 1 START");
+                LaundryDryerOptionForm form = (LaundryDryerOptionForm)mainForm;
+
+                AppConfigModel appConfig = Program.AppConfig;
+                Logger.Log($"{nameof(Dryer01LaundryItem)} Step 2 {JsonConvert.SerializeObject(appConfig)}");
+                bool isConnected = await machineService.ConnectAsync(appConfig.DollarCom, appConfig.DollarBaudRate, appConfig.DollarData, appConfig.DollarParity, appConfig.DollarStopBits);
+
+                if (isConnected)
+                {
+                    Logger.Log($"{nameof(Dryer01LaundryItem)} Step 3");
+                    string tempCommand = TemperatureCommands[$"{form.TempOptionItemSelected.Name}"];
+                    //Run temp program
+                    machineService.ExecHexCommand(tempCommand);
+
+                    string timeCommand = TimeCommands[$"{form.TimeOptionItemSelected.Name}"];
+                    //Run temp program
+                    machineService.ExecHexCommand(timeCommand);
+
+                    // Run implement as START
+                    machineService.ExecHexCommand(ImplementCommand);
+
+                    machineService.Disconect();
+                    Logger.Log($"{nameof(Dryer01LaundryItem)} Step 4 END");
+                }
+                else
+                {
+                    Logger.Log($"{nameof(Dryer01LaundryItem)} Can not connect device.");
+                }
+            });
         }
     }
 }

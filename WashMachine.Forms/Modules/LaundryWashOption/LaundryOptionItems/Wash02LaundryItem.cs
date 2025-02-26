@@ -1,8 +1,14 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
 using System.Drawing;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using WashMachine.Forms.Common.UI;
 using WashMachine.Forms.Modules.Laundry;
+using WashMachine.Forms.Modules.LaundryWashOption.Machine;
+using WashMachine.Forms.Modules.LaundryWashOption.PaymentItems;
+using WashMachine.Forms.Modules.LaundryWashOption.TimeOptionItems;
 
 namespace WashMachine.Forms.Modules.LaundryWashOption.LaundryOptionItems
 {
@@ -10,15 +16,24 @@ namespace WashMachine.Forms.Modules.LaundryWashOption.LaundryOptionItems
     {
         public string Name => nameof(Wash02LaundryItem);
 
+        public string ImplementCommand => "02 06 01 27 00 01 F9 CE";
+
+        public Dictionary<string, string> ProgramCommands => new Dictionary<string, string>
+        {
+            {$"{nameof(Minute15TimeOptionItem)}", "02 06 01 26 00 01 A8 0E" },
+            {$"{nameof(Minute30TimeOptionItem)}", "02 06 01 26 00 02 E8 0F" },
+            {$"{nameof(Minute40TimeOptionItem)}", "02 06 01 26 00 03 29 CF" },
+            {$"{nameof(Minute45TimeOptionItem)}", "02 06 01 26 00 04 68 0D" },
+        };
+
         Form mainForm;
+
+        MachineService machineService;
 
         public Wash02LaundryItem(ILaundryItem laundryItem, Form parent)
         {
             mainForm = parent;
-            if (laundryItem.Name.Equals(Name))
-            {
-                ((LaundryWashOptionForm)mainForm).LaundryOptionItemSelected = this;
-            }
+            machineService = new MachineService();
         }
 
         public void Click()
@@ -102,6 +117,38 @@ namespace WashMachine.Forms.Modules.LaundryWashOption.LaundryOptionItems
         public void DisableItem(Control control)
         {
             control.Enabled = false;
+        }
+
+        public async Task Start()
+        {
+            await Task.Run(async () =>
+            {
+                System.Threading.Thread.Sleep(2000);
+                Logger.Log($"{nameof(Wash02LaundryItem)} Step 1 START");
+                LaundryWashOptionForm form = (LaundryWashOptionForm)mainForm;
+
+                AppConfigModel appConfig = Program.AppConfig;
+                Logger.Log($"{nameof(Wash02LaundryItem)} Step 2 {JsonConvert.SerializeObject(appConfig)}");
+                bool isConnected = await machineService.ConnectAsync(appConfig.DollarCom, appConfig.DollarBaudRate, appConfig.DollarData, appConfig.DollarParity, appConfig.DollarStopBits);
+
+                if (isConnected)
+                {
+                    Logger.Log($"{nameof(Wash02LaundryItem)} Step 3");
+                    string programCommand = ProgramCommands[$"{form.TimeOptionItemSelected.Name}"];
+                    //Run selected program
+                    machineService.ExecHexCommand(programCommand);
+
+                    // Run implement as START
+                    machineService.ExecHexCommand(ImplementCommand);
+
+                    machineService.Disconect();
+                    Logger.Log($"{nameof(Wash02LaundryItem)} Step 4 END");
+                }
+                else
+                {
+                    Logger.Log($"{nameof(Wash02LaundryItem)} Can not connect device.");
+                }
+            });
         }
     }
 }

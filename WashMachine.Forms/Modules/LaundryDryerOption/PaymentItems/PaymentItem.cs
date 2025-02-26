@@ -3,7 +3,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using WashMachine.Forms.Common.UI;
 
-namespace WashMachine.Forms.Modules.LaundryWashOption.PaymentItems
+namespace WashMachine.Forms.Modules.LaundryDryerOption.PaymentItems
 {
     public class PaymentItem : IPaymentItem
     {
@@ -18,7 +18,7 @@ namespace WashMachine.Forms.Modules.LaundryWashOption.PaymentItems
         {
             try
             {
-                LaundryWashOptionForm form = (LaundryWashOptionForm)mainForm;
+                LaundryDryerOptionForm form = (LaundryDryerOptionForm)mainForm;
                 if (form.LaundryOptionItemSelected != null)
                 {
                     ProgressUI progressUI = new ProgressUI();

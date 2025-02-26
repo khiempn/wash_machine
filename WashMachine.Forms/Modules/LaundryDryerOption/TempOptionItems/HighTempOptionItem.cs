@@ -9,6 +9,7 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.TempOptionItems
     public class HighTempOptionItem : ITempOptionItem
     {
         Form mainForm;
+        public string Name => nameof(HighTempOptionItem);
 
         public HighTempOptionItem(Form form)
         {

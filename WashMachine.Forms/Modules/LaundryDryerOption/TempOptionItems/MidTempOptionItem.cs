@@ -9,6 +9,8 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.TempOptionItems
     public class MidTempOptionItem : ITempOptionItem
     {
         Form mainForm;
+        public string Name => nameof(MidTempOptionItem);
+
         public MidTempOptionItem(Form form)
         {
             mainForm = form;
@@ -35,6 +37,7 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.TempOptionItems
             }
 
             LaundryDryerOptionForm laundryDryerOptionForm = (LaundryDryerOptionForm)mainForm;
+            laundryDryerOptionForm.TempOptionItemSelected = this;
             laundryDryerOptionForm.Refresh();
         }
 

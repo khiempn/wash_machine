@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using WashMachine.Forms.Common.UI;
 using WashMachine.Forms.Modules.Laundry;
@@ -9,6 +11,12 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.LaundryOptionItems
     public class Wash01LaundryItem : ILaundryOptionItem
     {
         public string Name => nameof(Wash01LaundryItem);
+
+        public Dictionary<string, string> TemperatureCommands => throw new NotImplementedException();
+
+        public Dictionary<string, string> TimeCommands => throw new NotImplementedException();
+
+        public string ImplementCommand => throw new NotImplementedException();
 
         Form mainForm;
 
@@ -98,6 +106,11 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.LaundryOptionItems
         public void DisableItem(Control control)
         {
             control.Enabled = false;
+        }
+
+        public Task Start()
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -34,7 +34,8 @@ namespace WashMachine.Forms.Modules.LaundryWashOption
             tblLaundryForm = new TableLayoutPanel()
             {
                 Width = (int)(0.8 * Screen.PrimaryScreen.WorkingArea.Width),
-                Height = (int)(0.6 * Screen.PrimaryScreen.WorkingArea.Height)
+                Height = (int)(0.6 * Screen.PrimaryScreen.WorkingArea.Height),
+                Name = "MainLayout"
             };
             tblLaundryForm.RowStyles.Add(new RowStyle() { Height = 100, SizeType = SizeType.Percent });
             tblLaundryForm.RowStyles.Add(new RowStyle() { Height = 80, SizeType = SizeType.Absolute });
@@ -95,7 +96,11 @@ namespace WashMachine.Forms.Modules.LaundryWashOption
                 Control cardItemTemplate = cardItem.GetTemplate();
                 cardItemTemplate.Margin = new Padding(5, 5, 5, 0);
                 tblLaundryItemsForm.Controls.Add(cardItemTemplate, i, 1);
-                if (!cardItem.Name.Equals(laundryItem.Name))
+                if (cardItem.Name.Equals(laundryItem.Name))
+                {
+                    LaundryOptionItemSelected = cardItem;
+                }
+                else
                 {
                     cardItem.DisableItem(cardItemTemplate);
                 }

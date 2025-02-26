@@ -4,31 +4,25 @@ using System.Linq;
 using System.Windows.Forms;
 using WashMachine.Forms.Common.UI;
 
-namespace WashMachine.Forms.Modules.LaundryWashOption.TimeOptionItems
+namespace WashMachine.Forms.Modules.LaundryDryerOption.TimeOptionItems
 {
-    public class Minute30TimeOptionItem : ITimeOptionItem
+    public class Minute50TimeOptionItem : ITimeOptionItem
     {
         Form mainForm;
-        public string Name => nameof(Minute30TimeOptionItem);
-        public int TimeNumber => 30;
+        public string Name => nameof(Minute50TimeOptionItem);
+        public int TimeNumber => 50;
 
-        public Minute30TimeOptionItem(Form form)
+        public Minute50TimeOptionItem(Form form)
         {
             mainForm = form;
         }
 
         public void Click()
         {
-            if (mainForm.Controls.Find(nameof(Minute15TimeOptionItem), true).Any())
-            {
-                ButtonRoundedUI btn = (ButtonRoundedUI)mainForm.Controls.Find(nameof(Minute15TimeOptionItem), true).First();
-                btn.IsSelected = false;
-            }
-
             if (mainForm.Controls.Find(nameof(Minute30TimeOptionItem), true).Any())
             {
                 ButtonRoundedUI btn = (ButtonRoundedUI)mainForm.Controls.Find(nameof(Minute30TimeOptionItem), true).First();
-                btn.IsSelected = true;
+                btn.IsSelected = false;
             }
 
             if (mainForm.Controls.Find(nameof(Minute40TimeOptionItem), true).Any())
@@ -37,15 +31,21 @@ namespace WashMachine.Forms.Modules.LaundryWashOption.TimeOptionItems
                 btn.IsSelected = false;
             }
 
-            if (mainForm.Controls.Find(nameof(Minute45TimeOptionItem), true).Any())
+            if (mainForm.Controls.Find(nameof(Minute50TimeOptionItem), true).Any())
             {
-                ButtonRoundedUI btn = (ButtonRoundedUI)mainForm.Controls.Find(nameof(Minute45TimeOptionItem), true).First();
+                ButtonRoundedUI btn = (ButtonRoundedUI)mainForm.Controls.Find(nameof(Minute50TimeOptionItem), true).First();
+                btn.IsSelected = true;
+            }
+
+            if (mainForm.Controls.Find(nameof(Minute60TimeOptionItem), true).Any())
+            {
+                ButtonRoundedUI btn = (ButtonRoundedUI)mainForm.Controls.Find(nameof(Minute60TimeOptionItem), true).First();
                 btn.IsSelected = false;
             }
 
-            LaundryWashOptionForm laundryWashOptionForm = (LaundryWashOptionForm)mainForm;
-            laundryWashOptionForm.TimeOptionItemSelected = this;
-            laundryWashOptionForm.Refresh();
+            LaundryDryerOptionForm laundryDryerOptionForm = (LaundryDryerOptionForm)mainForm;
+            laundryDryerOptionForm.TimeOptionItemSelected = this;
+            laundryDryerOptionForm.Refresh();
         }
 
         public Control GetTemplate()
@@ -54,14 +54,15 @@ namespace WashMachine.Forms.Modules.LaundryWashOption.TimeOptionItems
             {
                 Height = 65,
                 Width = 150,
-                Text = "30 分鐘 (mins) / HKD 20",
+                Text = "50 分鐘 (mins) / HKD 50",
                 ShapeBackgroudColor = ColorTranslator.FromHtml("#ffc000"),
                 ShapeSelectedBackgroudColor = Color.Blue,
                 ShapeBorderColor = Color.Black,
                 CornerRadius = 30,
                 Dock = DockStyle.Fill,
                 ForeColor = Color.White,
-                Name = nameof(Minute30TimeOptionItem)
+                IsSelected = false,
+                Name = nameof(Minute50TimeOptionItem)
             };
             btn.Click += Btn_Click;
             return btn;

@@ -117,15 +117,19 @@
     <Compile Include="Modules\LaundryDryerOption\LaundryDryerOptionForm.Designer.cs">
       <DependentUpon>LaundryDryerOptionForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Modules\LaundryDryerOption\Machine\IMachineService.cs" />
+    <Compile Include="Modules\LaundryDryerOption\Machine\MachineService.cs" />
+    <Compile Include="Modules\LaundryDryerOption\PaymentItems\IPaymentItem.cs" />
+    <Compile Include="Modules\LaundryDryerOption\PaymentItems\PaymentItem.cs" />
     <Compile Include="Modules\LaundryDryerOption\TempOptionItems\ITempOptionItem.cs" />
     <Compile Include="Modules\LaundryDryerOption\TempOptionItems\MidTempOptionItem.cs" />
     <Compile Include="Modules\LaundryDryerOption\TempOptionItems\HighTempOptionItem.cs" />
     <Compile Include="Modules\LaundryDryerOption\TempOptionItems\LowTempOptionItem.cs" />
     <Compile Include="Modules\LaundryDryerOption\TimeOptionItems\ITimeOptionItem.cs" />
-    <Compile Include="Modules\LaundryDryerOption\TimeOptionItems\Minute15TimeOptionItem.cs" />
+    <Compile Include="Modules\LaundryDryerOption\TimeOptionItems\Minute50TimeOptionItem.cs" />
     <Compile Include="Modules\LaundryDryerOption\TimeOptionItems\Minute30TimeOptionItem.cs" />
     <Compile Include="Modules\LaundryDryerOption\TimeOptionItems\Minute40TimeOptionItem.cs" />
-    <Compile Include="Modules\LaundryDryerOption\TimeOptionItems\Minute45TimeOptionItem.cs" />
+    <Compile Include="Modules\LaundryDryerOption\TimeOptionItems\Minute60TimeOptionItem.cs" />
     <Compile Include="Modules\LaundryWashOption\CardItemProperty.cs" />
     <Compile Include="Modules\LaundryWashOption\ILaundryItem.cs" />
     <Compile Include="Modules\LaundryWashOption\LaundryWashOptionForm.cs">

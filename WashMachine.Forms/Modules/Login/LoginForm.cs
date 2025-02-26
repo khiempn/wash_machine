@@ -93,7 +93,7 @@ namespace WashMachine.Forms.Modules.Login
                 ShapeBorderColor = Color.Black
             };
             btnPayment.Click += BtnPayment_Click;
-            tlpLoginForm.Controls.Add(btnPayment, 0, 4);
+            tlpLoginForm.Controls.Add(btnPayment, 0, 3);
 
             ButtonRoundedUI btnMachineWithoutPayment = new ButtonRoundedUI()
             {
@@ -104,7 +104,7 @@ namespace WashMachine.Forms.Modules.Login
                 ShapeBorderColor = Color.Black
             };
             btnMachineWithoutPayment.Click += BtnMachine_Click;
-            tlpLoginForm.Controls.Add(btnMachineWithoutPayment, 0, 3);
+            tlpLoginForm.Controls.Add(btnMachineWithoutPayment, 0, 4);
 
             Controls.Add(tlpLoginForm);
             LoadSettingImagesAsync();
@@ -166,6 +166,8 @@ namespace WashMachine.Forms.Modules.Login
 
         private async void BtnPayment_Click(object sender, EventArgs e)
         {
+            MessageBox.Show("Hey there! Just a heads-up—the future's still being worked on, so stay tuned for updates as things come together!", "Message", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            return;
             progressUI.Show();
             string error = await accountService.SignIn(tbUserName.Text, tbPassword.Text);
             progressUI.Hide();

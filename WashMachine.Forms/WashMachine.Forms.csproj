@@ -100,6 +100,11 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="CryptLibrary.cs" />
+    <Compile Include="Database\Context\AppDbContext.cs" />
+    <Compile Include="Database\Tables\ICRUD.cs" />
+    <Compile Include="Database\Tables\Machine\Machine.cs" />
+    <Compile Include="Database\Tables\Machine\MachineModel.cs" />
+    <Compile Include="Database\Tables\Machine\MachineService.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="Modules\LaundryDryerOption\CardItemProperty.cs" />
     <Compile Include="Modules\LaundryDryerOption\ILaundryItem.cs" />
@@ -292,9 +297,6 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
-    <None Include="Database\washmachine.db">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="lib\EFTPaymentsServer.dll.config" />
     <None Include="lib\System.Data.SQLite.dll.config" />
     <None Include="packages.config" />

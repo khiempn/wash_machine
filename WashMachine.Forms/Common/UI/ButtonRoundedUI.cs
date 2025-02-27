@@ -44,7 +44,6 @@ namespace WashMachine.Forms.Common.UI
             {
                 e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
                 Color bgColor = IsSelected ? ShapeSelectedBackgroudColor : ShapeBackgroudColor;
-
                 SolidBrush solidBrush = new SolidBrush(bgColor);
                 Pen borderColor = new Pen(ShapeBorderColor, BorderWidth);
 

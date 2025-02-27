@@ -141,6 +141,10 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption
                 ITempOptionItem tempOptionItem = tempOptionItems[i];
                 Control tempItemTemplate = tempOptionItem.GetTemplate();
                 tblLaundryTempOption.Controls.Add(tempItemTemplate, i, 0);
+                if (TempOptionItemSelected == null)
+                {
+                    TempOptionItemSelected = tempOptionItem;
+                }
             }
 
             tblLaundryOptionItems.Controls.Add(tblLaundryTempOption, 0, 0);
@@ -169,6 +173,11 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption
                 Control timeItemTemplate = timeOptionItem.GetTemplate();
                 timeItemTemplate.Margin = new Padding(5, 5, 5, 0);
                 tblLaundryTimeOption.Controls.Add(timeItemTemplate, 0, i);
+
+                if (TimeOptionItemSelected == null)
+                {
+                    TimeOptionItemSelected = timeOptionItem;
+                }
             }
 
             tblLaundryOptionItems.Controls.Add(tblLaundryTimeOption, 0, 1);

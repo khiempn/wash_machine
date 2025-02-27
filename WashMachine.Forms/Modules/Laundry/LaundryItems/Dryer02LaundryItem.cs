@@ -2,6 +2,8 @@
 using System.Drawing;
 using System.Windows.Forms;
 using WashMachine.Forms.Common.UI;
+using WashMachine.Forms.Database.Context;
+using WashMachine.Forms.Database.Tables.Machine;
 using WashMachine.Forms.Modules.LaundryDryerOption;
 using WashMachine.Forms.Modules.Login;
 
@@ -78,6 +80,26 @@ namespace WashMachine.Forms.Modules.Laundry.LaundryItems
                 Dock = DockStyle.Fill,
                 ForeColor = ColorTranslator.FromHtml("#ffffff")
             };
+
+            MachineModel machine = AppDbContext.Machine.Get(new MachineModel() { Name = Name });
+
+            if (machine != null && machine.IsRunning == 1)
+            {
+                if (MachineService.IsRunCompleted(machine))
+                {
+                    machine.StartAt = "0";
+                    machine.EndAt = "0";
+                    machine.Time = 0;
+                    machine.Type = 0;
+                    machine.IsRunning = 0;
+                    AppDbContext.Machine.Update(machine);
+                }
+                else
+                {
+                    string remainAt = MachineService.GetRemainTimeAsFormat(machine);
+                    lbTitle.Text += $"\n\n\n {remainAt}";
+                }
+            }
 
             lbTitle.Paint += LbTitle_Paint;
             pnCover.Controls.Add(lbTitle);

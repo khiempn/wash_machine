@@ -5,6 +5,8 @@ using System.Drawing;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using WashMachine.Forms.Common.UI;
+using WashMachine.Forms.Database.Context;
+using WashMachine.Forms.Database.Tables.Machine;
 using WashMachine.Forms.Modules.Laundry;
 using WashMachine.Forms.Modules.LaundryDryerOption.Machine;
 using WashMachine.Forms.Modules.LaundryDryerOption.TempOptionItems;
@@ -35,12 +37,12 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.LaundryOptionItems
 
         Form mainForm;
 
-        MachineService machineService;
+        Machine.MachineService machineService;
 
         public Dryer03LaundryItem(ILaundryItem laundryItem, Form parent)
         {
             mainForm = parent;
-            machineService = new MachineService();
+            machineService = new Machine.MachineService();
         }
 
         public void Click()
@@ -144,15 +146,16 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.LaundryOptionItems
                     string tempCommand = TemperatureCommands[$"{form.TempOptionItemSelected.Name}"];
                     //Run temp program
                     machineService.ExecHexCommand(tempCommand);
-
+                    System.Threading.Thread.Sleep(2000);
                     string timeCommand = TimeCommands[$"{form.TimeOptionItemSelected.Name}"];
                     //Run temp program
                     machineService.ExecHexCommand(timeCommand);
-
+                    System.Threading.Thread.Sleep(2000);
                     // Run implement as START
                     machineService.ExecHexCommand(ImplementCommand);
-
-                    machineService.Disconect();
+                    System.Threading.Thread.Sleep(2000);
+                    //machineService.Disconect();
+                    SetIsRunning();
                     Logger.Log($"{nameof(Dryer03LaundryItem)} Step 4 END");
                 }
                 else
@@ -160,6 +163,19 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.LaundryOptionItems
                     Logger.Log($"{nameof(Dryer03LaundryItem)} Can not connect device.");
                 }
             });
+        }
+
+        public void SetIsRunning()
+        {
+            LaundryDryerOptionForm form = (LaundryDryerOptionForm)mainForm;
+
+            MachineModel machine = AppDbContext.Machine.Get(new MachineModel() { Name = Name });
+            machine.StartAt = DateTime.Now.Ticks.ToString();
+            machine.EndAt = DateTime.Now.AddMinutes(form.TimeOptionItemSelected.TimeNumber).Ticks.ToString();
+            machine.Time = form.TimeOptionItemSelected.TimeNumber;
+            machine.Temp = form.TempOptionItemSelected.TypeId;
+            machine.IsRunning = 1;
+            AppDbContext.Machine.Update(machine);
         }
     }
 }

@@ -111,5 +111,10 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.LaundryOptionItems
         {
             throw new NotImplementedException();
         }
+
+        public void SetIsRunning()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

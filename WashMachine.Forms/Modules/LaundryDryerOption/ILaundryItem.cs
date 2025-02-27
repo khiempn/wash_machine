@@ -23,5 +23,6 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption
         Control GetTemplate();
         void DisableItem(Control control);
         Task Start();
+        void SetIsRunning();
     }
 }

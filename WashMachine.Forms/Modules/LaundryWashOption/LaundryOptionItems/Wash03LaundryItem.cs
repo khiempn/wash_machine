@@ -137,10 +137,10 @@ namespace WashMachine.Forms.Modules.LaundryWashOption.LaundryOptionItems
                     string programCommand = ProgramCommands[$"{form.TimeOptionItemSelected.Name}"];
                     //Run selected program
                     machineService.ExecHexCommand(programCommand);
-
+                    System.Threading.Thread.Sleep(2000);
                     // Run implement as START
                     machineService.ExecHexCommand(ImplementCommand);
-
+                    System.Threading.Thread.Sleep(2000);
                     machineService.Disconect();
                     Logger.Log($"{nameof(Wash03LaundryItem)} Step 4 END");
                 }

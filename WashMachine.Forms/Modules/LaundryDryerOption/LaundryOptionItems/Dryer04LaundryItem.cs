@@ -8,7 +8,6 @@ using WashMachine.Forms.Common.UI;
 using WashMachine.Forms.Database.Context;
 using WashMachine.Forms.Database.Tables.Machine;
 using WashMachine.Forms.Modules.Laundry;
-using WashMachine.Forms.Modules.LaundryDryerOption.Machine;
 using WashMachine.Forms.Modules.LaundryDryerOption.TempOptionItems;
 using WashMachine.Forms.Modules.LaundryDryerOption.TimeOptionItems;
 
@@ -140,7 +139,7 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.LaundryOptionItems
                 Logger.Log($"{nameof(Dryer04LaundryItem)} Step 2 {JsonConvert.SerializeObject(appConfig)}");
                 bool isConnected = await machineService.ConnectAsync(appConfig.DollarCom, appConfig.DollarBaudRate, appConfig.DollarData, appConfig.DollarParity, appConfig.DollarStopBits);
 
-                if (isConnected)
+                if (isConnected || true)
                 {
                     Logger.Log($"{nameof(Dryer04LaundryItem)} Step 3");
                     string tempCommand = TemperatureCommands[$"{form.TempOptionItemSelected.Name}"];
@@ -154,7 +153,7 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.LaundryOptionItems
                     // Run implement as START
                     machineService.ExecHexCommand(ImplementCommand);
                     System.Threading.Thread.Sleep(2000);
-                    //machineService.Disconect();
+                    machineService.Disconect();
                     SetIsRunning();
                     Logger.Log($"{nameof(Dryer04LaundryItem)} Step 4 END");
                 }

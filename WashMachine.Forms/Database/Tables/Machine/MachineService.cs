@@ -1,5 +1,5 @@
-﻿using Microsoft.SqlServer.Server;
-using System;
+﻿using System;
+using System.Collections.Generic;
 
 namespace WashMachine.Forms.Database.Tables.Machine
 {
@@ -26,5 +26,16 @@ namespace WashMachine.Forms.Database.Tables.Machine
             return currentAt.CompareTo(endAt) > 0;
         }
 
+        public static string GetTempName(int typeId)
+        {
+            Dictionary<int, string> temps = new Dictionary<int, string>
+            {
+                { 1, "Low" },
+                { 2, "Medium" },
+                { 3, "High" },
+            };
+            temps.TryGetValue(typeId, out string tempName);
+            return tempName;
+        }
     }
 }

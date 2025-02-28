@@ -18,6 +18,7 @@ namespace WashMachine.Forms.Modules.Laundry.LaundryItems
         Form mainForm;
         FollowType followType;
         Timer timer;
+        string lbInforName = $"lbInfor_{nameof(Dryer01LaundryItem)}";
 
         public Dryer01LaundryItem(FollowType _followType, Form parent)
         {
@@ -35,8 +36,7 @@ namespace WashMachine.Forms.Modules.Laundry.LaundryItems
 
         private void LaundryDryerOptionForm_FormClosed(object sender, FormClosedEventArgs e)
         {
-            mainForm.Show();
-            mainForm.Refresh();
+            mainForm.Close();
         }
 
         public Control GetTemplate()
@@ -68,8 +68,8 @@ namespace WashMachine.Forms.Modules.Laundry.LaundryItems
                 Enabled = false
             };
 
-            tblCardItem.RowStyles.Add(new RowStyle() { Height = 150, SizeType = SizeType.Absolute });
-            tblCardItem.RowStyles.Add(new RowStyle() { Height = 150, SizeType = SizeType.Absolute });
+            tblCardItem.RowStyles.Add(new RowStyle() { Height = 130, SizeType = SizeType.Absolute });
+            tblCardItem.RowStyles.Add(new RowStyle() { Height = 170, SizeType = SizeType.AutoSize });
             tblCardItem.ColumnStyles.Add(new ColumnStyle() { Width = 100, SizeType = SizeType.Percent });
             Panel pnCover = new Panel
             {
@@ -92,7 +92,6 @@ namespace WashMachine.Forms.Modules.Laundry.LaundryItems
             tblCardItem.Controls.Add(pnCover, 0, 0);
 
             MachineModel machine = AppDbContext.Machine.Get(new MachineModel() { Name = Name });
-
             if (machine != null && machine.IsRunning == 1)
             {
                 if (MachineService.IsRunCompleted(machine))
@@ -108,7 +107,7 @@ namespace WashMachine.Forms.Modules.Laundry.LaundryItems
                         Enabled = false,
                         Dock = DockStyle.Fill,
                         ForeColor = ColorTranslator.FromHtml("#ffffff"),
-                        Name = "lbInfor"
+                        Name = lbInforName
                     };
                     
                     timer?.Stop();
@@ -122,11 +121,13 @@ namespace WashMachine.Forms.Modules.Laundry.LaundryItems
                     timer.Start();
 
                     string remainAt = MachineService.GetRemainTimeAsFormat(machine);
-                    lbInfor.Text = $"Remain Time: {remainAt}";
+                    string tempName = MachineService.GetTempName(machine.Temp);
+                    lbInfor.Text = $"Remain Time: {remainAt}\n Temp: {tempName}";
                     tblCardItem.Controls.Add(lbInfor, 0, 1);
                     cardButton.Enabled = false;
                 }
             }
+
             cardButton.Controls.Add(tblCardItem);
 
             return cardButton;
@@ -141,17 +142,18 @@ namespace WashMachine.Forms.Modules.Laundry.LaundryItems
                 {
                     timer.Stop();
                     AppDbContext.Machine.ResetMachine(machine);
-                    if (mainForm.Controls.Find("lbInfor", true).Any())
+                    if (mainForm.Controls.Find(lbInforName, true).Any())
                     {
-                        Label lbInfor = mainForm.Controls.Find("lbInfor", true).First() as Label;
+                        Label lbInfor = mainForm.Controls.Find(lbInforName, true).First() as Label;
                         mainForm.Controls.Remove(lbInfor);
                     }
                 }
                 else
                 {
-                    Label lbInfor = mainForm.Controls.Find("lbInfor", true).First() as Label;
+                    Label lbInfor = mainForm.Controls.Find(lbInforName, true).First() as Label;
                     string remainAt = MachineService.GetRemainTimeAsFormat(machine);
-                    lbInfor.Text = $"Remain Time: {remainAt}\n Temp: ";
+                    string tempName = MachineService.GetTempName(machine.Temp);
+                    lbInfor.Text = $"Remain Time: {remainAt}\n Temp: {tempName}";
                 }
             }
             catch (Exception ex)

@@ -253,7 +253,7 @@ namespace WashMachine.Forms.Database.Tables.Machine
                         var command = con.CreateCommand();
                         command.CommandText =
                         $@"
-                            UPDATE machine SET StartAt = $StartAt, EndAt = $EndAt, Time = $Time, Temp = $Time
+                            UPDATE machine SET StartAt = $StartAt, EndAt = $EndAt, Time = $Time, Temp = $Temp
                                 , IsRunning = $IsRunning
                             WHERE Name = '{model.Name}'
                         ";

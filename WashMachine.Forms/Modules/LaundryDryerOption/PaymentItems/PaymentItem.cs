@@ -27,6 +27,7 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.PaymentItems
 
                     await form.LaundryOptionItemSelected.Start();
                     progressUI.Hide();
+                    mainForm.Close();
                 }
             }
             catch (Exception ex)

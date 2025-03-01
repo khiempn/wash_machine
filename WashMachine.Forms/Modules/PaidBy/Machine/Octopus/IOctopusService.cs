@@ -1,11 +1,12 @@
-﻿using WashMachine.Forms.Modules.PaidBy.Service.Octopus;
+﻿using WashMachine.Forms.Modules.PaidBy.Service.Model;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace WashMachine.Forms.Modules.PaidBy.Machine.Octopus
 {
     public interface IOctopusService
     {
-        void FileLocked();
+        void ShowOutOfService();
 
         bool Initial();
 
@@ -19,5 +20,11 @@ namespace WashMachine.Forms.Modules.PaidBy.Machine.Octopus
         Task RefreshConfig();
 
         OctopusService StartWaitingPayment(PaymentModel payment);
+
+        void HideOutOfService();
+
+        void SetCurrentForm(Form form);
+
+        bool IsUserUsingApplication();
     }
 }

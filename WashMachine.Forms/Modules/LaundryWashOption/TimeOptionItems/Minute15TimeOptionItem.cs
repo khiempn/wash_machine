@@ -13,6 +13,8 @@ namespace WashMachine.Forms.Modules.LaundryWashOption.TimeOptionItems
 
         public int TimeNumber => 15;
 
+        public int Amount => 15;
+
         public Minute15TimeOptionItem(Form form)
         {
             mainForm = form;

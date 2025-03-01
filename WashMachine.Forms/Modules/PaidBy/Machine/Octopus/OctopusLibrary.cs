@@ -411,15 +411,10 @@ namespace WashMachine.Forms.Modules.PaidBy.Machine.Octopus
             string hexText = "0000" + id.ToString("X");
             string textBoxAddInfo = hexText.Substring(hexText.Length - 4);
 
-            Int32 r = 0;
-            //Int32 val = 0;
-
-            //textBoxRemainValue.Text = "Requesting...";
             var textAI = textBoxAddInfo + "000000" + textBoxAddInfo;
 
             try
             {
-                //val = Convert.ToInt32(textBoxAmount.Text);
                 Array.Clear(gBuf, 0, gBuf.Length);
                 gBuf[0] = getByteFromString(textAI, 0, 2);
                 gBuf[1] = getByteFromString(textAI, 2, 2);
@@ -445,7 +440,7 @@ namespace WashMachine.Forms.Modules.PaidBy.Machine.Octopus
 
             MemsetHGlobal(gBufPtr, BUFSIZE);
             Marshal.Copy(gBuf, 0, gBufPtr, 7);
-            r = Deduct(val, gBufPtr);
+            var r = Deduct(val, gBufPtr);
             gSBTmp.Clear();
             gSBTmp.Append("Deduct(").Append(val).Append(",").Append(textAI).Append(")");
             LogEvent1(gSBTmp.ToString(), r);
@@ -598,10 +593,12 @@ namespace WashMachine.Forms.Modules.PaidBy.Machine.Octopus
 
         public void ExcecuteXFile()
         {
-            if (IsCanRunXFile(ParseDatetimeJob(OctopusConfig.XFileHour, OctopusConfig.XFileMinute)))
+            if (!string.IsNullOrWhiteSpace(OctopusConfig.XFileHour)
+                && !string.IsNullOrWhiteSpace(OctopusConfig.XFileMinute) 
+                && IsCanRunXFile(ParseDatetimeJob(OctopusConfig.XFileHour, OctopusConfig.XFileMinute))
+                && !Program.octopusService.IsUserUsingApplication())
             {
-                IOctopusService octopusService = new OctopusService();
-                octopusService.FileLocked();
+                Program.octopusService.ShowOutOfService();
                 //HomeFrom.Browser.InvokeScript("xFileLocked");
                 LogEvent2("Xfile is going to generate, will be executed when system is idle.");
 
@@ -647,7 +644,10 @@ namespace WashMachine.Forms.Modules.PaidBy.Machine.Octopus
             {
                 Logger.Log(ex);
             }
-            //HomeFrom.Browser.InvokeScript("xFileResuming", emailType);
+            finally
+            {
+                Program.octopusService.HideOutOfService();
+            }
         }
 
         private bool IsCanRunUpload(DateTime dateTimeJob)
@@ -807,7 +807,8 @@ namespace WashMachine.Forms.Modules.PaidBy.Machine.Octopus
 
         public void UploadFiles(Action<bool, string> done)
         {
-            if (IsCanRunUpload(ParseDatetimeJob(OctopusConfig.UploadHour, OctopusConfig.UploadMinute)))
+            if (!string.IsNullOrWhiteSpace(OctopusConfig.UploadHour) && !string.IsNullOrWhiteSpace(OctopusConfig.UploadMinute) 
+                && IsCanRunUpload(ParseDatetimeJob(OctopusConfig.UploadHour, OctopusConfig.UploadMinute)))
             {
                 var config = OctopusINI.ReadFileConfig();
                 var folderPath = config.EXCHANGE;
@@ -906,7 +907,9 @@ namespace WashMachine.Forms.Modules.PaidBy.Machine.Octopus
 
         public void DownloadFiles(Action<bool, string> done)
         {
-            if (IsCanRunDownload(ParseDatetimeJob(OctopusConfig.DownloadHour, OctopusConfig.DownloadMinute)))
+            if (!string.IsNullOrWhiteSpace(OctopusConfig.DownloadHour)
+                && !string.IsNullOrWhiteSpace(OctopusConfig.DownloadMinute)
+                && IsCanRunDownload(ParseDatetimeJob(OctopusConfig.DownloadHour, OctopusConfig.DownloadMinute)))
             {
                 var downloadMock = DateTime.Now.ToString("HHmm");
                 var config = OctopusINI.ReadFileConfig();
@@ -990,6 +993,7 @@ namespace WashMachine.Forms.Modules.PaidBy.Machine.Octopus
         public string LastAddType { get; set; }
         public string LastAddDate { get; set; }
         public string CardJson { get; set; }
+        public List<int> MessageCodes { get; set; }
     }
 
     public class ExtraInfo

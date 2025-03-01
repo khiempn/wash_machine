@@ -6,6 +6,7 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.TimeOptionItems
     {
         string Name { get; }
         int TimeNumber { get; }
+        int Amount { get; }
         void Click();
         Control GetTemplate();
     }

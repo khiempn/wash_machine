@@ -69,5 +69,19 @@ namespace WashMachine.Forms.Modules.PaidBy.Service
 
             return null;
         }
+
+        public async Task<OrderModel> CreateIncompletedPayment(OrderModel orderModel)
+        {
+            string result = await httpService.Post($"{Program.AppConfig.AppHost}/ShopApi/CreateIncompletedPayment", orderModel);
+
+            ResponseModel response = httpService.ConvertTo<ResponseModel>(result);
+            if (response != null && response.Success)
+            {
+                OrderModel order = JsonConvert.DeserializeObject<OrderModel>(JsonConvert.SerializeObject(response.Data));
+                return order;
+            }
+
+            return null;
+        }
     }
 }

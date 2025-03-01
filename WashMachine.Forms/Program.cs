@@ -1,9 +1,8 @@
-﻿using WashMachine.Forms.Modules.Login;
-using WashMachine.Forms.Modules.PaidBy.Dialog;
-using WashMachine.Forms.Modules.Shop;
-using System;
+﻿using System;
 using System.IO;
 using System.Windows.Forms;
+using WashMachine.Forms.Modules.Login;
+using WashMachine.Forms.Modules.Shop;
 
 namespace WashMachine.Forms
 {
@@ -11,7 +10,7 @@ namespace WashMachine.Forms
     {
         public static AppConfigModel AppConfig;
         public static ShopConfigModel ShopConfig;
-
+        public static Modules.PaidBy.Machine.Octopus.OctopusService octopusService;
         public static int Counter { get; set; } = 1;
         /// <summary>
         /// The main entry point for the application.

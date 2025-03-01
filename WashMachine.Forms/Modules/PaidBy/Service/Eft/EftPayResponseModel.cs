@@ -102,7 +102,7 @@ namespace WashMachine.Forms.Modules.PaidBy.Service.Eft
         public string Message { get; set; }
         public int ReturnId { get; set; }
         public TransactionRecord TransactionRecord { get; set; }
-        public ResponseCodeModel GetResposeMessage()
+        public ResponseCodeModel GetErrorResposeMessage()
         {
             if (TransactionRecord != null)
             {
@@ -110,6 +110,11 @@ namespace WashMachine.Forms.Modules.PaidBy.Service.Eft
                 return codeModel;
             }
             return null;
+        }
+
+        public bool IsPaymentCompleted()
+        {
+            return $"{TransactionRecord.respondCode}".Equals("00");
         }
 
         public ErrorCodeModel GetErrorMessage()

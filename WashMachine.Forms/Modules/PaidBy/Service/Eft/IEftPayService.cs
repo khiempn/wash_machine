@@ -1,5 +1,4 @@
-﻿using WashMachine.Forms.Modules.PaidBy.PaidByItems.Model;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace WashMachine.Forms.Modules.PaidBy.Service.Eft
 {

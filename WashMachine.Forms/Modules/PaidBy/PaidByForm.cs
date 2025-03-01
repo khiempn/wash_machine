@@ -1,12 +1,11 @@
-﻿using WashMachine.Forms.Common.UI;
-using WashMachine.Forms.Modules.Login;
-using WashMachine.Forms.Modules.PaidBy.PaidByItems;
-using WashMachine.Forms.Modules.Payment;
-using WashMachine.Forms.Modules.Payment.PaymentItems;
+﻿using WashMachine.Forms.Modules.PaidBy.PaidByItems;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
+using WashMachine.Forms.Common.UI;
+using WashMachine.Forms.Modules.Login;
+using WashMachine.Forms.Modules.Payment;
 
 namespace WashMachine.Forms.Modules.PaidBy
 {
@@ -15,28 +14,11 @@ namespace WashMachine.Forms.Modules.PaidBy
         private TableLayoutPanel tblPaidByForm;
         private ProgressUI progressUI;
         public FollowType FollowType { get; set; }
-        Dictionary<string, IPaymentItem> codePayments = new Dictionary<string, IPaymentItem>();
 
         public PaidByForm(FollowType followType, IPaymentItem paymentItem)
         {
             InitializeComponent();
             FollowType = followType;
-            Hkd20PaymentItem hkd20Payment = new Hkd20PaymentItem();
-            hkd20Payment.DropCoinCompleted += DropcoinCompletedAction;
-
-            Hkd50PaymentItem hkd50Payment = new Hkd50PaymentItem();
-            hkd50Payment.DropCoinCompleted += DropcoinCompletedAction;
-
-            Hkd100PaymentItem hkd100Payment = new Hkd100PaymentItem();
-            hkd100Payment.DropCoinCompleted += DropcoinCompletedAction;
-
-            Hkd500PaymentItem hkd500Payment = new Hkd500PaymentItem();
-            hkd500Payment.DropCoinCompleted += DropcoinCompletedAction;
-
-            codePayments.Add(hkd20Payment.PaymentAmount.ToString(), hkd20Payment);
-            codePayments.Add(hkd50Payment.PaymentAmount.ToString(), hkd50Payment);
-            codePayments.Add(hkd100Payment.PaymentAmount.ToString(), hkd100Payment);
-            codePayments.Add(hkd500Payment.PaymentAmount.ToString(), hkd500Payment);
 
             ResizeRedraw = false;
             Padding = new Padding(10);
@@ -65,13 +47,12 @@ namespace WashMachine.Forms.Modules.PaidBy
             };
 
             tblPaymentItems.RowStyles.Add(new RowStyle() { Height = 200, SizeType = SizeType.AutoSize });
-            IPaymentItem payment = codePayments[paymentItem.PaymentAmount.ToString()];
 
             List<IPaidByItem> cardItems = new List<IPaidByItem>
             {
-                new OctopusPaidByItem(this, payment),
-                new AliPayPaidByItem(this, payment),
-                new PayMePaidByItem(this, payment)
+                new OctopusPaidByItem(this, paymentItem),
+                new AliPayPaidByItem(this, paymentItem),
+                new PayMePaidByItem(this, paymentItem)
              };
 
             for (int i = 0; i < cardItems.Count; i++)
@@ -156,6 +137,9 @@ namespace WashMachine.Forms.Modules.PaidBy
             tblPaidByForm.Controls.Add(tblPaymentItems, 0, 1);
             tblPaidByForm.Controls.Add(pnReturnItems, 0, 2);
             Controls.Add(tblPaidByForm);
+
+            Program.octopusService.SetCurrentForm(this);
+            Program.octopusService.SetUserIsUsingApp(true);
         }
 
         private void DropcoinCompletedAction(bool arg1, string arg2)

@@ -11,7 +11,7 @@ namespace WashMachine.Forms.Modules.LaundryWashOption.TimeOptionItems
         Form mainForm;
         public string Name => nameof(Minute40TimeOptionItem);
         public int TimeNumber => 40;
-
+        public int Amount => 30;
         public Minute40TimeOptionItem(Form form)
         {
             mainForm = form;

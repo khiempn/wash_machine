@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using WashMachine.Forms.Common.UI;
 using WashMachine.Forms.Modules.Laundry;
+using WashMachine.Forms.Modules.LaundryDryerOption.LaundryOptionItems;
 using WashMachine.Forms.Modules.LaundryWashOption.LaundryOptionItems;
 using WashMachine.Forms.Modules.LaundryWashOption.PaymentItems;
 using WashMachine.Forms.Modules.LaundryWashOption.TimeOptionItems;
@@ -60,7 +61,7 @@ namespace WashMachine.Forms.Modules.LaundryWashOption
             tblLaundryItemsForm.RowStyles.Add(new RowStyle() { Height = 100, SizeType = SizeType.Percent });
             tblLaundryItemsForm.RowStyles.Add(new RowStyle() { Height = 70, SizeType = SizeType.Absolute });
 
-            List<ILaundryOptionItem> cardItems = new List<ILaundryOptionItem>
+            List<LaundryDryerOption.ILaundryOptionItem> dryerItems = new List<LaundryDryerOption.ILaundryOptionItem>
             {
                 new Dryer01LaundryItem(laundryItem, this),
                 new Dryer02LaundryItem(laundryItem, this),
@@ -68,21 +69,21 @@ namespace WashMachine.Forms.Modules.LaundryWashOption
                 new Dryer04LaundryItem(laundryItem, this),
             };
 
-            for (int i = 0; i < cardItems.Count; i++)
+            for (int i = 0; i < dryerItems.Count; i++)
             {
                 tblLaundryItemsForm.ColumnStyles.Add(new ColumnStyle() { Width = 70, SizeType = SizeType.Percent });
 
-                ILaundryOptionItem cardItem = cardItems[i];
-                Control cardItemTemplate = cardItem.GetTemplate();
+                LaundryDryerOption.ILaundryOptionItem dryerItem = dryerItems[i];
+                Control cardItemTemplate = dryerItem.GetTemplate();
                 cardItemTemplate.Margin = new Padding(5, 0, 5, 5);
                 tblLaundryItemsForm.Controls.Add(cardItemTemplate, i, 0);
-                if (!cardItem.Name.Equals(laundryItem.Name))
+                if (!dryerItem.Name.Equals(laundryItem.Name))
                 {
-                    cardItem.DisableItem(cardItemTemplate);
+                    dryerItem.DisableItem(cardItemTemplate);
                 }
             }
 
-            cardItems = new List<ILaundryOptionItem>
+            List<ILaundryOptionItem> washItems = new List<ILaundryOptionItem>
             {
                 new Wash01LaundryItem(laundryItem, this),
                 new Wash02LaundryItem(laundryItem, this),
@@ -90,19 +91,19 @@ namespace WashMachine.Forms.Modules.LaundryWashOption
                 new Wash04LaundryItem(laundryItem, this),
             };
 
-            for (int i = 0; i < cardItems.Count; i++)
+            for (int i = 0; i < washItems.Count; i++)
             {
-                ILaundryOptionItem cardItem = cardItems[i];
-                Control cardItemTemplate = cardItem.GetTemplate();
+                ILaundryOptionItem washItem = washItems[i];
+                Control cardItemTemplate = washItem.GetTemplate();
                 cardItemTemplate.Margin = new Padding(5, 5, 5, 0);
                 tblLaundryItemsForm.Controls.Add(cardItemTemplate, i, 1);
-                if (cardItem.Name.Equals(laundryItem.Name))
+                if (washItem.Name.Equals(laundryItem.Name))
                 {
-                    LaundryOptionItemSelected = cardItem;
+                    LaundryOptionItemSelected = washItem;
                 }
                 else
                 {
-                    cardItem.DisableItem(cardItemTemplate);
+                    washItem.DisableItem(cardItemTemplate);
                 }
             }
 

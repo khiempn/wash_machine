@@ -1,8 +1,13 @@
-﻿using WashMachine.Forms.Modules.PaidBy.Machine;
+﻿using EFTSolutions;
+using WashMachine.Forms.Modules.PaidBy.Machine;
 using WashMachine.Forms.Modules.PaidBy.PaidByItems;
 using WashMachine.Forms.Modules.PaidBy.Service.Eft;
+using WashMachine.Forms.Modules.PaidBy.Service.Model;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Printing;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -12,9 +17,10 @@ namespace WashMachine.Forms.Modules.PaidBy.Service
     {
         MachineService machineService;
         EftPayService eftPayService;
-        bool IsCancelPaymentRequest { get; set; }
         public event EventHandler<string> CodeRecivedHandler;
+        public event EventHandler<bool> PaymentLoopingHandler;
         Timer timer;
+        OrderModel _orderModel;
 
         public AlipayService()
         {
@@ -22,14 +28,22 @@ namespace WashMachine.Forms.Modules.PaidBy.Service
             eftPayService = new EftPayService();
 
             machineService.CodeRecived += MachineService_CodeRecived;
+            machineService.PaymentLoopingHandler += MachineService_PaymentLoopingHandler;
             timer = new Timer();
             timer.Tick += Timer_Tick;
             timer.Interval = 1000;
             timer.Tag = 1000 * Program.AppConfig.ScanTimeout;
         }
 
+        private void MachineService_PaymentLoopingHandler(object sender, bool e)
+        {
+            
+        }
+
         private void Timer_Tick(object sender, EventArgs e)
         {
+            PaymentLoopingHandler?.Invoke(sender, true);
+
             int currentTime = (int)timer.Tag;
             if (currentTime > 0)
             {
@@ -67,7 +81,6 @@ namespace WashMachine.Forms.Modules.PaidBy.Service
                 bool isConnected = await machineService.ConnectAsync(appConfig.CouponCom, appConfig.CouponBaudRate, appConfig.CouponData, appConfig.CouponParity, appConfig.CouponStopBits);
                 if (isConnected)
                 {
-                    IsCancelPaymentRequest = false;
                     timer.Start();
                 }
                 else
@@ -100,7 +113,7 @@ namespace WashMachine.Forms.Modules.PaidBy.Service
                 bool isConnected = await machineService.ConnectAsync(mainForm);
                 if (isConnected)
                 {
-                    //timer.Start();
+                    timer.Start();
                 }
                 else
                 {
@@ -153,14 +166,44 @@ namespace WashMachine.Forms.Modules.PaidBy.Service
             }
         }
 
-        public bool IsCancelPayment()
+        public void Printer(OrderModel orderModel)
         {
-            return IsCancelPaymentRequest;
+            _orderModel = orderModel;
+            PrintDocument pd = new PrintDocument();
+            pd.PrintPage += PrintPage;
+            pd.Print();
         }
 
-        public void CancelPayment()
+        private void PrintPage(object sender, PrintPageEventArgs e)
         {
-            IsCancelPaymentRequest = true;
+            TransactionRecord cardInfo = JsonConvert.DeserializeObject<TransactionRecord>(_orderModel.CardJson);
+
+            List<string> lines = new List<string> {
+                "----------------------------------------------------------------------------------------------------------------",
+                $"Shop Name:　{ _orderModel.ShopName }",
+                $"Shop Code:　{ _orderModel.ShopCode }",
+                $"Print Time:　{ DateTime.Now.ToString("MM/dd/yyyy hh:mm:ss tt") }",
+                "----------------------------------------------------------------------------------------------------------------",
+                $"交易編號 Transaction No.:　{ cardInfo.OrderNumber }",
+                $"付款方法 Payment Method : Alipay",
+                $"總額 (Total): HKD { FormatDecimal(_orderModel.Amount) }"
+            };
+
+            Font font = new Font("Arial", 12);
+            float yPosition = 10;
+            float lineHeight = font.GetHeight(e.Graphics);
+
+            foreach (string line in lines)
+            {
+                e.Graphics.DrawString(line, font, Brushes.Black, new PointF(10, yPosition));
+                yPosition += lineHeight;
+            }
+        }
+
+        private string FormatDecimal(float? value, int n = 2)
+        {
+            if (value == null) return "0";
+            return value.Value.ToString("n" + n);
         }
     }
 }

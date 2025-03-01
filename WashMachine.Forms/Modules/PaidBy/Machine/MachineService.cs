@@ -1,5 +1,5 @@
 ﻿using WashMachine.Forms.Modules.PaidBy.Machine.Octopus;
-using WashMachine.Forms.Modules.PaidBy.Service.Octopus;
+using WashMachine.Forms.Modules.PaidBy.Service.Model;
 using System;
 using System.IO.Ports;
 using System.Threading.Tasks;
@@ -14,11 +14,26 @@ namespace WashMachine.Forms.Modules.PaidBy.Machine
         string codeBuilder;
         OctopusService octopusService;
         public event EventHandler<OctopusPaymentResponseModel> PaymentProgressHandler;
+        public event EventHandler<bool> PaymentLoopingHandler;
+        public event EventHandler<CardInfo> CreateOrderIncompleteHandler;
+
         public MachineService()
         {
             codeBuilder = string.Empty;
-            octopusService = new OctopusService();
-            octopusService.PaymentProgressHandler += OctopusService_PaymentProgressHandler; ;
+            octopusService = Program.octopusService;
+            octopusService.PaymentProgressHandler += OctopusService_PaymentProgressHandler;
+            octopusService.PaymentLoopingHandler += OctopusService_PaymentLoopingHandler;
+            octopusService.CreateOrderIncompleteHandler += OctopusService_CreateOrderIncompleteHandler;
+        }
+
+        private void OctopusService_CreateOrderIncompleteHandler(object sender, CardInfo e)
+        {
+            CreateOrderIncompleteHandler?.Invoke(sender, e);
+        }
+
+        private void OctopusService_PaymentLoopingHandler(object sender, bool e)
+        {
+            PaymentLoopingHandler?.Invoke(sender, e);
         }
 
         private void OctopusService_PaymentProgressHandler(object sender, OctopusPaymentResponseModel e)
@@ -121,10 +136,20 @@ namespace WashMachine.Forms.Modules.PaidBy.Machine
         {
             try
             {
-                bool status = octopusService.Initial();
-                if (status)
+                if (octopusService != null && octopusService.InitialStatus)
                 {
                     return octopusService;
+                }
+                else
+                {
+                    PaymentProgressHandler?.Invoke(false, new OctopusPaymentResponseModel()
+                    {
+                        Rs = octopusService.LastRsInitialCOM,
+                        MessageCodes = new System.Collections.Generic.List<int>()
+                        {
+                            octopusService.LastRsInitialCOM
+                        }
+                    });
                 }
             }
             catch (Exception ex)

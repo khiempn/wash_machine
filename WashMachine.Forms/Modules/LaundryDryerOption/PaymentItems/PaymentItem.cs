@@ -2,6 +2,8 @@
 using System.Drawing;
 using System.Windows.Forms;
 using WashMachine.Forms.Common.UI;
+using WashMachine.Forms.Modules.Login;
+using WashMachine.Forms.Modules.PaidBy;
 
 namespace WashMachine.Forms.Modules.LaundryDryerOption.PaymentItems
 {
@@ -9,17 +11,23 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.PaymentItems
     {
         Form mainForm;
 
-        public PaymentItem(Form form)
+        Payment.IPaymentItem paymentItem;
+        FollowType followType;
+
+        public PaymentItem(FollowType followType, Form form)
         {
             mainForm = form;
+            this.followType = followType;
+            paymentItem = new Payment.PaymentItems.HkdPaymentItem();
+            paymentItem.PaymentCompletedCallBack += PaymentItem_PaymentCompleted;
         }
 
-        public async void Click()
+        private async void PaymentItem_PaymentCompleted(object sender)
         {
             try
             {
                 LaundryDryerOptionForm form = (LaundryDryerOptionForm)mainForm;
-                if (form.LaundryOptionItemSelected != null)
+                if (form.LaundryOptionItemSelected != null && form.TimeOptionItemSelected != null && form.TempOptionItemSelected != null)
                 {
                     ProgressUI progressUI = new ProgressUI();
                     progressUI.SetParent(mainForm);
@@ -32,8 +40,33 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.PaymentItems
             }
             catch (Exception ex)
             {
+
+            }
+        }
+
+        public void Click()
+        {
+            try
+            {
+                LaundryDryerOptionForm form = (LaundryDryerOptionForm)mainForm;
+                if (form.LaundryOptionItemSelected != null && form.TimeOptionItemSelected != null && form.TempOptionItemSelected != null)
+                {
+                    paymentItem.SetAmount(form.TimeOptionItemSelected.Amount);
+
+                    PaidByForm paidByForm = new PaidByForm(followType, paymentItem);
+                    paidByForm.Show();
+                    paidByForm.FormClosed += PaidByForm_FormClosed;
+                }
+            }
+            catch (Exception ex)
+            {
                 Logger.Log(ex);
             }
+        }
+
+        private void PaidByForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            mainForm.Close();
         }
 
         public Control GetTemplate()

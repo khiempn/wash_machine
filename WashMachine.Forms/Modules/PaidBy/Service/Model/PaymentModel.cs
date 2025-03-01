@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace WashMachine.Forms.Modules.PaidBy.Service.Octopus
+namespace WashMachine.Forms.Modules.PaidBy.Service.Model
 {
     public class PaymentModel
     {

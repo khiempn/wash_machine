@@ -1,5 +1,4 @@
-﻿using WashMachine.Forms.Modules.PaidBy.PaidByItems.Model;
-using WashMachine.Forms.Modules.PaidBy.Service.Eft;
+﻿using WashMachine.Forms.Modules.PaidBy.Service.Eft;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -10,6 +9,5 @@ namespace WashMachine.Forms.Modules.PaidBy
         Control GetTemplate();
         void Click();
         Task<EftPayResponseModel> EftSale(EftPayRequestModel eftPayParameter);
-        Task TrackingStatistics(StatisticsModel statistics);
     }
 }

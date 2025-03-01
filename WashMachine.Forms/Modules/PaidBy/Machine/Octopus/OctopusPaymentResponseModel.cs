@@ -3,6 +3,13 @@ using System.Linq;
 
 namespace WashMachine.Forms.Modules.PaidBy.Machine.Octopus
 {
+    public enum OctopusPaymentStatus { 
+
+        SUCCESS = 3,
+        FAILURE = 2,
+        MANUAL_TIMEOUT = 1
+    }
+
     public class OctopusPaymentResponseModel
     {
         List<ResponseCodeModel> responseCodes = new List<ResponseCodeModel>()
@@ -25,9 +32,13 @@ namespace WashMachine.Forms.Modules.PaidBy.Machine.Octopus
             new ResponseCodeModel() { Code = 100049, Cn_Message = "卡上儲值額超出上限,請使用另一張八達通卡", En_Message = "Stored value on card exceeds limit. Please use another Octopus" },
 
             new ResponseCodeModel() { Code = 100001,  Cn_Message = "機器故障。請與本店職員聯絡", En_Message = "Machine out of order. Please contact staff for assistance" },
-            new ResponseCodeModel() { Code = -2, Cn_Message = "請重試(八達通號碼 88888888)", En_Message = "Retry please (Octopus no. 88888888)" },
+            new ResponseCodeModel() { Code = -100022, Cn_Message = "請重試(八達通號碼 88888888)", En_Message = "Retry please (Octopus no. 88888888)" },
             new ResponseCodeModel() { Code = int.MinValue, Cn_Message = "", En_Message = "Please setup Octopus equipment for this device" },
+            new ResponseCodeModel() { Code = (int)OctopusPaymentStatus.SUCCESS, Cn_Message = "付款成功!", En_Message = "Payment successfully!" },
+            new ResponseCodeModel() { Code = (int)OctopusPaymentStatus.FAILURE, Cn_Message = "", En_Message = "Can not completed payment!" },
+            new ResponseCodeModel() { Code = (int)OctopusPaymentStatus.MANUAL_TIMEOUT, Cn_Message = "", En_Message = "Timeout when waiting scan card." },
         };
+
 
         public OctopusPaymentResponseModel()
         {
@@ -38,33 +49,32 @@ namespace WashMachine.Forms.Modules.PaidBy.Machine.Octopus
         public CardInfo CardInfo { get; set; }
         public string Message { get; set; }
         public int Rs { get; set; }
-        public bool SpecificScenario { get; set; }
+        public List<int> MessageCodes { get; set; }
+        public bool IsStop { get; internal set; }
 
         /// <summary>
         /// Specific Scenario If the card detected is not the same card during retry on incomplete transaction (100022)
         /// </summary>
         /// <param name="isSpecificScenario"></param>
         /// <returns></returns>
-        public string GetMessage(int rs, bool isSpecificScenario)
+        public string GetMessage(int rs)
         {
             var res = responseCodes.FirstOrDefault(w => w.Code == rs);
             if (res == null)
             {
                 var resCode = responseCodes.First(w => w.Code == 100001);
-                return $"ERROR CODE:{rs}\n{resCode.Cn_Message}\n{resCode.En_Message}";
+                return $"{resCode.Cn_Message}\n{resCode.En_Message}";
             }
             else
             {
-                if (isSpecificScenario)
-                {
-                    var resCode = responseCodes.First(w => w.Code == -2);
-                    return $"ERROR CODE:{rs}\n{res.Cn_Message}\n{res.En_Message}\n" + $"{resCode.Cn_Message}\n{resCode.En_Message}";
-                }
-                else
-                {
-                    return $"ERROR CODE:{rs}\n{res.Cn_Message}\n{res.En_Message}";
-                }
+                return $"{res.Cn_Message}\n{res.En_Message}";
             }
+        }
+
+        public string GetMessageDefault()
+        {
+            var resCode = responseCodes.First(w => w.Code == 100001);
+            return $"ERROR CODE: 100001\n{resCode.Cn_Message}\n{resCode.En_Message}";
         }
     }
 }

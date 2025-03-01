@@ -174,7 +174,7 @@ namespace WashMachine.Forms.Modules.Login
 
             if (string.IsNullOrWhiteSpace(error))
             {
-                PaidByForm paidByForm = new PaidByForm(FollowType.TestPaymentOnly, new Hkd20PaymentItem(this));
+                PaidByForm paidByForm = new PaidByForm(FollowType.TestPaymentOnly, new HkdPaymentItem(20));
                 paidByForm.Show();
                 paidByForm.FormClosed += PaidByForm_FormClosed;
                 Hide();

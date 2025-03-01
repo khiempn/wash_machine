@@ -13,6 +13,8 @@ namespace WashMachine.Forms.Modules.PaidBy.Dialog
         public event EventHandler<bool> CancelHandler;
         public event EventHandler<bool> HomeHandler;
 
+        private Timer timerCloseAlert;
+
         public ScanWaitingUI(PaymentType paymentType, int amount)
         {
             Width = 850;
@@ -28,6 +30,8 @@ namespace WashMachine.Forms.Modules.PaidBy.Dialog
             tblLayoutPanel.RowStyles.Add(new RowStyle() { Height = 100, SizeType = SizeType.Absolute });
             tblLayoutPanel.RowStyles.Add(new RowStyle() { Height = 30, SizeType = SizeType.Percent });
             tblLayoutPanel.RowStyles.Add(new RowStyle() { Height = 70, SizeType = SizeType.Absolute });
+            tblLayoutPanel.RowStyles.Add(new RowStyle() { Height = 20, SizeType = SizeType.Absolute });
+
             tblLayoutPanel.ColumnStyles.Add(new ColumnStyle() { Width = 100, SizeType = SizeType.Percent });
             Label lbTitle = new Label()
             {
@@ -63,9 +67,9 @@ namespace WashMachine.Forms.Modules.PaidBy.Dialog
                 Dock = DockStyle.Fill
             };
             tblBody.RowStyles.Add(new RowStyle() { Height = 80, SizeType = SizeType.Absolute });
-            tblBody.RowStyles.Add(new RowStyle() { Height = 90, SizeType = SizeType.Absolute });
+            tblBody.RowStyles.Add(new RowStyle() { Height = 70, SizeType = SizeType.Absolute });
             tblBody.RowStyles.Add(new RowStyle() { Height = 30, SizeType = SizeType.Percent });
-            tblBody.RowStyles.Add(new RowStyle() { Height = 80, SizeType = SizeType.Absolute });
+            tblBody.RowStyles.Add(new RowStyle() { Height = 120, SizeType = SizeType.Absolute });
             tblBody.ColumnStyles.Add(new ColumnStyle() { Width = 100, SizeType = SizeType.Percent });
 
             Label lbBodyTitle = new Label()
@@ -155,7 +159,7 @@ namespace WashMachine.Forms.Modules.PaidBy.Dialog
             {
                 BackgroundImage = imgBg,
                 Width = 330,
-                Height = 230,
+                Height = 200,
                 BackgroundImageLayout = ImageLayout.Stretch,
             };
 
@@ -175,6 +179,7 @@ namespace WashMachine.Forms.Modules.PaidBy.Dialog
                 Width = Width,
                 TextAlign = ContentAlignment.TopCenter,
                 Height = 100,
+                Font = new Font(Font.FontFamily, 12f),
                 Text = ""
             };
 
@@ -204,6 +209,7 @@ namespace WashMachine.Forms.Modules.PaidBy.Dialog
 
             Panel pnBack = new Panel() { Name = "pnBack", BackgroundImage = imgBack, Width = 120, BackgroundImageLayout = ImageLayout.Stretch, Height = 50 };
             pnBack.Click += BtnCancel_Click;
+            pnBack.Paint += PnBack_Paint;
             tblFooter.Controls.Add(pnBack, 0, 0);
 
             bytes = Convert.FromBase64String("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");
@@ -212,9 +218,12 @@ namespace WashMachine.Forms.Modules.PaidBy.Dialog
 
             Panel pnBackHome = new Panel() { Name = "pnBackHome", BackgroundImage = imgBackHome, Width = 120, BackgroundImageLayout = ImageLayout.Stretch, Height = 50 };
             pnBackHome.Click += BtnHome_Click;
+            pnBackHome.Paint += PnBackHome_Paint;
             tblFooter.Controls.Add(pnBackHome, 1, 0);
 
             tblLayoutPanel.Controls.Add(tblFooter, 0, 2);
+            tblLayoutPanel.Controls.Add(new Label() { ForeColor = SystemColors.InfoText, Name = "lbTimeCounter", Text = "", Font = new Font(Font.FontFamily, 8f), }, 0, 3);
+
 
             BackColor = Color.White;
 
@@ -225,6 +234,30 @@ namespace WashMachine.Forms.Modules.PaidBy.Dialog
             SizeChanged += Panel_SizeChanged;
             Tag = tblLayoutPanel;
             VisibleChanged += ScanWaitingUI_VisibleChanged;
+        }
+
+        private void PnBackHome_Paint(object sender, PaintEventArgs e)
+        {
+            var pnControl = sender as Panel;
+            if (pnControl != null && (!pnControl.Enabled))
+            {
+                using (var img = new Bitmap(pnControl.BackgroundImage, pnControl.ClientSize))
+                {
+                    ControlPaint.DrawImageDisabled(e.Graphics, img, 0, 0, pnControl.BackColor);
+                }
+            }
+        }
+
+        private void PnBack_Paint(object sender, PaintEventArgs e)
+        {
+            var pnControl = sender as Panel;
+            if (pnControl != null && (!pnControl.Enabled))
+            {
+                using (var img = new Bitmap(pnControl.BackgroundImage, pnControl.ClientSize))
+                {
+                    ControlPaint.DrawImageDisabled(e.Graphics, img, 0, 0, pnControl.BackColor);
+                }
+            }
         }
 
         private void BtnCancel_Click(object sender, EventArgs e)
@@ -284,34 +317,123 @@ namespace WashMachine.Forms.Modules.PaidBy.Dialog
 
         public void ResetDefault()
         {
-            Label lbMessage = Controls.Find("lbMessage", true).First() as Label;
-            lbMessage.Text = string.Empty;
-            lbMessage.ForeColor = Color.Green;
-        }
-
-        public void SetMessage(string message, bool isError = false)
-        {
-            Label lbMessage = Controls.Find("lbMessage", true).First() as Label;
-            if (!string.IsNullOrWhiteSpace(message))
+            if (Controls.Find("lbMessage", true).Any())
             {
-                lbMessage.Text = message;
-
-                if (isError)
-                {
-                    lbMessage.ForeColor = Color.Red;
-                }
-            }
-            else
-            {
+                Label lbMessage = Controls.Find("lbMessage", true).First() as Label;
                 lbMessage.Text = string.Empty;
                 lbMessage.ForeColor = Color.Green;
             }
         }
 
+        public void SetErrorMessage(string message)
+        {
+            if (Controls.Find("lbMessage", true).Any())
+            {
+                Label lbMessage = Controls.Find("lbMessage", true).First() as Label;
+                if (!string.IsNullOrWhiteSpace(message))
+                {
+                    lbMessage.Text = message;
+                    lbMessage.ForeColor = Color.Red;
+                }
+                else
+                {
+                    lbMessage.Text = string.Empty;
+                    lbMessage.ForeColor = Color.Green;
+                }
+            }
+        }
+
+        public void SetSuccessMessage(string message)
+        {
+            if (Controls.Find("lbMessage", true).Any())
+            {
+                Label lbMessage = Controls.Find("lbMessage", true).First() as Label;
+                if (!string.IsNullOrWhiteSpace(message))
+                {
+                    lbMessage.Text = message;
+                    lbMessage.ForeColor = Color.Green;
+                }
+            }
+        }
+
         public void DisabledButtons()
         {
-            Panel pnBack = Controls.Find("pnBack", true).First() as Panel;
-            pnBack.Enabled = false;
+            if (Controls.Find("pnBack", true).Any())
+            {
+                Panel pnBack = Controls.Find("pnBack", true).First() as Panel;
+                pnBack.Enabled = false;
+            }
+            if (Controls.Find("pnBackHome", true).Any())
+            {
+                Panel pnBack = Controls.Find("pnBackHome", true).First() as Panel;
+                pnBack.Enabled = false;
+            }
+        }
+
+        public void EnableButtons()
+        {
+            if (Controls.Find("pnBack", true).Any())
+            {
+                Panel pnBack = Controls.Find("pnBack", true).First() as Panel;
+                pnBack.Enabled = true;
+            }
+            if (Controls.Find("pnBackHome", true).Any())
+            {
+                Panel pnBack = Controls.Find("pnBackHome", true).First() as Panel;
+                pnBack.Enabled = true;
+            }
+        }
+
+        public void StartTimerCloseAlert()
+        {
+            if (timerCloseAlert != null)
+            {
+                timerCloseAlert.Stop();
+                timerCloseAlert.Dispose();
+            }
+            EnableButtons();
+            timerCloseAlert = new Timer();
+            timerCloseAlert.Tick += TimerCloseAlert_Tick;
+            timerCloseAlert.Enabled = true;
+            timerCloseAlert.Interval = 1000;
+            //after 15s alter will be close
+            timerCloseAlert.Tag = 1000 * 8;
+            timerCloseAlert.Start();
+        }
+
+        private void TimerCloseAlert_Tick(object sender, EventArgs e)
+        {
+            try
+            {
+                int currentTime = int.Parse(timerCloseAlert.Tag.ToString());
+                if (currentTime > 0)
+                {
+                    if (Controls.Find("lbTimeCounter", true).Any())
+                    {
+                        Label lbTimeCounter = (Label)Controls.Find("lbTimeCounter", true)[0];
+                        lbTimeCounter.Text = $"The popup will be closed in {currentTime / 1000}s.";
+                        var sizeText = TextRenderer.MeasureText(lbTimeCounter.Text, lbTimeCounter.Font);
+                        lbTimeCounter.Width = sizeText.Width;
+                        lbTimeCounter.Height = sizeText.Height;
+                    }
+                    else
+                    {
+                        timerCloseAlert.Stop();
+                        timerCloseAlert.Dispose();
+                    }
+
+                    currentTime -= 1000;
+                    timerCloseAlert.Tag = currentTime;
+                }
+                else
+                {
+                    HomeHandler.Invoke(this, true);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
         }
     }
 }

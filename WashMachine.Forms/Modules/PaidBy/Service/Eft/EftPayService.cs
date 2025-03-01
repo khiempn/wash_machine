@@ -1,6 +1,5 @@
 ﻿using EFTSolutions;
 using WashMachine.Forms.Modules.PaidBy.PaidByItems;
-using WashMachine.Forms.Modules.PaidBy.PaidByItems.Model;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;

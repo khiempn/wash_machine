@@ -16,12 +16,27 @@ namespace WashMachine.Forms.Modules.PaidBy.Service
     {
         MachineService machineService;
         public event EventHandler<OctopusPaymentResponseModel> PaymentProgressHandler;
+        public event EventHandler<bool> PaymentLoopingHandler;
+        public event EventHandler<CardInfo> CreateOrderIncompleteHandler;
+
         OrderModel _orderModel;
 
         public OctopusService()
         {
             machineService = new MachineService();
-            machineService.PaymentProgressHandler += MachineService_PaymentProgressHandler; ;
+            machineService.PaymentProgressHandler += MachineService_PaymentProgressHandler;
+            machineService.PaymentLoopingHandler += MachineService_PaymentLoopingHandler;
+            machineService.CreateOrderIncompleteHandler += MachineService_CreateOrderIncompleteHandler;
+        }
+
+        private void MachineService_CreateOrderIncompleteHandler(object sender, CardInfo e)
+        {
+            CreateOrderIncompleteHandler?.Invoke(sender, e);
+        }
+
+        private void MachineService_PaymentLoopingHandler(object sender, bool e)
+        {
+            PaymentLoopingHandler?.Invoke(sender, e);
         }
 
         private void MachineService_PaymentProgressHandler(object sender, OctopusPaymentResponseModel e)
@@ -127,7 +142,7 @@ namespace WashMachine.Forms.Modules.PaidBy.Service
             }
         }
 
-        public static string FormatDecimal(float? value, int n = 2)
+        public string FormatDecimal(float? value, int n = 2)
         {
             if (value == null) return "0";
             return value.Value.ToString("n" + n);
@@ -145,16 +160,6 @@ namespace WashMachine.Forms.Modules.PaidBy.Service
             //};
 
             //previewDialog.ShowDialog();
-        }
-
-        public bool IsCancelPayment()
-        {
-            return machineService.IsCancelPayment();
-        }
-
-        public void CancelPayment()
-        {
-            machineService.CancelPayment();
         }
     }
 }

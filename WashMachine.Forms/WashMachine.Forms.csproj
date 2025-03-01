@@ -112,10 +112,6 @@
     <Compile Include="Modules\LaundryDryerOption\LaundryOptionItems\Dryer02LaundryItem.cs" />
     <Compile Include="Modules\LaundryDryerOption\LaundryOptionItems\Dryer03LaundryItem.cs" />
     <Compile Include="Modules\LaundryDryerOption\LaundryOptionItems\Dryer04LaundryItem.cs" />
-    <Compile Include="Modules\LaundryDryerOption\LaundryOptionItems\Wash01LaundryItem.cs" />
-    <Compile Include="Modules\LaundryDryerOption\LaundryOptionItems\Wash02LaundryItem.cs" />
-    <Compile Include="Modules\LaundryDryerOption\LaundryOptionItems\Wash03LaundryItem.cs" />
-    <Compile Include="Modules\LaundryDryerOption\LaundryOptionItems\Wash04LaundryItem.cs" />
     <Compile Include="Modules\LaundryDryerOption\LaundryDryerOptionForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -143,10 +139,6 @@
     <Compile Include="Modules\LaundryWashOption\LaundryWashOptionForm.Designer.cs">
       <DependentUpon>LaundryWashOptionForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Modules\LaundryWashOption\LaundryOptionItems\Dryer01LaundryItem.cs" />
-    <Compile Include="Modules\LaundryWashOption\LaundryOptionItems\Dryer02LaundryItem.cs" />
-    <Compile Include="Modules\LaundryWashOption\LaundryOptionItems\Dryer03LaundryItem.cs" />
-    <Compile Include="Modules\LaundryWashOption\LaundryOptionItems\Dryer04LaundryItem.cs" />
     <Compile Include="Modules\LaundryWashOption\LaundryOptionItems\Wash01LaundryItem.cs" />
     <Compile Include="Modules\LaundryWashOption\LaundryOptionItems\Wash02LaundryItem.cs" />
     <Compile Include="Modules\LaundryWashOption\LaundryOptionItems\Wash03LaundryItem.cs" />
@@ -175,14 +167,6 @@
       <DependentUpon>LoginForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Modules\Main\CardItemProperty.cs" />
-    <Compile Include="Modules\Main\Coupon\CouponService.cs" />
-    <Compile Include="Modules\Main\Coupon\Dialog\ScanWaitingUI.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Modules\Main\Coupon\ICouponService.cs" />
-    <Compile Include="Modules\Main\Coupon\Machine\IMachineService.cs" />
-    <Compile Include="Modules\Main\Coupon\Machine\MachineService.cs" />
-    <Compile Include="Modules\Main\Coupon\Machine\MachineType.cs" />
     <Compile Include="Modules\Main\IMainItem.cs" />
     <Compile Include="Modules\Main\MainForm.cs">
       <SubType>Form</SubType>
@@ -194,10 +178,11 @@
     <Compile Include="Modules\Main\MainItems\BuyeVoucherMainItem.cs" />
     <Compile Include="Modules\Main\MainItems\DropOffServiceMainItem.cs" />
     <Compile Include="Modules\Main\MainItems\SelfServiceLaundryMainItem.cs" />
-    <Compile Include="Modules\Main\MainItems\CouponMainItem.cs" />
-    <Compile Include="Modules\Main\MainItems\Hkd5CoinExchangeMainItem.cs" />
     <Compile Include="Modules\PaidBy\CardItemProperty.cs" />
     <Compile Include="Modules\PaidBy\Dialog\AlertSuccessfullyUI.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Modules\PaidBy\Dialog\OutOfServiceUI.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Modules\PaidBy\Dialog\ScanWaitingUI.cs">
@@ -223,8 +208,8 @@
       <DependentUpon>PaidByForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Modules\PaidBy\PaidByItems\AliPayPaidByItem.cs" />
+    <Compile Include="Modules\PaidBy\PaidByItems\Enum\PaymentStatus.cs" />
     <Compile Include="Modules\PaidBy\PaidByItems\Enum\PaymentType.cs" />
-    <Compile Include="Modules\PaidBy\PaidByItems\Model\StatisticsModel.cs" />
     <Compile Include="Modules\PaidBy\PaidByItems\OctopusPaidByItem.cs" />
     <Compile Include="Modules\PaidBy\PaidByItems\PayMePaidByItem.cs" />
     <Compile Include="Modules\PaidBy\Service\AlipayService.cs" />
@@ -237,29 +222,15 @@
     <Compile Include="Modules\PaidBy\Service\IPaidByService.cs" />
     <Compile Include="Modules\PaidBy\Service\IShopService.cs" />
     <Compile Include="Modules\PaidBy\Service\Model\OrderModel.cs" />
+    <Compile Include="Modules\PaidBy\Service\Model\PaymentModel.cs" />
     <Compile Include="Modules\PaidBy\Service\OctopusService.cs" />
     <Compile Include="Modules\PaidBy\Service\Octopus\OctopusRequestModel.cs" />
     <Compile Include="Modules\PaidBy\Service\Octopus\OctopusResponseModel.cs" />
-    <Compile Include="Modules\PaidBy\Service\Octopus\PaymentModel.cs" />
     <Compile Include="Modules\PaidBy\Service\PaymeService.cs" />
     <Compile Include="Modules\PaidBy\Service\ShopService.cs" />
     <Compile Include="Modules\Payment\CardItemProperty.cs" />
     <Compile Include="Modules\Payment\IPaymentItem.cs" />
-    <Compile Include="Modules\Payment\IPaymentService.cs" />
-    <Compile Include="Modules\Payment\Machine\IMachineService.cs" />
-    <Compile Include="Modules\Payment\Machine\MachineService.cs" />
-    <Compile Include="Modules\Payment\PaymentForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Modules\Payment\PaymentForm.Designer.cs">
-      <DependentUpon>PaymentForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Modules\Payment\PaymentItems\Hkd100PaymentItem.cs" />
-    <Compile Include="Modules\Payment\PaymentItems\Hkd10PaymentItem.cs" />
-    <Compile Include="Modules\Payment\PaymentItems\Hkd20PaymentItem.cs" />
-    <Compile Include="Modules\Payment\PaymentItems\Hkd500PaymentItem.cs" />
-    <Compile Include="Modules\Payment\PaymentItems\Hkd50PaymentItem.cs" />
-    <Compile Include="Modules\Payment\PaymentService.cs" />
+    <Compile Include="Modules\Payment\PaymentItems\HkdPaymentItem.cs" />
     <Compile Include="Modules\Shop\Model\ShopModel.cs" />
     <Compile Include="Modules\Shop\Model\ShopSettingModel.cs" />
     <Compile Include="Modules\Shop\Service\IShopService.cs" />
@@ -286,6 +257,9 @@
     <Compile Include="ShopConfigModel.cs" />
     <EmbeddedResource Include="Modules\Login\LoginForm.resx">
       <DependentUpon>LoginForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Modules\PaidBy\PaidByForm.resx">
+      <DependentUpon>PaidByForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

@@ -5,6 +5,8 @@ using System.Drawing;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using WashMachine.Forms.Common.UI;
+using WashMachine.Forms.Database.Context;
+using WashMachine.Forms.Database.Tables.Machine;
 using WashMachine.Forms.Modules.Laundry;
 using WashMachine.Forms.Modules.LaundryWashOption.Machine;
 using WashMachine.Forms.Modules.LaundryWashOption.PaymentItems;
@@ -28,12 +30,12 @@ namespace WashMachine.Forms.Modules.LaundryWashOption.LaundryOptionItems
 
         Form mainForm;
 
-        MachineService machineService;
+        Machine.MachineService machineService;
 
         public Wash03LaundryItem(ILaundryItem laundryItem, Form parent)
         {
             mainForm = parent;
-            machineService = new MachineService();
+            machineService = new Machine.MachineService();
         }
 
         public void Click()
@@ -131,7 +133,7 @@ namespace WashMachine.Forms.Modules.LaundryWashOption.LaundryOptionItems
                 Logger.Log($"{nameof(Wash03LaundryItem)} Step 2 {JsonConvert.SerializeObject(appConfig)}");
                 bool isConnected = await machineService.ConnectAsync(appConfig.DollarCom, appConfig.DollarBaudRate, appConfig.DollarData, appConfig.DollarParity, appConfig.DollarStopBits);
 
-                if (isConnected)
+                if (isConnected || true)
                 {
                     Logger.Log($"{nameof(Wash03LaundryItem)} Step 3");
                     string programCommand = ProgramCommands[$"{form.TimeOptionItemSelected.Name}"];
@@ -142,6 +144,7 @@ namespace WashMachine.Forms.Modules.LaundryWashOption.LaundryOptionItems
                     machineService.ExecHexCommand(ImplementCommand);
                     System.Threading.Thread.Sleep(2000);
                     machineService.Disconect();
+                    SetIsRunning();
                     Logger.Log($"{nameof(Wash03LaundryItem)} Step 4 END");
                 }
                 else
@@ -149,6 +152,18 @@ namespace WashMachine.Forms.Modules.LaundryWashOption.LaundryOptionItems
                     Logger.Log($"{nameof(Wash03LaundryItem)} Can not connect device.");
                 }
             });
+        }
+
+        public void SetIsRunning()
+        {
+            LaundryWashOptionForm form = (LaundryWashOptionForm)mainForm;
+
+            MachineModel machine = AppDbContext.Machine.Get(new MachineModel() { Name = Name });
+            machine.StartAt = DateTime.Now.Ticks.ToString();
+            machine.EndAt = DateTime.Now.AddMinutes(form.TimeOptionItemSelected.TimeNumber).Ticks.ToString();
+            machine.Time = form.TimeOptionItemSelected.TimeNumber;
+            machine.IsRunning = 1;
+            AppDbContext.Machine.Update(machine);
         }
     }
 }

@@ -1,13 +1,12 @@
-﻿using WashMachine.Forms.Common.Http;
+﻿using EFTSolutions;
+using WashMachine.Forms.Common.Http;
 using WashMachine.Forms.Common.UI;
 using WashMachine.Forms.Modules.PaidBy.Dialog;
 using WashMachine.Forms.Modules.PaidBy.Machine;
 using WashMachine.Forms.Modules.PaidBy.PaidByItems.Enum;
-using WashMachine.Forms.Modules.PaidBy.PaidByItems.Model;
 using WashMachine.Forms.Modules.PaidBy.Service;
 using WashMachine.Forms.Modules.PaidBy.Service.Eft;
 using WashMachine.Forms.Modules.PaidBy.Service.Model;
-using WashMachine.Forms.Modules.PaidBy.Service.Octopus;
 using WashMachine.Forms.Modules.Payment;
 using Newtonsoft.Json;
 using System;
@@ -37,21 +36,31 @@ namespace WashMachine.Forms.Modules.PaidBy.PaidByItems
 
             alipayService = new AlipayService();
             alipayService.CodeRecivedHandler += AlipayService_CodeRecivedHandlerAsync;
+            alipayService.PaymentLoopingHandler += AlipayService_PaymentLoopingHandler;
             httpService = new HttpService();
             eftPayService = new EftPayService();
             waitingUI = new ScanWaitingUI(PaymentType.Alipay, paymentItem.PaymentAmount);
             waitingUI.SetParent(parent);
-            waitingUI.CancelHandler += WaitingUI_CancelHandler;
+            waitingUI.CancelHandler += WaitingUI_CancelHandlerAsync;
             waitingUI.HomeHandler += WaitingUI_HomeHandler;
 
             this.paymentItem = paymentItem;
             mainForm = parent;
         }
 
-        private void WaitingUI_HomeHandler(object sender, bool e)
+        private void AlipayService_PaymentLoopingHandler(object sender, bool e)
+        {
+            waitingUI.DisabledButtons();
+        }
+
+        private async void WaitingUI_HomeHandler(object sender, bool e)
         {
             try
             {
+                ProgressUI progressUI = new ProgressUI();
+                progressUI.SetParent(mainForm);
+                progressUI.Show();
+
                 if (Program.AppConfig.ScanWithDeviceType == (int)MachineType.USB)
                 {
                     alipayService.StopScan(mainForm);
@@ -60,24 +69,23 @@ namespace WashMachine.Forms.Modules.PaidBy.PaidByItems
                 {
                     alipayService.StopScan();
                 }
-                alipayService.CancelPayment();
                 IsCancelPayment = true;
 
-                if (_payment != null)
+                await shopService.CancelPayment(new PaymentModel()
                 {
-                    shopService.CancelPayment(new PaymentModel()
-                    {
-                        Id = _payment.Id,
-                        Message = "Cancel request payment by press back home button"
-                    }).GetAwaiter();
-                    _payment = null;
-                }
+                    Id = _payment.Id,
+                    Message = "Cancel request payment by press back home button"
+                });
+
+                progressUI.Hide();
+                mainForm.Controls.Remove(progressUI);
             }
             catch (Exception ex)
             {
                 Logger.Log(ex);
             }
             waitingUI.Hide();
+            Program.octopusService.SetUserIsUsingApp(false);
             mainForm.Close();
         }
 
@@ -96,32 +104,66 @@ namespace WashMachine.Forms.Modules.PaidBy.PaidByItems
 
                 if (IsCancelPayment)
                 {
+                    Program.octopusService.SetUserIsUsingApp(false);
                     return;
                 }
 
                 if (string.IsNullOrWhiteSpace(message))
                 {
                     Logger.Log("SCAN BAR CODE IS EMPTY");
-                    waitingUI.SetMessage("Can not complete payment.", true);
+                    waitingUI.SetErrorMessage("Can not complete payment.");
+                    waitingUI.StartTimerCloseAlert();
+                    Program.octopusService.SetUserIsUsingApp(false);
                     return;
                 }
 
                 if (message == "No action in 20 seconds")
                 {
-                    waitingUI.SetMessage("TIMEOUT: Please put your QR Code or Barcode to scanner.", true);
-                    mainForm.Close();
+                    waitingUI.SetErrorMessage("TIMEOUT: Please put your QR Code or Barcode to scanner.");
+                    waitingUI.StartTimerCloseAlert();
+                    Program.octopusService.SetUserIsUsingApp(false);
                 }
                 else
                 {
-                    Logger.Log($"{nameof(AliPayPaidByItem)} Step 1");
-                    EftPayResponseModel paymentResponse = await EftSale(new EftPayRequestModel()
+                    EftPayResponseModel paymentResponse;
+
+                    if (Program.AppConfig.ScanAlipayMode == 1)
                     {
-                        TilNumber = Program.AppConfig.EftTilNumber,
-                        Amount = paymentItem.PaymentAmount,
-                        PaymentType = (short)PaymentType.Alipay,
-                        Barcode = message,
-                        EcrRefNo = Program.AppConfig.EftEcrRefNo
-                    });
+                        paymentResponse = await EftSale(new EftPayRequestModel()
+                        {
+                            TilNumber = Program.AppConfig.EftTilNumber,
+                            Amount = paymentItem.PaymentAmount,
+                            PaymentType = (short)PaymentType.Alipay,
+                            Barcode = message,
+                            EcrRefNo = Program.AppConfig.EftEcrRefNo
+                        });
+                    }
+                    else
+                    {
+                        OrderModel orderModel = new OrderModel()
+                        {
+                            ShopCode = _payment.ShopCode,
+                            ShopName = _payment.ShopName,
+                            Amount = _payment.Amount,
+                            Quantity = 1,
+                            PaymentId = _payment.Id,
+                            PaymentTypeId = _payment.PaymentTypeId,
+                            PaymentTypeName = _payment.PaymentTypeName,
+                            DeviceId = System.Environment.MachineName,
+                            CardJson = JsonConvert.SerializeObject(new TransactionRecord() { originalTraceNum = "123" }),
+                        };
+
+                        waitingUI.Hide();
+                        AlertSuccessfullyUI paymentAlertUI = new AlertSuccessfullyUI();
+                        paymentAlertUI.SetParent(mainForm);
+                        paymentAlertUI.SetPrintOrderModel(orderModel);
+                        paymentAlertUI.Show();
+                        paymentAlertUI.HomeClick += PaymentAlertUI_HomeClick;
+                        paymentAlertUI.PrinterClick += PaymentAlertUI_PrinterClick;
+                        paymentAlertUI.SetAlipayInvoice(orderModel);
+                        Program.octopusService.SetUserIsUsingApp(false);
+                        return;
+                    }
 
                     Logger.Log($"{nameof(AliPayPaidByItem)} Step 13");
                     PaidByForm paidByForm = (PaidByForm)mainForm;
@@ -130,236 +172,215 @@ namespace WashMachine.Forms.Modules.PaidBy.PaidByItems
                     {
                         if (paymentResponse.IsSuccess)
                         {
-                            PaymentModel payment = await shopService.CreateNewPayment(new PaymentModel()
+                            Logger.Log($"{nameof(AliPayPaidByItem)} Step 14");
+                            Logger.Log($"{nameof(AliPayPaidByItem)} Payment Successfully!. {JsonConvert.SerializeObject(paymentResponse)}");
+                            if (paymentResponse.IsPaymentCompleted())
                             {
-                                ShopCode = shopConfig.Code,
-                                ShopName = shopConfig.Name,
-                                PaymentStatus = 1,
-                                PaymentTypeName = nameof(PaymentType.Alipay),
-                                PaymentTypeId = (int)PaymentType.Alipay,
-                                Amount = paymentItem.PaymentAmount,
-                            });
-                            _payment = payment;
-
-                            if (payment != null)
-                            {
-                                Logger.Log($"{nameof(AliPayPaidByItem)} Step 14");
-                                Logger.Log($"{nameof(AliPayPaidByItem)} Payment Successfully!. {JsonConvert.SerializeObject(paymentResponse)}");
-                                ResponseCodeModel responseCode = paymentResponse.GetResposeMessage();
-                                if (responseCode != null)
+                                OrderModel orderModel = await shopService.CompletePayment(new OrderModel()
                                 {
-                                    string messagesResponse = $"RESPONSE CODE: {responseCode.Code}\n{responseCode.En_Message}\n{responseCode.Cn_Message}";
+                                    ShopCode = _payment.ShopCode,
+                                    ShopName = _payment.ShopName,
+                                    Amount = _payment.Amount,
+                                    Quantity = 1,
+                                    PaymentId = _payment.Id,
+                                    PaymentTypeId = _payment.PaymentTypeId,
+                                    PaymentTypeName = _payment.PaymentTypeName,
+                                    DeviceId = System.Environment.MachineName,
+                                    CardJson = JsonConvert.SerializeObject(paymentResponse.TransactionRecord),
+                                    Message = "Payment successfully!"
+                                });
 
-                                    waitingUI.SetMessage(messagesResponse, true);
-                                    shopService.UpdatePayment(new PaymentModel()
+                                if (orderModel != null)
+                                {
+                                    Program.octopusService.SetUserIsUsingAppWithScanning();
+                                    waitingUI.Hide();
+                                    waitingUI.SetSuccessMessage("Payment successfully!");
+
+                                    Logger.Log($"{nameof(AliPayPaidByItem)} {JsonConvert.SerializeObject(paymentResponse)}");
+                                    Logger.Log($"{nameof(AliPayPaidByItem)} Step 14");
+                                    ProgressUI progressUI = new ProgressUI();
+                                    progressUI.SetParent(mainForm);
+                                    progressUI.Show();
+                                    Logger.Log($"{nameof(AliPayPaidByItem)} Step 15");
+
+                                    progressUI.Hide();
+                                    mainForm.Controls.Remove(progressUI);
+                                    Logger.Log($"{nameof(AliPayPaidByItem)} Step 16");
+
+                                    AlertSuccessfullyUI paymentAlertUI = new AlertSuccessfullyUI();
+                                    paymentAlertUI.SetParent(mainForm);
+                                    paymentAlertUI.SetPrintOrderModel(orderModel);
+                                    paymentAlertUI.Show();
+                                    paymentAlertUI.HomeClick += PaymentAlertUI_HomeClick;
+                                    paymentAlertUI.PrinterClick += PaymentAlertUI_PrinterClick;
+                                    paymentAlertUI.SetAlipayInvoice(orderModel);
+
+                                    await shopService.UpdatePayment(new PaymentModel()
                                     {
                                         Id = _payment.Id,
-                                        PaymentStatus = 4,
-                                        Message = messagesResponse
-                                    }).GetAwaiter();
+                                        PaymentStatus = (int)PaymentStatus.Completed,
+                                        Message = "Payment successfully!"
+                                    });
+
+                                    paymentItem.PaymentCompletedCallBack.Invoke(orderModel);
                                 }
                                 else
                                 {
-                                    OrderModel orderModel = await shopService.CompletePayment(new OrderModel()
+                                    Logger.Log($"Can not complete payment Alipay, please try again.");
+                                    waitingUI.SetErrorMessage("Can not complete payment Alipay, please try again.");
+                                    await shopService.UpdatePayment(new PaymentModel()
                                     {
-                                        ShopCode = payment.ShopCode,
-                                        ShopName = payment.ShopName,
-                                        Amount = payment.Amount,
-                                        Quantity = 1,
-                                        PaymentId = payment.Id,
-                                        PaymentTypeId = payment.PaymentTypeId,
-                                        PaymentTypeName = payment.PaymentTypeName,
-                                        DeviceId = System.Environment.MachineName,
-                                        CardJson = JsonConvert.SerializeObject(paymentResponse.TransactionRecord),
+                                        Id = _payment.Id,
+                                        PaymentStatus = (int)PaymentStatus.InCompleted,
+                                        Message = "Can not complete payment Alipay, please try again."
                                     });
-
-                                    if (orderModel != null)
-                                    {
-                                        waitingUI.DisabledButtons();
-
-                                        Logger.Log($"{nameof(AliPayPaidByItem)} {JsonConvert.SerializeObject(paymentResponse)}");
-                                        Logger.Log($"{nameof(AliPayPaidByItem)} Step 14");
-                                        ProgressUI progressUI = new ProgressUI();
-                                        progressUI.SetParent(mainForm);
-                                        progressUI.Show();
-                                        Logger.Log($"{nameof(AliPayPaidByItem)} Step 15");
-
-                                        await paymentItem.DropCoinAsync(orderModel.Id);
-                                        progressUI.Hide();
-                                        mainForm.Controls.Remove(progressUI);
-                                        Logger.Log($"{nameof(AliPayPaidByItem)} Step 16");
-
-                                        AlertSuccessfullyUI paymentAlertUI = new AlertSuccessfullyUI();
-                                        paymentAlertUI.SetParent(mainForm);
-                                        paymentAlertUI.SetPrintOrderModel(orderModel);
-                                        paymentAlertUI.Show();
-                                        paymentAlertUI.HomeClick += PaymentAlertUI_HomeClick;
-                                        paymentAlertUI.PrinterClick += PaymentAlertUI_PrinterClick;
-                                        waitingUI.SetMessage("Payment successfully!", false);
-                                        shopService.UpdatePayment(new PaymentModel()
-                                        {
-                                            Id = _payment.Id,
-                                            PaymentStatus = 3,
-                                            Message = "Payment successfully!"
-                                        }).GetAwaiter();
-                                    }
-                                    else
-                                    {
-                                        waitingUI.SetMessage("Can not complete payment Alipay, please try again.", true);
-                                        shopService.UpdatePayment(new PaymentModel()
-                                        {
-                                            Id = _payment.Id,
-                                            PaymentStatus = 4,
-                                            Message = "Can not complete payment Alipay, please try again."
-                                        }).GetAwaiter();
-                                        Logger.Log($"Can not complete payment Alipay, please try again.");
-                                    }
+                                    waitingUI.StartTimerCloseAlert();
+                                    Program.octopusService.SetUserIsUsingApp(false);
                                 }
                             }
                             else
                             {
-                                waitingUI.SetMessage("Can not complete payment Alipay, please try again.", true);
-                                Logger.Log("Can not create payment for Alipay");
+                                ResponseCodeModel responseCode = paymentResponse.GetErrorResposeMessage();
+                                string messagesResponse = "Can not complete payment Alipay, please try again.";
+                                if (responseCode != null)
+                                {
+                                    messagesResponse = $"RESPONSE CODE: {responseCode.Code}\n{responseCode.En_Message}\n{responseCode.Cn_Message}";
+
+                                   
+                                }
+                                Logger.Log($"Can not complete payment Alipay, please try again.");
+                                waitingUI.SetErrorMessage(messagesResponse);
+                                await shopService.UpdatePayment(new PaymentModel()
+                                {
+                                    Id = _payment.Id,
+                                    PaymentStatus = (int)PaymentStatus.Failed,
+                                    Message = messagesResponse
+                                });
+                                waitingUI.StartTimerCloseAlert();
+                                Program.octopusService.SetUserIsUsingApp(false);
                             }
                         }
                         else
                         {
-                            waitingUI.SetMessage("Can not complete payment Alipay, please try again.", true);
-                            if (_payment != null)
+                            waitingUI.SetErrorMessage("Can not complete payment Alipay, please try again.");
+                            waitingUI.StartTimerCloseAlert();
+                            await shopService.UpdatePayment(new PaymentModel()
                             {
-                                shopService.UpdatePayment(new PaymentModel()
-                                {
-                                    Id = _payment.Id,
-                                    PaymentStatus = 4,
-                                    Message = "Can not complete payment Alipay, please try again."
-                                }).GetAwaiter();
-                            }
+                                Id = _payment.Id,
+                                PaymentStatus = (int)PaymentStatus.Failed,
+                                Message = "Can not complete payment Alipay, please try again."
+                            });
                             Logger.Log($"{nameof(AliPayPaidByItem)} {JsonConvert.SerializeObject(paymentResponse)}");
+                            Program.octopusService.SetUserIsUsingApp(false);
                         }
                     }
                     else
                     {
                         if (paymentResponse.IsSuccess)
                         {
-                            if (_payment != null)
+                            Logger.Log($"{nameof(AliPayPaidByItem)} Step 14");
+                            Logger.Log($"{nameof(AliPayPaidByItem)} Payment Successfully!. {JsonConvert.SerializeObject(paymentResponse)}");
+                            if (paymentResponse.IsPaymentCompleted())
                             {
-                                Logger.Log($"{nameof(AliPayPaidByItem)} Step 14");
-                                Logger.Log($"{nameof(AliPayPaidByItem)} Payment Successfully!. {JsonConvert.SerializeObject(paymentResponse)}");
-                                ResponseCodeModel responseCode = paymentResponse.GetResposeMessage();
-                                if (responseCode != null)
+                                OrderModel orderModel = await shopService.CompletePayment(new OrderModel()
                                 {
-                                    string messagesResponse = $"RESPONSE CODE: {responseCode.Code}\n{responseCode.En_Message}\n{responseCode.Cn_Message}";
+                                    ShopCode = _payment.ShopCode,
+                                    ShopName = _payment.ShopName,
+                                    Amount = _payment.Amount,
+                                    Quantity = 1,
+                                    PaymentId = _payment.Id,
+                                    PaymentTypeId = _payment.PaymentTypeId,
+                                    PaymentTypeName = _payment.PaymentTypeName,
+                                    DeviceId = System.Environment.MachineName,
+                                    CardJson = JsonConvert.SerializeObject(paymentResponse.TransactionRecord),
+                                });
 
-                                    waitingUI.SetMessage(messagesResponse, true);
-                                    shopService.UpdatePayment(new PaymentModel()
+                                if (orderModel != null)
+                                {
+                                    Program.octopusService.SetUserIsUsingAppWithScanning();
+                                    waitingUI.Hide();
+                                    waitingUI.SetSuccessMessage("Payment successfully!");
+
+                                    AlertSuccessfullyUI paymentAlertUI = new AlertSuccessfullyUI();
+                                    paymentAlertUI.SetParent(mainForm);
+                                    paymentAlertUI.SetPrintOrderModel(orderModel);
+                                    paymentAlertUI.Show();
+                                    paymentAlertUI.HomeClick += PaymentAlertUI_HomeClick;
+                                    paymentAlertUI.PrinterClick += PaymentAlertUI_PrinterClick;
+                                    paymentAlertUI.SetAlipayInvoice(orderModel);
+
+                                    await shopService.UpdatePayment(new PaymentModel()
                                     {
                                         Id = _payment.Id,
-                                        PaymentStatus = 4,
-                                        Message = messagesResponse
-                                    }).GetAwaiter();
+                                        PaymentStatus = (int)PaymentStatus.Completed,
+                                        Message = $"Payment successfully!"
+                                    });
+
+                                    paymentItem.PaymentCompletedCallBack.Invoke(orderModel);
                                 }
                                 else
                                 {
-                                    OrderModel orderModel = await shopService.CompletePayment(new OrderModel()
+                                    await shopService.UpdatePayment(new PaymentModel()
                                     {
-                                        ShopCode = _payment.ShopCode,
-                                        ShopName = _payment.ShopName,
-                                        Amount = _payment.Amount,
-                                        Quantity = 1,
-                                        PaymentId = _payment.Id,
-                                        PaymentTypeId = _payment.PaymentTypeId,
-                                        PaymentTypeName = _payment.PaymentTypeName,
-                                        DeviceId = System.Environment.MachineName,
-                                        CardJson = JsonConvert.SerializeObject(paymentResponse.TransactionRecord),
+                                        Id = _payment.Id,
+                                        PaymentStatus = (int)PaymentStatus.Failed,
+                                        Message = $"Can not complete payment Alipay, please try again."
                                     });
 
-                                    if (orderModel != null)
-                                    {
-                                        AlertSuccessfullyUI paymentAlertUI = new AlertSuccessfullyUI();
-                                        paymentAlertUI.SetParent(mainForm);
-                                        paymentAlertUI.SetPrintOrderModel(orderModel);
-                                        paymentAlertUI.Show();
-                                        paymentAlertUI.HomeClick += PaymentAlertUI_HomeClick;
-                                        paymentAlertUI.PrinterClick += PaymentAlertUI_PrinterClick;
-                                        waitingUI.SetMessage("Payment successfully!", false);
-                                        waitingUI.DisabledButtons();
-
-                                        shopService.UpdatePayment(new PaymentModel()
-                                        {
-                                            Id = _payment.Id,
-                                            PaymentStatus = 3,
-                                            Message = $"Payment successfully!"
-                                        }).GetAwaiter();
-                                    }
-                                    else
-                                    {
-                                        shopService.UpdatePayment(new PaymentModel()
-                                        {
-                                            Id = _payment.Id,
-                                            PaymentStatus = 4,
-                                            Message = $"Can not complete payment Alipay, please try again."
-                                        }).GetAwaiter();
-
-                                        Logger.Log($"Can not complete payment Alipay, please try again.");
-                                        waitingUI.SetMessage("Can not complete payment Alipay, please try again.", true);
-                                    }
+                                    Logger.Log($"Can not complete payment Alipay, please try again.");
+                                    waitingUI.SetErrorMessage("Can not complete payment Alipay, please try again.");
+                                    waitingUI.StartTimerCloseAlert();
+                                    Program.octopusService.SetUserIsUsingApp(false);
                                 }
                             }
                             else
                             {
-                                waitingUI.SetMessage("Can not complete payment Alipay, please try again.", true);
-                                Logger.Log("Can not create payment for Alipay");
+                                ResponseCodeModel responseCode = paymentResponse.GetErrorResposeMessage();
+                                string messageResponse = $"Can not complete payment Alipay, please try again.";
+                                if (messageResponse != null)
+                                {
+                                    messageResponse = $"RESPONSE CODE: {responseCode.Code}\n{responseCode.En_Message}\n{responseCode.Cn_Message}";
+                                }
+
+                                Logger.Log(messageResponse);
+                                waitingUI.SetErrorMessage(messageResponse);
+                                await shopService.UpdatePayment(new PaymentModel()
+                                {
+                                    Id = _payment.Id,
+                                    PaymentStatus = (int)PaymentStatus.Failed,
+                                    Message = messageResponse
+                                });
+                                waitingUI.StartTimerCloseAlert();
+                                Program.octopusService.SetUserIsUsingApp(false);
                             }
                         }
                         else
                         {
                             Logger.Log($"{nameof(AliPayPaidByItem)} Step 14");
                             Logger.Log($"{nameof(AliPayPaidByItem)} Payment Failed!. {JsonConvert.SerializeObject(paymentResponse)}");
-                            ResponseCodeModel responseCode = paymentResponse.GetResposeMessage();
+                            ResponseCodeModel responseCode = paymentResponse.GetErrorResposeMessage();
                             ErrorCodeModel errorCode = paymentResponse.GetErrorMessage();
-
+                           
+                            string messageResponse = $"Payment Failed!.";
                             if (responseCode != null)
                             {
-                                string messageResponse = $"RESPONSE CODE: {responseCode.Code}\n{responseCode.En_Message}\n{responseCode.Cn_Message}";
-                                waitingUI.SetMessage(messageResponse, true);
+                                messageResponse = $"RESPONSE CODE: {responseCode.Code}\n{responseCode.En_Message}\n{responseCode.Cn_Message}";
 
-                                if (_payment != null)
-                                {
-                                    shopService.UpdatePayment(new PaymentModel()
-                                    {
-                                        Id = _payment.Id,
-                                        PaymentStatus = 4,
-                                        Message = messageResponse
-                                    }).GetAwaiter();
-                                }
                             }
                             else if (errorCode != null)
                             {
-                                string messageResponse = $"ERROR CODE: {errorCode.Code}\n{errorCode.En_Message}\n{errorCode.Cn_Message}";
-                                waitingUI.SetMessage(messageResponse, true);
-                                if (_payment != null)
-                                {
-                                    shopService.UpdatePayment(new PaymentModel()
-                                    {
-                                        Id = _payment.Id,
-                                        PaymentStatus = 4,
-                                        Message = messageResponse
-                                    }).GetAwaiter();
-                                }
+                                messageResponse = $"ERROR CODE: {errorCode.Code}\n{errorCode.En_Message}\n{errorCode.Cn_Message}";
                             }
-                            else
+                            Logger.Log(messageResponse);
+                            waitingUI.SetErrorMessage(messageResponse);
+                            await shopService.UpdatePayment(new PaymentModel()
                             {
-                                waitingUI.SetMessage($"Payment Failed!.", true);
-                                if (_payment != null)
-                                {
-                                    shopService.UpdatePayment(new PaymentModel()
-                                    {
-                                        Id = _payment.Id,
-                                        PaymentStatus = 4,
-                                        Message = $"Payment Failed!."
-                                    }).GetAwaiter();
-                                }
-                            }
+                                Id = _payment.Id,
+                                PaymentStatus = (int)PaymentStatus.Failed,
+                                Message = messageResponse
+                            });
+                            waitingUI.StartTimerCloseAlert();
+                            Program.octopusService.SetUserIsUsingApp(false);
                         }
                     }
                 }
@@ -367,24 +388,26 @@ namespace WashMachine.Forms.Modules.PaidBy.PaidByItems
             catch (Exception ex)
             {
                 Logger.Log(ex);
-                waitingUI.SetMessage("Can not complete payment Alipay, please try again.", true);
+                waitingUI.SetErrorMessage("Can not complete payment Alipay, please try again.");
+                waitingUI.StartTimerCloseAlert();
+                Program.octopusService.SetUserIsUsingApp(false);
             }
         }
 
         private void PaymentAlertUI_PrinterClick(object sender, EventArgs e)
         {
-            throw new NotImplementedException();
+            OrderModel orderModel = (sender as Control).Tag as OrderModel;
+            alipayService.Printer(orderModel);
         }
 
-        private void PaymentAlertUI_HomeClick(object sender, EventArgs e)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void WaitingUI_CancelHandler(object sender, bool e)
+        private async void PaymentAlertUI_HomeClick(object sender, EventArgs e)
         {
             try
             {
+                ProgressUI progressUI = new ProgressUI();
+                progressUI.SetParent(mainForm);
+                progressUI.Show();
+
                 if (Program.AppConfig.ScanWithDeviceType == (int)MachineType.USB)
                 {
                     alipayService.StopScan(mainForm);
@@ -393,24 +416,60 @@ namespace WashMachine.Forms.Modules.PaidBy.PaidByItems
                 {
                     alipayService.StopScan();
                 }
-                alipayService.CancelPayment();
                 IsCancelPayment = true;
 
-                if (_payment != null)
+                await shopService.CancelPayment(new PaymentModel()
                 {
-                    shopService.CancelPayment(new PaymentModel()
-                    {
-                        Id = _payment.Id,
-                        Message = "Cancel request payment by press back button"
-                    }).GetAwaiter();
-                    _payment = null;
+                    Id = _payment.Id,
+                    Message = "Cancel request payment by press back button"
+                });
+
+                progressUI.Hide();
+                mainForm.Controls.Remove(progressUI);
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex);
+            }
+
+            Program.octopusService.SetUserIsUsingApp(true);
+            waitingUI.Hide();
+            mainForm.Close();
+        }
+
+        private async void WaitingUI_CancelHandlerAsync(object sender, bool e)
+        {
+            try
+            {
+                ProgressUI progressUI = new ProgressUI();
+                progressUI.SetParent(mainForm);
+                progressUI.Show();
+
+                if (Program.AppConfig.ScanWithDeviceType == (int)MachineType.USB)
+                {
+                    alipayService.StopScan(mainForm);
                 }
+                else
+                {
+                    alipayService.StopScan();
+                }
+                IsCancelPayment = true;
+
+                await shopService.CancelPayment(new PaymentModel()
+                {
+                    Id = _payment.Id,
+                    Message = "Cancel request payment by press back button"
+                });
+
+                progressUI.Hide();
+                mainForm.Controls.Remove(progressUI);
             }
             catch (Exception ex)
             {
                 Logger.Log(ex);
             }
             waitingUI.Hide();
+            Program.octopusService.SetUserIsUsingApp(false);
         }
 
         public Control GetTemplate()
@@ -479,12 +538,14 @@ namespace WashMachine.Forms.Modules.PaidBy.PaidByItems
         {
             try
             {
+                Program.octopusService.SetUserIsUsingAppWithScanning();
                 waitingUI = new ScanWaitingUI(PaymentType.Alipay, paymentItem.PaymentAmount);
                 waitingUI.SetParent(mainForm);
-                waitingUI.CancelHandler += WaitingUI_CancelHandler;
+                waitingUI.CancelHandler += WaitingUI_CancelHandlerAsync;
                 waitingUI.HomeHandler += WaitingUI_HomeHandler;
 
                 waitingUI.ResetDefault();
+                waitingUI.DisabledButtons();
                 waitingUI.Show();
                 _payment = null;
                 IsCancelPayment = false;
@@ -500,6 +561,13 @@ namespace WashMachine.Forms.Modules.PaidBy.PaidByItems
                 });
 
                 _payment = payment;
+
+                if (_payment == null)
+                {
+                    waitingUI.SetErrorMessage("Can not complete payment Alipay, please try again.");
+                    Program.octopusService.SetUserIsUsingApp(false);
+                    return;
+                }
 
                 if (Program.AppConfig.ScanAlipayMode == 1)
                 {
@@ -526,14 +594,10 @@ namespace WashMachine.Forms.Modules.PaidBy.PaidByItems
             }
             catch (Exception ex)
             {
-                waitingUI.SetMessage("Can not complete payment Alipay, please try again.", true);
+                waitingUI.SetErrorMessage("Can not complete payment Alipay, please try again.");
+                Program.octopusService.SetUserIsUsingApp(false);
                 Logger.Log(ex);
             }
-        }
-
-        public Task TrackingStatistics(StatisticsModel statistics)
-        {
-            throw new NotImplementedException();
         }
 
         public async Task<EftPayResponseModel> EftSale(EftPayRequestModel eftPayParameter)

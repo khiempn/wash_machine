@@ -107,11 +107,13 @@ namespace WashMachine.Forms.Modules.Login
             tlpLoginForm.Controls.Add(btnMachineWithoutPayment, 0, 4);
 
             Controls.Add(tlpLoginForm);
-            LoadSettingImagesAsync();
 
-            //Start a timer to upload files or download file from server
-            OctopusService octopusService = new OctopusService();
-            octopusService.RunAJobToCompleteFiles();
+            Program.octopusService = new OctopusService();
+            Program.octopusService.SetCurrentForm(this);
+            Program.octopusService.RunAJobToCompleteFiles();
+            Program.octopusService.Initial();
+            Program.octopusService.SetUserIsUsingApp(true);
+            LoadSettingImagesAsync();
         }
 
         private void LoadSettingImagesAsync()
@@ -166,8 +168,6 @@ namespace WashMachine.Forms.Modules.Login
 
         private async void BtnPayment_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Hey there! Just a heads-up—the future's still being worked on, so stay tuned for updates as things come together!", "Message", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            return;
             progressUI.Show();
             string error = await accountService.SignIn(tbUserName.Text, tbPassword.Text);
             progressUI.Hide();

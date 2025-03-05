@@ -1,4 +1,5 @@
-﻿using System.Windows.Forms;
+﻿using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace WashMachine.Forms.Modules.LaundryWashOption.PaymentItems
 {

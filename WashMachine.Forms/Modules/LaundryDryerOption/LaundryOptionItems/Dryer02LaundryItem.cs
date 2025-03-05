@@ -124,14 +124,13 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.LaundryOptionItems
 
         public void DisableItem(Control control)
         {
-            control.Enabled = false;
+            (control as CardButtonRoundedUI).IsDisabled = true;
         }
 
         public async Task Start()
         {
             await Task.Run(async () =>
             {
-                System.Threading.Thread.Sleep(2000);
                 Logger.Log($"{nameof(Dryer02LaundryItem)} Step 1 START");
                 LaundryDryerOptionForm form = (LaundryDryerOptionForm)mainForm;
 

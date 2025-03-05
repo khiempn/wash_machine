@@ -2,10 +2,8 @@
 using System.Drawing;
 using System.Windows.Forms;
 using WashMachine.Forms.Common.UI;
-using WashMachine.Forms.Modules.LaundryDryerOption.PaymentItems;
 using WashMachine.Forms.Modules.Login;
 using WashMachine.Forms.Modules.PaidBy;
-using WashMachine.Forms.Modules.Payment;
 
 namespace WashMachine.Forms.Modules.LaundryWashOption.PaymentItems
 {
@@ -20,21 +18,20 @@ namespace WashMachine.Forms.Modules.LaundryWashOption.PaymentItems
             mainForm = form;
             this.followType = followType;
             paymentItem = new Payment.PaymentItems.HkdPaymentItem();
-            paymentItem.PaymentCompleted += PaymentItem_PaymentCompleted; 
+            paymentItem.PaymentCompletedCallBack = PaymentItem_PaymentCompleted;
         }
 
-        private async void PaymentItem_PaymentCompleted(object sender, EventArgs e)
+        private async void PaymentItem_PaymentCompleted(Form form, Action done)
         {
-            LaundryWashOptionForm form = (LaundryWashOptionForm)mainForm;
-            if (form.LaundryOptionItemSelected != null)
+            LaundryWashOptionForm laundryWashOptionForm = (LaundryWashOptionForm)mainForm;
+            if (laundryWashOptionForm.LaundryOptionItemSelected != null)
             {
                 ProgressUI progressUI = new ProgressUI();
-                progressUI.SetParent(mainForm);
+                progressUI.SetParent(form);
                 progressUI.Show();
-
-                await form.LaundryOptionItemSelected.Start();
+                await laundryWashOptionForm.LaundryOptionItemSelected.Start();
                 progressUI.Hide();
-                mainForm.Close();
+                done.Invoke();
             }
         }
 

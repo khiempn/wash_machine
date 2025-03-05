@@ -15,7 +15,7 @@ namespace WashMachine.Forms.Common.UI
         public bool IsFillTopRight { get; set; } = false;
         public Color ShapeBackgroudColor { get; set; }
         public Color ShapeBorderColor { get; set; }
-
+        public bool IsDisabled { get; set; }
 
         public CardButtonRoundedUI()
         {
@@ -43,7 +43,12 @@ namespace WashMachine.Forms.Common.UI
             using (GraphicsPath path = GetGraphicsPath(ClientRectangle))
             {
                 e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
-                Color bgColor = Enabled ? ShapeBackgroudColor : Color.LightGray;
+                Color bgColor = ShapeBackgroudColor;
+                if (IsDisabled)
+                {
+                    bgColor = Color.LightGray;
+                }
+
                 SolidBrush solidBrush = new SolidBrush(bgColor);
                 Pen borderColor = new Pen(ShapeBorderColor, BorderWidth);
 
@@ -52,7 +57,10 @@ namespace WashMachine.Forms.Common.UI
 
                 TextRenderer.DrawText(e.Graphics, Text, Font, ClientRectangle, ForeColor);
 
-                SetBackgroundControl(Controls, bgColor);
+                if (IsDisabled)
+                {
+                    SetBackgroundControl(Controls, bgColor);
+                }
             }
         }
 

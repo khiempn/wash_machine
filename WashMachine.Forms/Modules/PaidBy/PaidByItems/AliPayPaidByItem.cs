@@ -198,22 +198,15 @@ namespace WashMachine.Forms.Modules.PaidBy.PaidByItems
 
                                     Logger.Log($"{nameof(AliPayPaidByItem)} {JsonConvert.SerializeObject(paymentResponse)}");
                                     Logger.Log($"{nameof(AliPayPaidByItem)} Step 14");
-                                    ProgressUI progressUI = new ProgressUI();
-                                    progressUI.SetParent(mainForm);
-                                    progressUI.Show();
-                                    Logger.Log($"{nameof(AliPayPaidByItem)} Step 15");
-
-                                    progressUI.Hide();
-                                    mainForm.Controls.Remove(progressUI);
-                                    Logger.Log($"{nameof(AliPayPaidByItem)} Step 16");
 
                                     AlertSuccessfullyUI paymentAlertUI = new AlertSuccessfullyUI();
                                     paymentAlertUI.SetParent(mainForm);
                                     paymentAlertUI.SetPrintOrderModel(orderModel);
-                                    paymentAlertUI.Show();
                                     paymentAlertUI.HomeClick += PaymentAlertUI_HomeClick;
                                     paymentAlertUI.PrinterClick += PaymentAlertUI_PrinterClick;
                                     paymentAlertUI.SetAlipayInvoice(orderModel);
+                                    paymentAlertUI.Enabled = false;
+                                    paymentAlertUI.Show();
 
                                     await shopService.UpdatePayment(new PaymentModel()
                                     {
@@ -222,7 +215,10 @@ namespace WashMachine.Forms.Modules.PaidBy.PaidByItems
                                         Message = "Payment successfully!"
                                     });
 
-                                    paymentItem.PaymentCompletedCallBack.Invoke(orderModel);
+                                    paymentItem.PaymentCompletedCallBack.Invoke(mainForm, () =>
+                                    {
+                                        paymentAlertUI.Enabled = true;
+                                    });
                                 }
                                 else
                                 {
@@ -304,10 +300,11 @@ namespace WashMachine.Forms.Modules.PaidBy.PaidByItems
                                     AlertSuccessfullyUI paymentAlertUI = new AlertSuccessfullyUI();
                                     paymentAlertUI.SetParent(mainForm);
                                     paymentAlertUI.SetPrintOrderModel(orderModel);
-                                    paymentAlertUI.Show();
                                     paymentAlertUI.HomeClick += PaymentAlertUI_HomeClick;
                                     paymentAlertUI.PrinterClick += PaymentAlertUI_PrinterClick;
                                     paymentAlertUI.SetAlipayInvoice(orderModel);
+                                    paymentAlertUI.Enabled = false;
+                                    paymentAlertUI.Show();
 
                                     await shopService.UpdatePayment(new PaymentModel()
                                     {
@@ -316,7 +313,10 @@ namespace WashMachine.Forms.Modules.PaidBy.PaidByItems
                                         Message = $"Payment successfully!"
                                     });
 
-                                    paymentItem.PaymentCompletedCallBack.Invoke(orderModel);
+                                    paymentItem.PaymentCompletedCallBack.Invoke(mainForm, () =>
+                                    {
+                                        paymentAlertUI.Enabled = true;
+                                    });
                                 }
                                 else
                                 {

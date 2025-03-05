@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Windows.Forms;
 
 namespace WashMachine.Forms.Modules.Payment.PaymentItems
 {
     public class HkdPaymentItem : IPaymentItem
     {
         public int PaymentAmount { get; set; }
-        public Action<object> PaymentCompletedCallBack { get; set; }
+        public Action<Form, Action> PaymentCompletedCallBack { get; set; }
 
         public HkdPaymentItem()
         {

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
 using WashMachine.Forms.Common.UI;
@@ -22,25 +23,24 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.PaymentItems
             paymentItem.PaymentCompletedCallBack += PaymentItem_PaymentCompleted;
         }
 
-        private async void PaymentItem_PaymentCompleted(object sender)
+        private async void PaymentItem_PaymentCompleted(Form form, Action done)
         {
             try
             {
-                LaundryDryerOptionForm form = (LaundryDryerOptionForm)mainForm;
-                if (form.LaundryOptionItemSelected != null && form.TimeOptionItemSelected != null && form.TempOptionItemSelected != null)
+                LaundryDryerOptionForm laundryDryerOptionForm = (LaundryDryerOptionForm)mainForm;
+                if (laundryDryerOptionForm.LaundryOptionItemSelected != null && laundryDryerOptionForm.TimeOptionItemSelected != null && laundryDryerOptionForm.TempOptionItemSelected != null)
                 {
                     ProgressUI progressUI = new ProgressUI();
-                    progressUI.SetParent(mainForm);
+                    progressUI.SetParent(form);
                     progressUI.Show();
-
-                    await form.LaundryOptionItemSelected.Start();
+                    await laundryDryerOptionForm.LaundryOptionItemSelected.Start();
                     progressUI.Hide();
-                    mainForm.Close();
+                    done.Invoke();
                 }
             }
             catch (Exception ex)
             {
-
+                Debug.WriteLine(ex.ToString());
             }
         }
 

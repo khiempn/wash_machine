@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows.Forms;
 
 namespace WashMachine.Forms.Modules.Payment
 {
@@ -7,6 +8,6 @@ namespace WashMachine.Forms.Modules.Payment
         int PaymentAmount { get; set; }
         void SetAmount(int paymentAmount);
         int GetAmount();
-        Action<object> PaymentCompletedCallBack { get; set; }
+        Action<Form, Action> PaymentCompletedCallBack { get; set; }
     }
 }

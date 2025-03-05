@@ -156,10 +156,12 @@ namespace WashMachine.Forms.Modules.PaidBy.PaidByItems
                         AlertSuccessfullyUI paymentAlertUI = new AlertSuccessfullyUI();
                         paymentAlertUI.SetParent(mainForm);
                         paymentAlertUI.SetPrintOrderModel(orderRequest);
-                        paymentAlertUI.Show();
                         paymentAlertUI.HomeClick += PaymentAlertUI_HomeClick;
                         paymentAlertUI.PrinterClick += PaymentAlertUI_PrinterClick;
                         paymentAlertUI.SetOctopusInvoice(orderRequest);
+                        paymentAlertUI.Enabled = false;
+                        paymentAlertUI.Show();
+
                         if (e.MessageCodes.Count > 0)
                         {
                             int messageCode = e.MessageCodes.Last();
@@ -179,24 +181,24 @@ namespace WashMachine.Forms.Modules.PaidBy.PaidByItems
                             PaymentStatus = (int)PaymentStatus.Completed,
                             Message = "付款成功\nPayment successfully!"
                         });
-                        paymentItem.PaymentCompletedCallBack.Invoke(orderRequest);
+                        paymentItem.PaymentCompletedCallBack.Invoke(mainForm, () =>
+                        {
+                            paymentAlertUI.Enabled = true;
+                        });
                     }
                     else if (paidByForm.FollowType == Login.FollowType.Normal)
                     {
                         Logger.Log($"PaymentProgressHandler Step 9 ");
                         waitingUI.Hide();
 
-                        ProgressUI progressUI = new ProgressUI();
-                        progressUI.SetParent(mainForm);
-                        progressUI.Show();
-
                         AlertSuccessfullyUI paymentAlertUI = new AlertSuccessfullyUI();
                         paymentAlertUI.SetParent(mainForm);
                         paymentAlertUI.SetPrintOrderModel(orderRequest);
-                        paymentAlertUI.Show();
                         paymentAlertUI.HomeClick += PaymentAlertUI_HomeClick;
                         paymentAlertUI.PrinterClick += PaymentAlertUI_PrinterClick;
                         paymentAlertUI.SetOctopusInvoice(orderRequest);
+                        paymentAlertUI.Enabled = false;
+                        paymentAlertUI.Show();
 
                         if (e.MessageCodes.Count > 0)
                         {
@@ -218,9 +220,11 @@ namespace WashMachine.Forms.Modules.PaidBy.PaidByItems
                             PaymentStatus = 3,
                             Message = "付款成功\nPayment successfully!"
                         });
-                        progressUI.Hide();
-                        mainForm.Controls.Remove(progressUI);
-                        paymentItem.PaymentCompletedCallBack.Invoke(orderRequest);
+
+                        paymentItem.PaymentCompletedCallBack.Invoke(mainForm, () =>
+                        {
+                            paymentAlertUI.Enabled = true;
+                        });
                     }
                 }
                 else

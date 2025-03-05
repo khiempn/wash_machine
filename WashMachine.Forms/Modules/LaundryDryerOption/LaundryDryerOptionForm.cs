@@ -239,7 +239,7 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption
             tblCardReturn.Controls.Add(pnReturn, 1, 0);
             cardReturnUI.Controls.Add(tblCardReturn);
 
-            IPaymentItem paymentItem = new PaymentItem(this);
+            IPaymentItem paymentItem = new PaymentItem(followType, this);
             FlowLayoutPanel flowLayoutFooter = new FlowLayoutPanel()
             {
                 Dock = DockStyle.Fill,

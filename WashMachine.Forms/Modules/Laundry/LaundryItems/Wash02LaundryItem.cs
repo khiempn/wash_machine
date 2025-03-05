@@ -120,7 +120,7 @@ namespace WashMachine.Forms.Modules.Laundry.LaundryItems
                     string tempName = MachineService.GetTempName(machine.Temp);
                     lbInfor.Text = $"Remain Time: {remainAt}";
                     tblCardItem.Controls.Add(lbInfor, 0, 1);
-                    cardButton.Enabled = false;
+                    cardButton.IsDisabled = true;
                 }
             }
 

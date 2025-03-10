@@ -1,60 +1,160 @@
-﻿@{
+﻿@model DashboardDataModel
+@{
+    var systemInfo = Context.GetSystemInfo();
     ViewData["Title"] = "Dashboard";
 }
-<div class="row">
-    <!-- Column -->
-    <div class="col-md-6 col-lg-2 col-xlg-3">
-        <a href="/" style="color: white;">
-            <div class="card card-hover">
-                <div class="box bg-cyan text-center">
-                    <h1 class="font-light text-white"><i class="mdi mdi-view-dashboard"></i></h1>
-                    <h6 class="text-white">Dashboard</h6>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    $(document).ready(function () {
+        var ctx = document.getElementById('orderByYear');
+
+        const monthNames = [
+            "January", "February", "March", "April",
+            "May", "June", "July", "August",
+            "September", "October", "November", "December"
+        ];
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: monthNames,
+                datasets: [{
+                    label: '# of Orders',
+                    data: @(Json.Serialize(Model.OrderByYear.OrderGroupMonths)),
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    });
+</script>
+<form class="body-content" action="@Html.GetUri()" name="form" id="dashboardForm" enctype="multipart/form-data" method="get">
+    <div class="row">
+        <!-- Column -->
+        <div class="col-md-6 col-lg-2 col-xlg-3">
+            <a href="/" style="color: white;">
+                <div class="card card-hover">
+                    <div class="box bg-cyan text-center">
+                        <h1 class="font-light text-white"><i class="mdi mdi-view-dashboard"></i></h1>
+                        <h6 class="text-white">Dashboard</h6>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <!-- Column -->
+        <div class="col-md-6 col-lg-4 col-xlg-3">
+            <a href="/administrator/shops/listshops" style="color: white;">
+                <div class="card card-hover">
+                    <div class="box bg-success text-center">
+                        <h1 class="font-light text-white"><i class="fas fa-shopping-cart"></i></h1>
+                        <h6 class="text-white">Shops</h6>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Column -->
+        <div class="col-md-6 col-lg-4 col-xlg-3">
+            <a href="/administrator/reports/order" style="color: white;">
+                <div class="card card-hover">
+                    <div class="box bg-danger text-center">
+                        <h1 class="font-light text-white"><i class="far fa-money-bill-alt"></i></h1>
+                        <h6 class="text-white">Order Reports</h6>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Column -->
+@*         <div class="col-md-6 col-lg-4 col-xlg-3">
+            <a href="/administrator/reports/coupon" style="color: white;">
+                <div class="card card-hover">
+                    <div class="box bg-warning text-center">
+                        <h1 class="font-light text-white"><i class="fas fa-barcode"></i></h1>
+                        <h6 class="text-white">Coupon Reports</h6>
+                    </div>
+                </div>
+            </a>
+        </div> *@
+
+        @{
+            if (systemInfo.User.IsAdmin)
+            {
+                <!-- Column -->
+                <div class="col-md-6 col-lg-2 col-xlg-3">
+                    <a href="/administrator/access/listusers" style="color: white;">
+                        <div class="card card-hover">
+                            <div class="box bg-warning text-center">
+                                <h1 class="font-light text-white"><i class="mdi mdi-account-key"></i></h1>
+                                <h6 class="text-white">Users</h6>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Column -->
+                <div class="col-md-6 col-lg-4 col-xlg-3">
+                    <a href="/administrator/setting/OctopusSetting" style="color: white;">
+                        <div class="card card-hover">
+                            <div class="box bg-danger text-center">
+                                <h1 class="font-light text-white"><i class="ti-settings"></i></h1>
+                                <h6 class="text-white">Octopus settings</h6>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <!-- Column -->
+                <div class="col-md-6 col-lg-4 col-xlg-3">
+                    <a href="/administrator/setting/GeneralSetting" style="color: white;">
+                        <div class="card card-hover">
+                            <div class="box bg-warning text-center">
+                                <h1 class="font-light text-white"><i class="ti-settings"></i></h1>
+                                <h6 class="text-white">System settings</h6>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            }
+        }
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    @{
+                        List<int> years = Model.OrderByYear.OrderModels.Select(s => s.InsertTime.Value.Year).ToList();
+                        years.Add(DateTime.Now.Year);
+                        years.Add(2024);
+                        years = years.OrderByDescending(s => s).Distinct().ToList();
+                    }
+                    <h5 class="card-title">
+                        Order by Year -
+                        <select name="OrderByYear.Filter.Year" onchange="document.getElementById('dashboardForm').submit()">
+                            @{
+                                foreach (int year in years)
+                                {
+                                    if (year == Model.OrderByYear.Filter.Year)
+                                    {
+                                        <option value="@year" selected>@year</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@year">@year</option>
+                                    }
+                                }
+                            }
+                        </select>
+                    </h5>
+                    <canvas id="orderByYear"></canvas>
                 </div>
             </div>
-        </a>
+        </div>
     </div>
-    <!-- Column -->
-    <div class="col-md-6 col-lg-4 col-xlg-3">
-        <a href="/administrator/shops/listshops" style="color: white;">
-            <div class="card card-hover">
-                <div class="box bg-success text-center">
-                    <h1 class="font-light text-white"><i class="mdi mdi-receipt"></i></h1>
-                    <h6 class="text-white">Shops</h6>
-                </div>
-            </div>
-        </a>
-    </div>
-    <!-- Column -->
-    <div class="col-md-6 col-lg-2 col-xlg-3">
-        <a href="/administrator/access/listusers" style="color: white;">
-            <div class="card card-hover">
-                <div class="box bg-warning text-center">
-                    <h1 class="font-light text-white"><i class="mdi mdi-account-key"></i></h1>
-                    <h6 class="text-white">Users</h6>
-                </div>
-            </div>
-        </a>
-    </div>
-    <!-- Column -->
-    <div class="col-md-6 col-lg-4 col-xlg-3">
-        <a href="/administrator/setting/OctopusSetting" style="color: white;">
-            <div class="card card-hover">
-                <div class="box bg-danger text-center">
-                    <h1 class="font-light text-white"><i class="ti-settings"></i></h1>
-                    <h6 class="text-white">Octopus settings</h6>
-                </div>
-            </div>
-        </a>
-    </div>
-    <!-- Column -->
-    <div class="col-md-6 col-lg-4 col-xlg-3">
-        <a href="/administrator/setting/GeneralSetting" style="color: white;">
-            <div class="card card-hover">
-                <div class="box bg-warning text-center">
-                    <h1 class="font-light text-white"><i class="ti-settings"></i></h1>
-                    <h6 class="text-white">System settings</h6>
-                </div>
-            </div>
-        </a>
-    </div>
-</div>
+</form>

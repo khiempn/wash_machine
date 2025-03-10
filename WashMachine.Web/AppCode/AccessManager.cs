@@ -3,11 +3,7 @@ using Libraries;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
 
 namespace WashMachine.Web.AppCode
 {
@@ -30,10 +26,6 @@ namespace WashMachine.Web.AppCode
                 new Claim(ClaimTypes.GivenName, user.FullName),
                 new Claim(ClaimTypes.Actor, user.Email + string.Empty),
                 new Claim(UserClaimTypes.Type, user.Type + string.Empty),
-                new Claim(UserClaimTypes.Role, user.TeamId + string.Empty),
-                new Claim(UserClaimTypes.RoleName, user.TeamName + string.Empty),
-                new Claim(ClaimTypes.System, user.ShopCode + string.Empty),
-                new Claim(ClaimTypes.Locality, user.Image + string.Empty),
                 new Claim(ClaimTypes.UserData, TextUtilities.SerializeObject(user))
             }, CookieAuthenticationDefaults.AuthenticationScheme);
 
@@ -54,19 +46,16 @@ namespace WashMachine.Web.AppCode
             httpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
 
         }
+
         public static void SignOutAsync(HttpContext httpContext)
         {
             httpContext.Response.Cookies.Delete("authenticate__");
             httpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         }
+
         public class UserClaimTypes
         {
             public static string Type => "Type";
-            public static string Mode => "Mode";
-            public static string ModeName => "ModeName";
-            public static string Role => "Role";
-            public static string RoleName => "RoleName";
-            public static string DataObject => "DataObject";
         }
     }
 }

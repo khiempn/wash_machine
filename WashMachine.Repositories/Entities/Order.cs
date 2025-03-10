@@ -21,6 +21,8 @@ namespace WashMachine.Repositories.Entities
         public int PaymentStatus { get; set; }
         public string DeviceId { get; set; }
         public string CardJson { get; set; }
+        public string OctopusNo { get; set; }
+        public string Message { get; set; }
         public DateTime? InsertTime { get; set; }
         public DateTime? UpdateTime { get; set; }
         public ICollection<Payment> Payment { get; set; }

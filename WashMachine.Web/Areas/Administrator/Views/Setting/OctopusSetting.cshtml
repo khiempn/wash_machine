@@ -9,6 +9,7 @@
             <div class="nav nav-tabs" id="nav-tab" role="tablist">
                 <a class="nav-link active" data-toggle="tab" href="#" tab="#octopus_job_tab" role="tab" aria-controls="nav-home" aria-selected="true">Octopus job</a>
                 <a class="nav-link" data-toggle="tab" href="#" tab="#email_server_tab" role="tab" aria-controls="nav-profile" aria-selected="false">Email server</a>
+                <a class="nav-link" data-toggle="tab" href="#" tab="#email_template_tab" role="tab" aria-controls="nav-profile" aria-selected="false">Email templates</a>
             </div>
         </nav>
         <div class="tab-content w-100" id="nav-tabContent" style="padding: 15px">
@@ -116,7 +117,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                
+
                             </div>
                         </div>
                         <div class="top-20"></div>
@@ -135,6 +136,70 @@
                         </div>
                     </div>
                 </div>
+                <div class="tab-pane" id="email_template_tab" role="tabpanel" aria-labelledby="nav-profile-tab" style="display: none">
+                    <div class="wap-500">
+                        <div class="form-area">
+                            <h5 class="group-title">Email template config</h5>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group row">
+                                        <label for="GenerationErrorSubject" class="col-sm-4 col-form-label">Generation Error Subject</label>
+                                        <div class="col-md-12 form-item">
+                                            @Html.TextBoxFor(m => m.EmailTemplate.GenerationErrorSubject, new { @name = "EmailTemplate.GenerationErrorSubject", placeholder = "Generation Error Subject", @class = "form-control" })
+                                        </div>
+                                        <label for="GenerationErrorBody" class="col-sm-4 col-form-label">Generation Error Body</label>
+                                        <div class="col-md-12 form-item">
+                                            @Html.TextAreaFor(m => m.EmailTemplate.GenerationErrorBody, new { @name = "EmailTemplate.GenerationErrorBody", style = "height: 230px;", @row = "30", placeholder = "Generation Error Body", @class = "form-control" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group row">
+                                        <label for="DisconnectErrorSubject" class="col-sm-4 col-form-label">Disconnect Error Subject</label>
+                                        <div class="col-md-12 form-item">
+                                            @Html.TextBoxFor(m => m.EmailTemplate.DisconnectErrorSubject, new { @name = "EmailTemplate.DisconnectErrorSubject", placeholder = "Disconnect Error Subject", @class = "form-control" })
+                                        </div>
+                                        <label for="DisconnectErrorBody" class="col-sm-4 col-form-label">Disconnect Error Body</label>
+                                        <div class="col-md-12 form-item">
+                                            @Html.TextAreaFor(m => m.EmailTemplate.DisconnectErrorBody, new { @name = "EmailTemplate.DisconnectErrorBody", style = "height: 230px;", @row = "30", placeholder = "Disconnect Error Body", @class = "form-control" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group row">
+                                        <label for="UploadFileErrorSubject" class="col-sm-4 col-form-label">Upload File Error Subject</label>
+                                        <div class="col-md-12 form-item">
+                                            @Html.TextBoxFor(m => m.EmailTemplate.UploadFileErrorSubject, new { @name = "EmailTemplate.UploadFileErrorSubject", placeholder = "Upload File Error Subject", @class = "form-control" })
+                                        </div>
+                                        <label for="UploadFileErrorBody" class="col-sm-4 col-form-label">Upload File Body</label>
+                                        <div class="col-md-12 form-item">
+                                            @Html.TextAreaFor(m => m.EmailTemplate.UploadFileErrorBody, new { @name = "EmailTemplate.UploadFileErrorBody", style = "height: 230px;", @row = "30", placeholder = "Upload File Error Body", @class = "form-control" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group row">
+                                        <label for="DownloadErrorSubject" class="col-sm-4 col-form-label">Download File Error Subject</label>
+                                        <div class="col-md-12 form-item">
+                                            @Html.TextBoxFor(m => m.EmailTemplate.DownloadErrorSubject, new { @name = "EmailTemplate.DownloadErrorSubject", placeholder = "Download File Error Subject", @class = "form-control" })
+                                        </div>
+                                        <label for="DownloadErrorBody" class="col-sm-4 col-form-label">Download File Body</label>
+                                        <div class="col-md-12 form-item">
+                                            @Html.TextAreaFor(m => m.EmailTemplate.DownloadErrorBody, new { @name = "EmailTemplate.DownloadErrorBody", style = "height: 230px;", @row = "30", placeholder = "Download File Error Body", @class = "form-control" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="form-button" style="float: right">
                     <a class="btn btn-secondary" href="@Context.GetBaseUrl()">Back</a>
                     <button type="submit" class="btn btn-primary"><i class="far fa-save"></i> Save</button>

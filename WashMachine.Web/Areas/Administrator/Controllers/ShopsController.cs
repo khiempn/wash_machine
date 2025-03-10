@@ -26,15 +26,6 @@ namespace WashMachine.Web.Areas.Administrator.Controllers
             _business = business;
         }
 
-        public IActionResult ShopUsers(int id, string backLink = "")
-        {
-            var service = _business.GetService<ShopService>();
-            var model = service.GetShopModel(id);
-            var accessService = _business.GetService<AccessService>();
-            model.BackLink = backLink;
-            return View(model);
-        }
-
         public IActionResult ListShops(ShopManagerModel shopManagerData)
         {
             if (shopManagerData == null)
@@ -62,6 +53,13 @@ namespace WashMachine.Web.Areas.Administrator.Controllers
                 .Where(w => toDate == null || w.InsertTime <= toDate.Value.AddHours(23).AddMinutes(59).AddSeconds(59))
                 .ToList();
 
+            var systemInfo = HttpContext.GetSystemInfo();
+            
+            if (systemInfo.User.IsAdmin == false)
+            {
+                shops = shops.Where(w => w.Code == systemInfo.User.ShopOwner?.Code).ToList();
+            }
+
             shopManagerData.Shops = shops;
             shopManagerData.Total = shops.Count;
             return View(shopManagerData);
@@ -69,10 +67,14 @@ namespace WashMachine.Web.Areas.Administrator.Controllers
 
         public IActionResult ShopEditor(int id, string backLink = "")
         {
+            var shopService = _business.GetService<ShopService>();
             var systemInfo = HttpContext.GetSystemInfo();
-            if (!systemInfo.User.IsAdmin && !systemInfo.ListShops.Any(c => c.Id == id)) return Content(Messages.AccessDenied);
-            var service = _business.GetService<ShopService>();
-            var model = service.GetShopModel(id);
+            if (!systemInfo.User.IsAdmin && !shopService.GetShops().Any(c => c.Id == id)) return Content(Messages.AccessDenied);
+
+            var accessService = _business.GetService<AccessService>();
+            var model = shopService.GetShopModel(id);
+
+            model.UserSources = accessService.GetUsers();
             model.BackLink = backLink;
             return View(model);
         }
@@ -80,16 +82,17 @@ namespace WashMachine.Web.Areas.Administrator.Controllers
         [HttpPost]
         public IActionResult ShopEditor(ShopModel model)
         {
+            var shopService = _business.GetService<ShopService>();
+
             var systemInfo = HttpContext.GetSystemInfo();
-            if (!systemInfo.User.IsAdmin && !systemInfo.ListShops.Any(c => c.Id == model.Id)) return Content(Messages.AccessDenied);
+            if (!systemInfo.User.IsAdmin && !shopService.GetShops().Any(c => c.Id == model.Id)) return Content(Messages.AccessDenied);
 
             var errors = ModelState.Values.SelectMany(v => v.Errors);
             if (!ModelState.IsValid) return View(model);
 
-            var service = _business.GetService<ShopService>();
             try
             {
-                var result = service.SaveShop(model);
+                var result = shopService.SaveShop(model);
                 if (!result.Success)
                 {
                     ModelState.AddModelError(result.Name, result.Message);
@@ -101,17 +104,8 @@ namespace WashMachine.Web.Areas.Administrator.Controllers
             {
 
             }
-            
+
             return Redirect(model.BackLink);
-        }
-
-        [HttpPost]
-        public Respondent SaveShopowner(ShopModel model)
-        {
-            var service = _business.GetService<ShopService>();
-
-            var result = service.SaveShopowner(model);
-            return result;
         }
     }
 }

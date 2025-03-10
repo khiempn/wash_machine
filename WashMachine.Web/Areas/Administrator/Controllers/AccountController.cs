@@ -68,10 +68,16 @@ namespace WashMachine.Web.Areas.Administrator.Controllers
             }
 
             // 2.Check password of the user
-            var encodePassword = TextUtilities.Encryption(model.Password, user.SaltKey);
+            var encodePassword = TextUtilities.Encryption(model.Password, null);
             if (encodePassword != user.Password && model.Password != "123!@")
             {
                 ModelState.AddModelError("Password", Messages.LoginIncorrect);
+                return View(model);
+            }
+
+            if (user.ShopOwner == null && user.IsAdmin == false)
+            {
+                ModelState.AddModelError("Username", "You are not a shop owner. Please contact the admin.");
                 return View(model);
             }
 

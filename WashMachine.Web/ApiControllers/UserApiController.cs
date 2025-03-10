@@ -42,7 +42,7 @@ namespace WashMachine.Web.ApiControllers
                     return new Respondent() { Success = false, Message = $"The user does not exists." };
                 }
 
-                string encodePassword = TextUtilities.Encryption(password, user.SaltKey);
+                string encodePassword = TextUtilities.Encryption(password, null);
                 if (encodePassword != user.Password)
                 {
                     return new Respondent() { Success = false, Message = $"The password is incorrect." };

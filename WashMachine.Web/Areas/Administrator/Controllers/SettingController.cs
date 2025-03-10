@@ -22,10 +22,12 @@ namespace WashMachine.Web.Areas.Administrator.Controllers
             _mapper = mapper;
             _business = business;
         }
+
         public IActionResult Index()
         {
             return GeneralSetting();
         }
+
         public IActionResult GeneralSetting()
         {
             var service = _business.GetService<SettingService>();
@@ -55,6 +57,7 @@ namespace WashMachine.Web.Areas.Administrator.Controllers
             var systemInfo = service.GetSystemInfo(userId);
             return View("GeneralSetting", systemInfo.Setting);
         }
+
         public IActionResult OctopusSetting()
         {
             var service = _business.GetService<SettingService>();

@@ -1,0 +1,10 @@
+Created time: 21:31:00 Time Zone 07:00:00
+Msg: An attempt was made to access a socket in a way forbidden by its access permissions Time: 2025/03/04 21:31:00 IP: 0.0.0.0
+Url: http://localhost:51758/administrator/reports/order
+StackTrace: 
+Msg: An attempt was made to access a socket in a way forbidden by its access permissions Time: 2025/03/04 21:31:03 IP: 0.0.0.0
+Url: http://localhost:51758/administrator/reports/order
+StackTrace: 
+Msg: A socket operation was attempted to an unreachable network Time: 2025/03/04 21:31:48 IP: 0.0.0.0
+Url: http://localhost:51758/administrator/reports/order
+StackTrace: 

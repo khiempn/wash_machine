@@ -67,8 +67,9 @@
                                         <th>No</th>
                                         <th>Shop Code</th>
                                         <th>Shop Name</th>
+                                        <th>Shop Owner</th>
                                         <th>Status</th>
-                                        <th>Created Date</th>
+                                        <th>Modified Date</th>
                                         <th width="120">Action</th>
                                     </tr>
                                 </thead>
@@ -81,8 +82,16 @@
                                                 <td>@index</td>
                                                 <td>@item.Code</td>
                                                 <td>@item.Name</td>
-                                                <td>@(item.Status == 1 ? "Active" : "Inactive")</td>
-                                                <td>@(item.InsertTime?.ToString("MM/dd/yyyy hh:mm:ss tt"))</td>
+                                                <td>@item.ShopOwner</td>
+                                                <td>@{
+                                                        if (item.Status == 1)
+                                                        {
+                                                            <span style="color: green"> Active </span>
+                                                        }else{
+                                                            <span style="color: #ff9800"> In-active </span>
+                                                        }
+                                                    }</td>
+                                                <td>@(item.UpdateTime?.ToString("MM/dd/yyyy hh:mm:ss tt"))</td>
                                                 <td>
                                                     <a class="grid-button" title="Edit Shop" href="/administrator/shops/shopeditor?id=@item.Id&backlink=@Html.GetUriEncode()"><i class="fas fa-edit"></i></a>
                                                 </td>

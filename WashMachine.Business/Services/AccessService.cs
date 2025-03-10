@@ -6,9 +6,7 @@ using Libraries;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
 
 namespace WashMachine.Business.Services
 {
@@ -28,13 +26,7 @@ namespace WashMachine.Business.Services
         {
             var entity = _dbContext.User.FirstOrDefault(c => c.Email == email);
             var model = _mapper.Map<UserModel>(entity);
-            if(model != null)
-            {
-                model.ListShops = new List<Libraries.SelectItem>
-                {
-
-                };
-            }
+            model.ShopOwner = _mapper.Map<ShopModel>(_dbContext.Shop.FirstOrDefault(f => f.ShopOwnerId == entity.Id));
             return model;
         }
 
@@ -78,20 +70,22 @@ namespace WashMachine.Business.Services
             var model = new DataList<UserModel>(modelItems, filter.Page, filter.PageSize, count);
             return model;
         }
+
         public UserModel GetUserModel(int id)
         {
             var entity = _dbContext.User.FirstOrDefault(c => c.Id == id);
             var model = _mapper.Map<UserModel>(entity);
-            if (model == null) model = new UserModel { 
+            if (model == null) model = new UserModel
+            {
                 Password = Constants.DefaultPassword
             };
-            if(model.Birthday != null)
+            if (model.Birthday != null)
             {
                 model.BirthdayText = model.Birthday.Value.ToString("dd/MM/yyyy");
             }
-            if (string.IsNullOrEmpty(model.Image)) model.Image = Constants.DefaultAvatar;
             return model;
         }
+
         public Respondent SaveUser(UserModel model)
         {
             model.Email = model.Email.ToLower().Trim();
@@ -99,13 +93,13 @@ namespace WashMachine.Business.Services
             var response = new Respondent();
             var currentUserId = _httpContextAccessor.HttpContext.GetId();
             var currentUser = _dbContext.User.FirstOrDefault(c => c.Id == currentUserId);
-            if(currentUser == null)
+            if (currentUser == null)
             {
                 response.Name = nameof(model.Email);
                 response.Message = Messages.ActionInvalid;
                 return response;
             }
-            var checkExisted = _dbContext.User.FirstOrDefault(c => c.Id != model.Id && c.Email == model.Email); 
+            var checkExisted = _dbContext.User.FirstOrDefault(c => c.Id != model.Id && c.Email == model.Email);
             if (checkExisted != null)
             {
                 response.Name = nameof(model.Email);
@@ -120,8 +114,21 @@ namespace WashMachine.Business.Services
                     InsertTime = currentTime,
                     Email = model.Email
                 };
+                var encodePassword = TextUtilities.Encryption(model.Password, null);
+                entity.Password = encodePassword;
                 _dbContext.User.Add(entity);
-            };
+            }
+            else
+            {
+                if (!string.IsNullOrWhiteSpace(model.NewPassword)
+                    && !string.IsNullOrWhiteSpace(model.RepeatNewPassword)
+                    && model.NewPassword.Equals(model.RepeatNewPassword))
+                {
+                    var encodePassword = TextUtilities.Encryption(model.NewPassword, null);
+                    entity.Password = encodePassword;
+                }
+            }
+
             entity.FullName = model.FullName;
             entity.Address = model.Address;
             entity.Phone = model.Phone;
@@ -132,15 +139,11 @@ namespace WashMachine.Business.Services
             {
                 entity.Birthday = TextUtilities.ConvertToDatetime(model.BirthdayText);
             }
-            if(entity.Id != currentUserId && currentUser.UserType == (int)UserTypes.Admin)
+            if (entity.Id != currentUserId && currentUser.UserType == (int)UserTypes.Admin)
             {
                 entity.UserType = model.UserType;
             }
             entity.Notes = model.Notes;
-            if(model.ImageFile != null)
-            {
-                entity.Image = FormFileUtilities.SaveImage(model.ImageFile, Constants.UploadFolder);
-            }
             entity.UpdateTime = currentTime;
             _dbContext.SaveChanges();
             return new Respondent
@@ -165,6 +168,7 @@ namespace WashMachine.Business.Services
             }
             return settings;
         }
+
         public SystemInfo GetSystemInfo(int userId)
         {
             var systemInfo = new SystemInfo();
@@ -175,25 +179,15 @@ namespace WashMachine.Business.Services
             {
                 var user = _dbContext.User.FirstOrDefault(c => c.Id == userId);
                 systemInfo.User = _mapper.Map<UserModel>(user);
+                systemInfo.User.ShopOwner = _mapper.Map<ShopModel>(_dbContext.Shop.FirstOrDefault(f => f.ShopOwnerId == user.Id));
+
             }
             if (systemInfo.User == null) systemInfo.User = new UserModel();
             systemInfo.User.Rights = new List<string> { EnumUtilities.GetName<UserTypes>(systemInfo.User.UserType) };
-            //if (systemInfo.User.Missions == null) systemInfo.User.Missions = new List<string>();
-
 
             // 2.Get system setting
             systemInfo.Setting = GetSettingModel(_dbContext);
 
-            // 3.Get list shops
-            var listShopIds = _dbContext.ShopOwner.Where(c => c.OwnerId == systemInfo.User.Id && c.Active != false).Select(s => s.ShopId).ToList();
-            var shops = _dbContext.Shop.Where(c => systemInfo.User.UserType == (int)UserTypes.Admin || listShopIds.Contains(c.Id)).ToList();
-            var listShops = shops.Select(s => new SelectItem { Id = s.Id, Code = s.Code, Name = s.Name }).ToList();
-            systemInfo.ListShops = listShops;
-
-            var shopCode = _httpContextAccessor.HttpContext.Request.Cookies[Business.Constants.ShopCodeCookie];
-            systemInfo.User.ShopCode = shopCode;
-            var shop = _dbContext.Shop.FirstOrDefault(c => c.Code == shopCode);
-            systemInfo.ClientShop = _mapper.Map<ShopModel>(shop);
             return systemInfo;
         }
 
@@ -203,7 +197,7 @@ namespace WashMachine.Business.Services
 
             // 1.Check user exists
             var entity = _dbContext.User.FirstOrDefault(c => c.Email == model.Email);
-            if(entity == null)
+            if (entity == null)
             {
                 response.Name = nameof(model.Email);
                 response.Message = Messages.ItemNotExisted;
@@ -211,7 +205,7 @@ namespace WashMachine.Business.Services
             }
 
             // 2.Check password of the user
-            var encodePassword = TextUtilities.Encryption(model.CurrentPassword, entity.SaltKey);
+            var encodePassword = TextUtilities.Encryption(model.CurrentPassword, null);
             if (encodePassword != entity.Password)
             {
                 response.Name = nameof(model.CurrentPassword);
@@ -229,6 +223,7 @@ namespace WashMachine.Business.Services
             response.Message = Messages.SaveSuccess;
             return response;
         }
+
         public Respondent ResetPassword(int id)
         {
             var response = new Respondent();
@@ -244,32 +239,32 @@ namespace WashMachine.Business.Services
                 response.Message = Messages.ItemNotExisted;
                 return response;
             }
-            var encodePassword = TextUtilities.Encryption(Constants.DefaultPassword, entity.SaltKey);
+            var encodePassword = TextUtilities.Encryption(Constants.DefaultPassword, null);
             entity.Password = encodePassword;
-            
+
             _dbContext.SaveChanges();
 
             response.Success = true;
             response.Message = Messages.ResetPasswordSuccess;
             return response;
         }
+
         public Respondent DeleteUser(int id)
         {
             var response = new Respondent();
             var userId = _httpContextAccessor.HttpContext.GetId();
-            if(id == userId)
+            if (id == userId)
             {
                 response.Message = Messages.ActionInvalid;
                 return response;
             }
             var entity = _dbContext.User.FirstOrDefault(c => c.Id == id);
-            if(entity == null)
+            if (entity == null)
             {
                 response.Message = Messages.ItemNotExisted;
                 return response;
             }
-            var listItems = _dbContext.ShopOwner.Where(c => c.OwnerId == id).ToList();
-            _dbContext.ShopOwner.RemoveRange(listItems);
+
             _dbContext.User.Remove(entity);
             _dbContext.SaveChanges();
 
@@ -280,7 +275,13 @@ namespace WashMachine.Business.Services
 
         public List<UserModel> GetUsers()
         {
-            return _mapper.Map<List<UserModel>>(_dbContext.User.ToList());
+            List<UserModel> users = _mapper.Map<List<UserModel>>(_dbContext.User.ToList());
+            foreach (UserModel user in users)
+            {
+                Shop shop = _dbContext.Shop.FirstOrDefault(f => f.ShopOwnerId == user.Id);
+                user.ShopOwner = _mapper.Map<ShopModel>(shop);
+            }
+            return users;
         }
     }
 }

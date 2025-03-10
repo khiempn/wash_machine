@@ -21,35 +21,17 @@ namespace WashMachine.Business.Models
         [Required]
         public int? Status { get; set; }
         public string Notes { get; set; }
-        public DateTime? StartDate { get; set; }
-        public DateTime? ExpiryDate { get; set; }
-        public string SecureCode { get; set; }
-        public bool? Active { get; set; }
-        public int? Owner { get; set; }
+        public int? ShopOwnerId { get; set; }
+        public string ShopOwner { get; set; }
         public int? InsertUser { get; set; }
         public DateTime? InsertTime { get; set; }
         public int? UpdateUser { get; set; }
         public DateTime? UpdateTime { get; set; }
-        public string Coordinate { get; set; }
-        public IFormFile BackgroundFile { get; set; }
-        public string BackgroundPath { get; set; }
-        public IFormFile LogoFile { get; set; }
-        public string LogoPath { get; set; }
-
-        public List<UserModel> ShopUsers { get; set; }
-        public string UserIds { get; set; }
-        public List<UserModel> AvailableUsers { get; set; }
-        public string BackLink { get; set; }
-        public bool ShopActive { get
-            {
-                return Status == 1;
-            }
-        }
+        public List<UserModel> UserSources { get; set; }
         public string Location { get; set; }
         public string MachineCode { get; set; }
+        public string BackLink { get; set; }
 
         public ShopComModel DollarCom { get; set; } = new ShopComModel();
-        public ShopComModel CouponCom { get; set; } = new ShopComModel();
-        public ShopComModel OctopusCom { get; set; } = new ShopComModel();
     }
 }

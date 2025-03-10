@@ -11,7 +11,6 @@ namespace WashMachine.Repositories.Entities
         public float Amount { get; set; }
         public int PaymentTypeId { get; set; }
         public string PaymentTypeName { get; set; }
-        //1 Pendding 2 Cancel 3 Success
         public int PaymentStatus { get; set; }
         public string Message { get; set; }
         public DateTime InsertTime { get; set; }

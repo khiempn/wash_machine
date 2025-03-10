@@ -12,7 +12,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace WashMachine.Web.Areas.Administrator.Controllers
 {
@@ -26,14 +25,6 @@ namespace WashMachine.Web.Areas.Administrator.Controllers
         {
             _mapper = mapper;
             _business = business;
-        }
-        [UserAuthorize(Mission = Roles.Admin)]
-        public IActionResult ListNormalUsers(ParamFilter filter)
-        {
-            var service = _business.GetService<AccessService>();
-            var model = service.FindShopUsers(filter);
-            ViewBag.Filter = filter;
-            return View(model);
         }
 
         [UserAuthorize(Mission = Roles.Admin)]
@@ -59,9 +50,10 @@ namespace WashMachine.Web.Areas.Administrator.Controllers
             AccessService accessService = _business.GetService<AccessService>();
 
             List<UserModel> coupons = accessService.GetUsers()
-                .Where(w => string.IsNullOrWhiteSpace(userManagerData.Filter.SearchCriteria) || $"{w.Username} {w.Email} {w.FullName} {w.ShopCode}".IndexOf(userManagerData.Filter.SearchCriteria, StringComparison.OrdinalIgnoreCase) >= 0)
+                .Where(w => string.IsNullOrWhiteSpace(userManagerData.Filter.SearchCriteria) || $"{w.Email} {w.FullName} {w.ShopOwner?.Code}".IndexOf(userManagerData.Filter.SearchCriteria, StringComparison.OrdinalIgnoreCase) >= 0)
                 .Where(w => fromDate == null || w.InsertTime >= fromDate.Value)
                 .Where(w => toDate == null || w.InsertTime <= toDate.Value.AddHours(23).AddMinutes(59).AddSeconds(59))
+                .OrderByDescending(s=> s.InsertTime)
                 .ToList();
 
             userManagerData.Users = coupons;
@@ -74,6 +66,7 @@ namespace WashMachine.Web.Areas.Administrator.Controllers
         {
             var service = _business.GetService<AccessService>();
             var model = service.GetUserModel(id);
+
             model.BackLink = backLink;
             return View(model);
         }
@@ -85,9 +78,8 @@ namespace WashMachine.Web.Areas.Administrator.Controllers
             var errors = ModelState.Values.SelectMany(v => v.Errors);
             if (!ModelState.IsValid) return View(model);
 
-            var service = _business.GetService<AccessService>();
-
-            var result = service.SaveUser(model);
+            var accessService = _business.GetService<AccessService>();
+            var result = accessService.SaveUser(model);
             if (!result.Success)
             {
                 ModelState.AddModelError(result.Name, result.Message);
@@ -136,8 +128,7 @@ namespace WashMachine.Web.Areas.Administrator.Controllers
             var userModel = service.GetUserModel(userId);
             var model = new ChangePasswordModel
             {
-                Email = userModel.Email,
-                Username = userModel.Username
+                Email = userModel.Email
             };
             return View(model);
         }

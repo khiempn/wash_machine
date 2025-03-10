@@ -7,24 +7,28 @@
 <div class="manager-list">
     <nav>
         <div class="nav nav-tabs" id="nav-tab" role="tablist">
-            <a class="nav-link active" data-toggle="tab" href="#user_info_tab" role="tab" aria-controls="nav-home" aria-selected="true">User information</a>
-@*             <a class="nav-link" data-toggle="tab" href="#reset_password_tab" role="tab" aria-controls="nav-home" aria-selected="true">Reset Password</a>
- *@        </div>
+            <a class="nav-link active" data-toggle="tab" tab="#user_info_tab" href="#user_info_tab" role="tab" aria-controls="nav-home" aria-selected="true">User information</a>
+            @{
+                if (Model.Id > 0)
+                {
+                    <a class="nav-link" data-toggle="tab" tab="#reset_password_tab" href="#reset_password_tab" role="tab" aria-controls="nav-home" aria-selected="true">Reset Password</a>
+                }
+            }
+        </div>
     </nav>
     <div class="tab-content w-100" id="nav-tabContent" style="padding: 15px">
         <form class="form-area" autocomplete="off" enctype="multipart/form-data" method="post" action="/administrator/access/usereditor/@Model.Id" novalidate="novalidate">
-            <div class="tab-pane box-15" id="user_info_tab" role="tabpanel" aria-labelledby="nav-home-tab">
+            <div class="tab-pane box-15" id="user_info_tab" role="tabpanel">
                 @Html.HiddenFor(m => m.Id)
-                @Html.HiddenFor(m => m.ShopCode)
                 @Html.HiddenFor(m => m.BackLink)
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-group row">
-                            <label for="inputPassword" class="col-sm-4 col-form-label">Email</label>
+                            <label for="inputPassword" class="col-sm-4 col-form-label required">Email</label>
                             <div class="col-sm-8 form-item">
                                 @if (Model.Id > 0)
                                 {
-                                    @Html.TextBoxFor(model => model.Email, new { @class = "form-control", @autocomplete = "off", ReadOnly = "true", placeholder = "Duplication Email" })
+                                    @Html.TextBoxFor(model => model.Email, new { @class = "form-control", @autocomplete = "off", ReadOnly = "true", placeholder = "Email" })
                                     @Html.ValidationMessageFor(model => model.Email)
                                 }
                                 else
@@ -36,10 +40,9 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6"></div>
                     <div class="col-md-6">
                         <div class="form-group row">
-                            <label for="inputPassword" class="col-sm-4 col-form-label">Full name</label>
+                            <label for="inputPassword" class="col-sm-4 col-form-label required">Full name</label>
                             <div class="col-sm-8 form-item">
                                 @Html.TextBoxFor(model => model.FullName, new { @class = "form-control", @autocomplete = "off", placeholder = "Full name" })
                                 @Html.ValidationMessageFor(model => model.FullName)
@@ -75,12 +78,12 @@
                     </div>
                     <div class="col-md-6">
                         <div class="form-group row">
-                            <label for="inputPassword" class="col-sm-4 col-form-label">Status</label>
+                            <label for="inputPassword" class="col-sm-4 col-form-label required">Status</label>
                             <div class="col-sm-8 form-item">
                                 <div class="select-types " tabindex="0">
                                     @Html.DropDownList("Status", new List<SelectListItem> {
                                     new SelectListItem { Value = "1", Text = "Active", Selected = (Model.Status == 1) },
-                                    new SelectListItem { Value = "2", Text = "Inactive", Selected = (Model.Status == 2) }
+                                    new SelectListItem { Value = "2", Text = "In-active", Selected = (Model.Status == 2) }
                                     }, "---Select an option---", new { @class = "form-control" })
                                     @Html.ValidationMessageFor(model => model.Status)
                                 </div>
@@ -89,12 +92,12 @@
                     </div>
                     <div class="col-md-6">
                         <div class="form-group row">
-                            <label for="inputPassword" class="col-sm-4 col-form-label">User type</label>
+                            <label for="inputPassword" class="col-sm-4 col-form-label required">User type</label>
                             <div class="col-sm-8 form-item">
                                 <div class="select-types " tabindex="0">
                                     @Html.DropDownList("UserType", new List<SelectListItem> {
                                     new SelectListItem { Value = "1", Text = "Admin", Selected = (Model.UserType == 1) },
-                                    new SelectListItem { Value = "2", Text = "Normal", Selected = (Model.UserType == 2) }
+                                    new SelectListItem { Value = "2", Text = "Shop Owner", Selected = (Model.UserType == 2) }
                                     }, "---Select an option---", new { @class = "form-control" })
                                     @Html.ValidationMessageFor(model => model.UserType)
                                 </div>
@@ -133,6 +136,30 @@
                             <div class="col-sm-10 form-item">
                                 @Html.TextAreaFor(model => model.Notes, new { @class = "form-control", @autocomplete = "off", placeholder = "Notes" })
                                 @Html.ValidationMessageFor(model => model.Notes)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane box-15" id="reset_password_tab" role="tabpanel" style="display: none;">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group row">
+                            <label for="inputPassword" class="col-sm-4 col-form-label required">New Password</label>
+                            <div class="col-sm-8 form-item">
+                                @Html.TextBoxFor(model => model.NewPassword, new { @class = "form-control", @autocomplete = "off", placeholder = "New Password" })
+                                @Html.ValidationMessageFor(model => model.NewPassword)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group row">
+                            <label for="inputPassword" class="col-sm-4 col-form-label required">Repeat Password</label>
+                            <div class="col-sm-8 form-item">
+                                @Html.TextBoxFor(model => model.RepeatNewPassword, new { @class = "form-control", @autocomplete = "off", placeholder = "Repeat Password" })
+                                @Html.ValidationMessageFor(model => model.RepeatNewPassword)
                             </div>
                         </div>
                     </div>

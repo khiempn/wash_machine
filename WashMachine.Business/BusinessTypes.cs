@@ -5,16 +5,12 @@ namespace WashMachine.Business
     public class Roles
     {
         public const string Admin = "Admin";
-        public const string Normal = "Normal";
-    }
-
-    public class BusinessTypes
-    {
+        public const string ShopOwner = "Shop Owner";
     }
 
     public enum UserTypes
     {
         Admin = 1,
-        Normal = 2
+        ShopOwner = 2
     }
 }

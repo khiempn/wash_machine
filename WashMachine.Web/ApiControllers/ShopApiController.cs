@@ -202,5 +202,33 @@ namespace WashMachine.Web.ApiControllers
                 return new Respondent() { Success = false, Message = e.Message };
             }
         }
+
+        [HttpPost]
+        public Respondent CreateIncompletedPayment([FromBody] OrderModel orderModel)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(orderModel.ShopCode))
+                {
+                    return new Respondent() { Success = false, Message = $"The shop code can not empty." };
+                }
+
+                ShopService shopService = _business.GetService<ShopService>();
+
+                OrderModel order = shopService.CreateIncompletedOrder(orderModel);
+                if (order != null)
+                {
+                    return new Respondent() { Success = true, Message = string.Empty, Data = order };
+                }
+                else
+                {
+                    return new Respondent() { Success = false, Message = "Can not create new payment." };
+                }
+            }
+            catch (Exception ex)
+            {
+                return new Respondent() { Success = false, Message = ex.InnerException.Message };
+            }
+        }
     }
 }

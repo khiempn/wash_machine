@@ -33,7 +33,6 @@ namespace WashMachine.Business.Services
                 systemInfo.User = _mapper.Map<UserModel>(user);
             }
             if (systemInfo.User == null) systemInfo.User = new UserModel();
-            //if (systemInfo.User.Missions == null) systemInfo.User.Missions = new List<string>();
 
 
             // 2.Get system setting
@@ -47,6 +46,35 @@ namespace WashMachine.Business.Services
                 var piInstance = settingType.GetProperty(item.Key);
                 if (piInstance == null) continue;
                 piInstance.SetValue(settings, item.Value);
+            }
+
+            settings.EmailTemplate = new Models.EmailTemplateConfig();
+            var emailGenerationError = _dbContext.EmailTemplate.FirstOrDefault(f => f.Type == "GenerationError");
+            if (emailGenerationError != null)
+            {
+                settings.EmailTemplate.GenerationErrorSubject = emailGenerationError.Subject;
+                settings.EmailTemplate.GenerationErrorBody = emailGenerationError.Template;
+            }
+
+            var emailDisconnectError = _dbContext.EmailTemplate.FirstOrDefault(f => f.Type == "DisconnectError");
+            if (emailDisconnectError != null)
+            {
+                settings.EmailTemplate.DisconnectErrorSubject = emailDisconnectError.Subject;
+                settings.EmailTemplate.DisconnectErrorBody = emailDisconnectError.Template;
+            }
+
+            var emailUploadFileError = _dbContext.EmailTemplate.FirstOrDefault(f => f.Type == "UploadFileError");
+            if (emailUploadFileError != null)
+            {
+                settings.EmailTemplate.UploadFileErrorSubject = emailUploadFileError.Subject;
+                settings.EmailTemplate.UploadFileErrorBody = emailUploadFileError.Template;
+            }
+
+            var emailDownloadError = _dbContext.EmailTemplate.FirstOrDefault(f => f.Type == "DownloadError");
+            if (emailDownloadError != null)
+            {
+                settings.EmailTemplate.DownloadErrorSubject = emailDownloadError.Subject;
+                settings.EmailTemplate.DownloadErrorBody = emailDownloadError.Template;
             }
             systemInfo.Setting = settings;
             return systemInfo;
@@ -94,8 +122,44 @@ namespace WashMachine.Business.Services
             SetSetting(nameof(model.ServerEmailPort), model.ServerEmailPort);
             SetSetting(nameof(model.ServerEmailFrom), model.ServerEmailFrom);
 
-
             _dbContext.SaveChanges();
+
+            var emailGenerationError = _dbContext.EmailTemplate.FirstOrDefault(f => f.Type == "GenerationError");
+            if (emailGenerationError != null)
+            {
+                emailGenerationError.Subject = model.EmailTemplate.GenerationErrorSubject;
+                emailGenerationError.Template = model.EmailTemplate.GenerationErrorBody;
+                _dbContext.EmailTemplate.Update(emailGenerationError);
+                _dbContext.SaveChanges();
+            }
+
+            var emailDisconnectError = _dbContext.EmailTemplate.FirstOrDefault(f => f.Type == "DisconnectError");
+            if (emailDisconnectError != null)
+            {
+                emailDisconnectError.Subject = model.EmailTemplate.DisconnectErrorSubject;
+                emailDisconnectError.Template = model.EmailTemplate.DisconnectErrorBody;
+                _dbContext.EmailTemplate.Update(emailDisconnectError);
+                _dbContext.SaveChanges();
+            }
+
+            var emailUploadFileError = _dbContext.EmailTemplate.FirstOrDefault(f => f.Type == "UploadFileError");
+            if (emailUploadFileError != null)
+            {
+                emailUploadFileError.Subject = model.EmailTemplate.UploadFileErrorSubject;
+                emailUploadFileError.Template = model.EmailTemplate.UploadFileErrorBody;
+                _dbContext.EmailTemplate.Update(emailUploadFileError);
+                _dbContext.SaveChanges();
+            }
+
+            var emailDownloadError = _dbContext.EmailTemplate.FirstOrDefault(f => f.Type == "DownloadError");
+            if (emailDownloadError != null)
+            {
+                emailDownloadError.Subject = model.EmailTemplate.DownloadErrorSubject;
+                emailDownloadError.Template = model.EmailTemplate.DownloadErrorBody;
+                _dbContext.EmailTemplate.Update(emailDownloadError);
+                _dbContext.SaveChanges();
+            }
+
             response.Success = true;
             response.Message = Messages.SaveSuccess;
             return response;

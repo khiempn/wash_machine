@@ -3,6 +3,7 @@ using WashMachine.Business;
 using WashMachine.Business.Interfaces;
 using WashMachine.Business.Models;
 using WashMachine.Business.Services;
+using WashMachine.Repositories.Entities;
 using WashMachine.Web.AppCode.Attributes;
 using WashMachine.Web.Models;
 using Libraries.Services;
@@ -37,8 +38,14 @@ namespace WashMachine.Web.Areas.Administrator.Controllers
                 couponReportData = new CouponReportDataModel();
             }
             ShopService shopService = _business.GetService<ShopService>();
+            var systemInfo = HttpContext.GetSystemInfo();
 
             couponReportData.Filter.ShopCodeList = shopService.GetShops().Select(s => s.Code).ToList();
+            if (systemInfo.User.IsAdmin == false)
+            {
+                couponReportData.Filter.ShopCodeList = couponReportData.Filter.ShopCodeList.Where(w => w == systemInfo.User.ShopOwner?.Code).ToList();
+                couponReportData.Filter.ShopCode = systemInfo.User.ShopOwner?.Code;
+            }
 
             DateTime? fromDate = null;
             if (!string.IsNullOrWhiteSpace(couponReportData.Filter.FromDate))
@@ -58,7 +65,13 @@ namespace WashMachine.Web.Areas.Administrator.Controllers
                 .Where(w => fromDate == null || w.UsedDate >= fromDate.Value)
                 .Where(w => toDate == null || w.UsedDate <= toDate.Value.AddHours(23).AddMinutes(59).AddSeconds(59))
                 .Where(w => string.IsNullOrWhiteSpace(couponReportData.Filter.ShopCode) || w.ShopCode.IndexOf(couponReportData.Filter.ShopCode, StringComparison.OrdinalIgnoreCase) >= 0)
+                .OrderByDescending(o => o.Id)
                 .ToList();
+
+            if (systemInfo.User.IsAdmin == false)
+            {
+                coupons = coupons.Where(w => w.ShopCode == systemInfo.User.ShopOwner?.Code).ToList();
+            }
 
             couponReportData.Coupons = coupons;
             couponReportData.Total = coupons.Count;
@@ -91,7 +104,15 @@ namespace WashMachine.Web.Areas.Administrator.Controllers
                 .Where(w => fromDate == null || w.UsedDate >= fromDate.Value)
                 .Where(w => toDate == null || w.UsedDate <= toDate.Value.AddHours(23).AddMinutes(59).AddSeconds(59))
                 .Where(w => string.IsNullOrWhiteSpace(couponReportData.Filter.ShopCode) || w.ShopCode.IndexOf(couponReportData.Filter.SearchCriteria, StringComparison.OrdinalIgnoreCase) >= 0)
+                .OrderByDescending(o => o.Id)
                 .ToList();
+
+            var systemInfo = HttpContext.GetSystemInfo();
+
+            if (systemInfo.User.IsAdmin == false)
+            {
+                coupons = coupons.Where(w => w.ShopCode == systemInfo.User.ShopOwner?.Code).ToList();
+            }
 
             DataTable dataTable = new DataTable();
             dataTable.Columns.Add("No", typeof(int));
@@ -132,7 +153,15 @@ namespace WashMachine.Web.Areas.Administrator.Controllers
                 }
                 ShopService shopService = _business.GetService<ShopService>();
 
+                var systemInfo = HttpContext.GetSystemInfo();
+
                 orderReportData.Filter.ShopCodeList = shopService.GetShops().Select(s => s.Code).ToList();
+
+                if (systemInfo.User.IsAdmin == false)
+                {
+                    orderReportData.Filter.ShopCodeList = orderReportData.Filter.ShopCodeList.Where(w => w == systemInfo.User.ShopOwner?.Code).ToList();
+                    orderReportData.Filter.ShopCode = systemInfo.User.ShopOwner?.Code;
+                }
 
                 DateTime? fromDate = null;
                 if (!string.IsNullOrWhiteSpace(orderReportData.Filter.FromDate))
@@ -154,7 +183,14 @@ namespace WashMachine.Web.Areas.Administrator.Controllers
                     .Where(w => toDate == null || w.InsertTime <= toDate.Value.AddHours(23).AddMinutes(59).AddSeconds(59))
                     .Where(w => string.IsNullOrWhiteSpace(orderReportData.Filter.ShopCode) || w.ShopCode.IndexOf(orderReportData.Filter.ShopCode, StringComparison.OrdinalIgnoreCase) >= 0)
                     .Where(w => string.IsNullOrWhiteSpace(orderReportData.Filter.PaymentMethod) || w.PaymentTypeName.IndexOf(orderReportData.Filter.PaymentMethod, StringComparison.OrdinalIgnoreCase) >= 0)
+                    .OrderByDescending(o => o.Id)
                     .ToList();
+
+
+                if (systemInfo.User.IsAdmin == false)
+                {
+                    orders = orders.Where(w => w.ShopCode == systemInfo.User.ShopOwner?.Code).ToList();
+                }
 
                 orderReportData.Orders = orders;
                 orderReportData.Total = orders.Count;
@@ -194,34 +230,72 @@ namespace WashMachine.Web.Areas.Administrator.Controllers
                 .Where(w => toDate == null || w.InsertTime <= toDate.Value.AddHours(23).AddMinutes(59).AddSeconds(59))
                 .Where(w => string.IsNullOrWhiteSpace(orderReportData.Filter.ShopCode) || w.ShopCode.IndexOf(orderReportData.Filter.SearchCriteria, StringComparison.OrdinalIgnoreCase) >= 0)
                 .Where(w => string.IsNullOrWhiteSpace(orderReportData.Filter.PaymentMethod) || w.PaymentTypeName.IndexOf(orderReportData.Filter.PaymentMethod, StringComparison.OrdinalIgnoreCase) >= 0)
+                .OrderByDescending(o => o.Id)
                 .ToList();
+
+
+            var systemInfo = HttpContext.GetSystemInfo();
+
+            if (systemInfo.User.IsAdmin == false)
+            {
+                orders = orders.Where(w => w.ShopCode == systemInfo.User.ShopOwner?.Code).ToList();
+            }
 
             DataTable dataTable = new DataTable();
 
             dataTable.Columns.Add("No", typeof(int));
             dataTable.Columns.Add("Shop Code", typeof(string));
             dataTable.Columns.Add("Shop Name", typeof(string));
-            dataTable.Columns.Add("Machine Code", typeof(string));
-            dataTable.Columns.Add("Date", typeof(string));
             dataTable.Columns.Add("Location", typeof(string));
             dataTable.Columns.Add("Payment Method", typeof(string));
-            dataTable.Columns.Add("Amount", typeof(string));
+            dataTable.Columns.Add("Receipt No", typeof(string));
+            dataTable.Columns.Add("Transaction Date / Time", typeof(string));
+            dataTable.Columns.Add("Device ID", typeof(string));
+            dataTable.Columns.Add("Octopus ID", typeof(string));
+            dataTable.Columns.Add("Usage", typeof(string));
+            dataTable.Columns.Add("Transaction Amount", typeof(string));
             dataTable.Columns.Add("Status", typeof(string));
             dataTable.Columns.Add("Messenger", typeof(string));
 
             int index = 1;
             foreach (OrderModel order in orders)
             {
+                string status = string.Empty;
+
+                if (order.PaymentStatus == (int)(PaymentStatus.Completed))
+                {
+                    status = "Completed";
+                                                        }
+                else if (order.PaymentStatus == (int)(PaymentStatus.Failed))
+                {
+                    status = "Failed";
+                }
+                else if (order.PaymentStatus == (int)(PaymentStatus.InCompleted))
+                {
+                    status = "Incompleted";
+                }
+                else if (order.PaymentStatus == (int)(PaymentStatus.Cancel))
+                {
+                    status = "Cancel";
+                }
+                else if (order.PaymentStatus == (int)(PaymentStatus.Pending))
+                {
+                    status = "Pending";
+                }
+
                 dataTable.Rows.Add(index,
                     order.ShopCode,
                     order.ShopName,
-                    order.DeviceId,
-                    order.InsertTime.Value.ToString("MM/dd/yyyy hh:mm:ss tt"),
                     order.Location,
                     order.PaymentTypeName,
+                    order.Id.ToString().PadLeft(8, '0'),
+                    order.InsertTime.Value.ToString("MM/dd/yyyy hh:mm:ss tt"),
+                    order.DeviceId,
+                    order.OctopusNo,
+                    order.PaymentTypeName == "Octopus" ? "Deduct" : "Eft",
                     order.Amount,
-                    order.PaymentStatus == (int)(PaymentStatus.Paid) ? "Success" : "Failed",
-                    order.PaymentStatus == (int)(PaymentStatus.Paid) ? "OK" : ""
+                    status,
+                    order.Message
                 );
                 index++;
             }

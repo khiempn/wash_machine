@@ -67,6 +67,7 @@
                                         <th>Full name</th>
                                         <th>Address</th>
                                         <th>Type</th>
+                                        <th>Shop Owner</th>
                                         <th>Testing mode</th>
                                         <th>Created Date</th>
                                         <th width="120">Action</th>
@@ -82,14 +83,18 @@
                                                 <td>@item.Email</td>
                                                 <td>@item.FullName</td>
                                                 <td>@item.Address</td>
-                                                <td>@item.UserTypeName</td>
+                                                <td>@(item.UserType == 1 ? "Admin" : "Shop Owner")</td>
+                                                <td>@(item.ShopOwner?.Code)</td>
                                                 <td>@(item.TestingMode == 1 ? "ON" : "OFF")</td>
                                                 <td>@(item.InsertTime?.ToString("MM/dd/yyyy hh:mm:ss tt"))</td>
                                                 <td>
-                                                    @if (systemInfo.User.Id != item.Id)
+                                                    @if (systemInfo.User.IsAdmin)
                                                     {
                                                         <a class="grid-button" title="Edit User" href="/administrator/access/usereditor/@item.Id?backlink=@Html.GetUriEncode()"><i class="fas fa-edit"></i></a>
-                                                        <button class="btn" title="Delete User" onclick="deleteItem('/administrator/access/DeleteUser/@item.Id','/administrator/access/listusers')" style="color:red"><i class="fas fa-trash"></i></button>
+                                                        if (systemInfo.User.Id != item.Id)
+                                                        {
+                                                            <button class="btn" title="Delete User" onclick="deleteItem('/administrator/access/DeleteUser/@item.Id','/administrator/access/listusers')" style="color:red"><i class="fas fa-trash"></i></button>
+                                                        }
                                                     }
                                                 </td>
                                             </tr>

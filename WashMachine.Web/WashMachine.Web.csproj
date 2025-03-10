@@ -34,8 +34,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\WashMachine.Business\WashMachine.Business.csproj" />
-    <ProjectReference Include="..\WashMachine.Repositories\WashMachine.Repositories.csproj" />
     <ProjectReference Include="..\Libraries\Libraries.csproj" />
+    <ProjectReference Include="..\WashMachine.Repositories\WashMachine.Repositories.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -4,8 +4,6 @@ using WashMachine.Business.Models;
 using WashMachine.Repositories.Entities;
 using Libraries;
 using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -13,12 +11,6 @@ using System.Linq;
 
 namespace WashMachine.Business.Services
 {
-    public enum OrderTypes
-    {
-        PaymentHK = 1,
-        TicketRedeem = 2
-    }
-
     public class ShopService : IBusiness
     {
         private readonly IMapper _mapper;
@@ -31,37 +23,10 @@ namespace WashMachine.Business.Services
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public DataList<ShopModel> FindShops(ParamFilter filter)
-        {
-            var userId = _httpContextAccessor.HttpContext.GetId();
-            var user = _dbContext.User.FirstOrDefault(c => c.Id == userId);
-
-            var query = _dbContext.Shop.Where(c => c.Name.Contains(filter.Keyword)
-                || c.Code.Contains(filter.Keyword)
-                || c.Email.Contains(filter.Keyword)
-                || c.Phone.Contains(filter.Keyword)
-                || string.IsNullOrEmpty(filter.Keyword));
-            if (user.UserType != (int)UserTypes.Admin)
-            {
-                var listShopIds = _dbContext.ShopOwner.Where(c => c.OwnerId == userId && c.Active == true).Select(s => s.ShopId).ToList();
-                query = query.Where(c => listShopIds.Contains(c.Id));
-            }
-            var count = query.Count();
-            var listItems = query.OrderByDescending(o => o.Id).ToList();
-
-            var modelItems = _mapper.Map<List<ShopModel>>(listItems);
-            var model = new DataList<ShopModel>(modelItems, filter.Page, filter.PageSize, count);
-            return model;
-        }
-
         public ShopModel GetShopModel(int id)
         {
             var entity = _dbContext.Shop.FirstOrDefault(c => c.Id == id);
             var model = _mapper.Map<ShopModel>(entity) ?? new ShopModel();
-            var userIds = _dbContext.ShopOwner.Where(c => c.ShopId == id && c.Active != false).Select(s => s.OwnerId).ToList();
-            var listUsers = _dbContext.User.Where(c => userIds.Contains(c.Id)).ToList();
-            model.ShopUsers = _mapper.Map<List<UserModel>>(listUsers);
-            model.UserIds = "-0-" + string.Join("-", userIds) + "-";
 
             if (entity != null)
             {
@@ -71,53 +36,8 @@ namespace WashMachine.Business.Services
                 {
                     model.DollarCom = _mapper.Map<ShopComModel>(dollarCom);
                 }
-
-                var couponCom = entity.ShopComs.FirstOrDefault(w => w.ComType == "CouponCom");
-                if (couponCom != null)
-                {
-                    model.CouponCom = _mapper.Map<ShopComModel>(couponCom);
-                }
-
-                var octopusCom = entity.ShopComs.FirstOrDefault(w => w.ComType == "OctopusCom");
-                if (octopusCom != null)
-                {
-                    model.OctopusCom = _mapper.Map<ShopComModel>(octopusCom);
-                }
             }
             return model;
-        }
-
-        public Respondent SaveShopowner(ShopModel model)
-        {
-            var response = new Respondent();
-            var userIds = model.UserIds.Split('-', StringSplitOptions.RemoveEmptyEntries);
-            var listUserIds = userIds.Select(c => TextUtilities.GetInt(c)).ToList();
-
-            var listShopUsers = _dbContext.ShopOwner.Where(c => c.ShopId == model.Id).ToList();
-            var removedUsers = listShopUsers.Where(c => c.ShopId == model.Id && !listUserIds.Contains(c.OwnerId)).ToList();
-            foreach (var item in removedUsers)
-            {
-                item.Active = false;
-            }
-            foreach (var item in listUserIds)
-            {
-                if (item == 0) continue;
-                var obj = listShopUsers.FirstOrDefault(c => c.OwnerId == item);
-                if (obj == null)
-                {
-                    obj = new ShopOwner
-                    {
-                        ShopId = model.Id,
-                        OwnerId = item
-                    };
-                    _dbContext.Add(obj);
-                }
-                obj.Active = true;
-            }
-            _dbContext.SaveChanges();
-
-            response.Success = true;
-            return response;
         }
 
         public Respondent SaveShop(ShopModel model)
@@ -130,7 +50,7 @@ namespace WashMachine.Business.Services
                 return response;
             }
             var currentTime = DateTime.Now;
-            var entity = _dbContext.Shop.FirstOrDefault(c => c.Id == model.Id);
+            Shop entity = _dbContext.Shop.FirstOrDefault(c => c.Id == model.Id);
             if (entity == null)
             {
                 entity = new Shop
@@ -147,23 +67,10 @@ namespace WashMachine.Business.Services
             entity.Email = model.Email;
             entity.Phone = model.Phone;
             entity.Notes = model.Notes;
-            entity.Location = model.Location;
             entity.MachineCode = model.MachineCode;
+            entity.Location = model.Location;
+            entity.ShopOwnerId = model.ShopOwnerId;
 
-            var userId = _httpContextAccessor.HttpContext.GetId();
-            var user = _dbContext.User.FirstOrDefault(c => c.Id == userId);
-            if (user.UserType == (int)UserTypes.Admin)
-            {
-                if (model.BackgroundFile != null)
-                {
-                    entity.BackgroundPath = FormFileUtilities.SaveImage(model.BackgroundFile, Constants.ShopFolder);
-                }
-                if (model.LogoFile != null)
-                {
-                    entity.LogoPath = FormFileUtilities.SaveImage(model.LogoFile, Constants.ShopFolder);
-                }
-                entity.Status = model.Status;
-            }
             entity.UpdateTime = currentTime;
             entity.ShopComs.Clear();
             _dbContext.SaveChanges();
@@ -184,26 +91,7 @@ namespace WashMachine.Business.Services
                 ShopId = model.Id,
                 StopBits = model.DollarCom.StopBits
             });
-            _dbContext.ShopCom.Add(new ShopCom()
-            {
-                ComType = model.CouponCom.ComType,
-                BaudRate = model.CouponCom.BaudRate,
-                ComName = model.CouponCom.ComName,
-                Data = model.CouponCom.Data,
-                Parity = model.CouponCom.Parity,
-                ShopId = model.Id,
-                StopBits = model.CouponCom.StopBits
-            });
-            _dbContext.ShopCom.Add(new ShopCom()
-            {
-                ComType = model.OctopusCom.ComType,
-                BaudRate = model.OctopusCom.BaudRate,
-                ComName = model.OctopusCom.ComName,
-                Data = model.OctopusCom.Data,
-                Parity = model.OctopusCom.Parity,
-                ShopId = model.Id,
-                StopBits = model.OctopusCom.StopBits
-            });
+
             _dbContext.SaveChanges();
             return new Respondent
             {
@@ -249,34 +137,54 @@ namespace WashMachine.Business.Services
 
         public OrderModel CreateNewOrder(OrderModel orderModel)
         {
+            DateTime currentTime = DateTime.Now;
+
             _dbContext.Log.Add(new Log() { Message = JsonConvert.SerializeObject(orderModel), Time = DateTime.Now });
             var shop = _dbContext.Shop.FirstOrDefault(c => c.Code == orderModel.ShopCode);
+            Order entity = _dbContext.Order.FirstOrDefault(w => w.PaymentId == orderModel.PaymentId && w.PaymentStatus == (int)PaymentStatus.InCompleted);
 
-            DateTime currentTime = DateTime.Now;
-            Order entity = new Order
+            if (entity != null)
             {
-                ShopCode = orderModel.ShopCode,
-                ShopName = orderModel.ShopName,
-                Location = shop.Location,
-                Amount = orderModel.Amount,
-                Quantity = 1,
-                PaymentId = orderModel.PaymentId,
-                PaymentTypeId = orderModel.PaymentTypeId,
-                PaymentTypeName = orderModel.PaymentTypeName,
-                PaymentStatus = (int)PaymentStatus.Paid,
-                DeviceId = orderModel.DeviceId,
-                CardJson = orderModel.CardJson,
-                InsertTime = currentTime,
-                UpdateTime = currentTime,
-            };
+                entity.UpdateTime = currentTime;
+                entity.PaymentStatus = (int)PaymentStatus.Completed;
+                entity.Amount = orderModel.Amount;
+                entity.DeviceId = orderModel.DeviceId;
+                entity.CardJson = orderModel.CardJson;
+                entity.OctopusNo = orderModel.OctopusNo;
+                entity.Message = orderModel.Message;
 
-            _dbContext.Order.Add(entity);
-            _dbContext.SaveChanges();
+                _dbContext.Order.Update(entity);
+                _dbContext.SaveChanges();
+            }
+            else
+            {
+                entity = new Order
+                {
+                    ShopCode = orderModel.ShopCode,
+                    ShopName = orderModel.ShopName,
+                    Location = shop.Location,
+                    Amount = orderModel.Amount,
+                    Quantity = 1,
+                    PaymentId = orderModel.PaymentId,
+                    PaymentTypeId = orderModel.PaymentTypeId,
+                    PaymentTypeName = orderModel.PaymentTypeName,
+                    PaymentStatus = orderModel.PaymentStatus == (int)PaymentStatus.InCompleted ? (int)PaymentStatus.InCompleted : (int)PaymentStatus.Completed,
+                    DeviceId = orderModel.DeviceId,
+                    CardJson = orderModel.CardJson,
+                    OctopusNo = orderModel.OctopusNo,
+                    Message = orderModel.Message,
+                    InsertTime = currentTime,
+                    UpdateTime = currentTime,
+                };
+
+                _dbContext.Order.Add(entity);
+                _dbContext.SaveChanges();
+            }
 
             Payment payment = _dbContext.Payment.FirstOrDefault(w => w.Id == orderModel.PaymentId);
             if (payment != null)
             {
-                payment.PaymentStatus = (int)PaymentStatus.Paid;
+                payment.PaymentStatus = (int)PaymentStatus.Completed;
             }
             _dbContext.Update(payment);
 
@@ -293,6 +201,27 @@ namespace WashMachine.Business.Services
                 payment.PaymentStatus = (int)PaymentStatus.Cancel;
                 payment.UpdateTime = currentTime;
                 payment.Message = paymentModel.Message;
+
+                Order entity = new Order
+                {
+                    ShopCode = payment.ShopCode,
+                    ShopName = payment.ShopName,
+                    Location = string.Empty,
+                    Amount = payment.Amount,
+                    Quantity = 1,
+                    PaymentId = payment.Id,
+                    PaymentTypeId = payment.PaymentTypeId,
+                    PaymentTypeName = payment.PaymentTypeName,
+                    PaymentStatus = (int)PaymentStatus.Cancel,
+                    DeviceId = string.Empty,
+                    CardJson = string.Empty,
+                    Message = paymentModel.Message,
+                    InsertTime = currentTime,
+                    UpdateTime = currentTime,
+                };
+
+                _dbContext.Order.Add(entity);
+                _dbContext.SaveChanges();
             }
             _dbContext.Update(payment);
             _dbContext.SaveChanges();
@@ -309,16 +238,91 @@ namespace WashMachine.Business.Services
                 payment.PaymentStatus = paymentModel.PaymentStatus;
                 payment.UpdateTime = currentTime;
                 payment.Message = paymentModel.Message;
+
+                if (payment.PaymentStatus == (int)PaymentStatus.Failed)
+                {
+                    Order entity = new Order
+                    {
+                        ShopCode = payment.ShopCode,
+                        ShopName = payment.ShopName,
+                        Location = string.Empty,
+                        Amount = payment.Amount,
+                        Quantity = 1,
+                        PaymentId = payment.Id,
+                        PaymentTypeId = payment.PaymentTypeId,
+                        PaymentTypeName = payment.PaymentTypeName,
+                        PaymentStatus = (int)PaymentStatus.Failed,
+                        DeviceId = string.Empty,
+                        CardJson = string.Empty,
+                        Message = paymentModel.Message,
+                        InsertTime = currentTime,
+                        UpdateTime = currentTime,
+                    };
+
+                    _dbContext.Order.Add(entity);
+                    _dbContext.SaveChanges();
+                }
             }
+
             _dbContext.Update(payment);
             _dbContext.SaveChanges();
             PaymentModel model = _mapper.Map<PaymentModel>(payment);
             return model;
         }
 
+        public OrderModel CreateIncompletedOrder(OrderModel orderModel)
+        {
+            DateTime currentTime = DateTime.Now;
+
+            _dbContext.Log.Add(new Log() { Message = JsonConvert.SerializeObject(orderModel), Time = DateTime.Now });
+            var shop = _dbContext.Shop.FirstOrDefault(c => c.Code == orderModel.ShopCode);
+            Order entity = _dbContext.Order.FirstOrDefault(w => w.PaymentId == orderModel.PaymentId && w.PaymentStatus == (int)PaymentStatus.InCompleted);
+
+            if (entity == null)
+            {
+                entity = new Order
+                {
+                    ShopCode = orderModel.ShopCode,
+                    ShopName = orderModel.ShopName,
+                    Location = shop.Location,
+                    Amount = orderModel.Amount,
+                    Quantity = 1,
+                    PaymentId = orderModel.PaymentId,
+                    PaymentTypeId = orderModel.PaymentTypeId,
+                    PaymentTypeName = orderModel.PaymentTypeName,
+                    PaymentStatus = (int)PaymentStatus.InCompleted,
+                    DeviceId = orderModel.DeviceId,
+                    CardJson = orderModel.CardJson,
+                    OctopusNo = orderModel.OctopusNo,
+                    Message = orderModel.Message,
+                    InsertTime = currentTime,
+                    UpdateTime = currentTime,
+                };
+
+                _dbContext.Order.Add(entity);
+                _dbContext.SaveChanges();
+                Payment payment = _dbContext.Payment.FirstOrDefault(w => w.Id == orderModel.PaymentId);
+                if (payment != null)
+                {
+                    payment.PaymentStatus = (int)PaymentStatus.Pending;
+                }
+                _dbContext.Update(payment);
+            }
+
+            var model = _mapper.Map<OrderModel>(entity);
+            return model;
+        }
+
         public List<ShopModel> GetShops()
         {
-            return _mapper.Map<List<ShopModel>>(_dbContext.Shop.ToList());
+            List<ShopModel> shops = _mapper.Map<List<ShopModel>>(_dbContext.Shop.ToList());
+            shops.ForEach((shop) =>
+            {
+                User user = _dbContext.User.FirstOrDefault(f => f.Id == shop.ShopOwnerId);
+                shop.ShopOwner = user != null ? user.Email : string.Empty;
+            });
+
+            return shops;
         }
     }
 }

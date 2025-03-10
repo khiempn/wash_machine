@@ -1,6 +1,4 @@
-﻿using Libraries;
-using Microsoft.AspNetCore.Http;
-using System.Collections.Generic;
+﻿using Microsoft.AspNetCore.Http;
 
 namespace WashMachine.Business.Models
 {
@@ -8,8 +6,6 @@ namespace WashMachine.Business.Models
     {
         public SettingModel Setting { get; set; }
         public UserModel User { get; set; }
-        public List<SelectItem> ListShops { get; set; }
-        public ShopModel ClientShop { get; set; }
     }
 
     public class SettingModel
@@ -48,5 +44,21 @@ namespace WashMachine.Business.Models
         public string ServerEmailHost { get; set; }
         public string ServerEmailPort { get; set; }
         public string ServerEmailFrom { get; set; }
+        public EmailTemplateConfig EmailTemplate { get; set; } = new EmailTemplateConfig();
+    }
+
+    public class EmailTemplateConfig
+    {
+        public string GenerationErrorBody { get; set; }
+        public string GenerationErrorSubject { get; set; }
+
+        public string DisconnectErrorBody { get; set; }
+        public string DisconnectErrorSubject { get; set; }
+
+        public string UploadFileErrorBody { get; set; }
+        public string UploadFileErrorSubject { get; set; }
+
+        public string DownloadErrorBody { get; set; }
+        public string DownloadErrorSubject { get; set; }
     }
 }

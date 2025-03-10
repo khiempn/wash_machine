@@ -77,18 +77,21 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-12">
+                        <div class="col-md-12" style="overflow: auto;">
                             <table class="table" id="order_list">
                                 <thead>
                                     <tr>
                                         <th>No</th>
                                         <th>Shop Code</th>
                                         <th>Shop Name</th>
-                                        <th>Machine Code</th>
-                                        <th>Date</th>
                                         <th>Location</th>
                                         <th>Payment Method</th>
-                                        <th>Amount</th>
+                                        <th>Receipt No</th>
+                                        <th>Transaction Date/Time</th>
+                                        <th>Device ID</th>
+                                        <th>Octopus ID</th>
+                                        <th>Usage</th>
+                                        <th>Transaction Amount</th>
                                         <th>Status</th>
                                         <th>Messenger</th>
                                     </tr>
@@ -102,13 +105,39 @@
                                                 <td>@index</td>
                                                 <td>@order.ShopCode</td>
                                                 <td>@order.ShopName</td>
-                                                <td>@order.DeviceId</td>
-                                                <td>@order.InsertTime.Value.ToString("MM/dd/yyyy hh:mm:ss tt")</td>
                                                 <td>@order.Location</td>
                                                 <td>@order.PaymentTypeName</td>
+                                                <td>@order.Id.ToString().PadLeft(8, '0')</td>
+                                                <td>@order.InsertTime.Value.ToString("MM/dd/yyyy hh:mm:ss tt")</td>
+                                                <td>@order.DeviceId</td>
+                                                <td>@order.OctopusNo</td>
+                                                <td>@(order.PaymentTypeName == "Octopus" ? "Deduct" : "Eft")</td>
                                                 <td>@order.Amount</td>
-                                                <td>@(order.PaymentStatus == (int)(PaymentStatus.Paid) ? "Success" : "Failed")</td>
-                                                <td>@(order.PaymentStatus == (int)(PaymentStatus.Paid) ? "OK" : "")</td>
+                                                <td>
+                                                    @{
+                                                        if (order.PaymentStatus == (int)(PaymentStatus.Completed))
+                                                        {
+                                                            <span style="color: green;">Completed</span>
+                                                        }
+                                                        else if (order.PaymentStatus == (int)(PaymentStatus.Failed))
+                                                        {
+                                                            <span style="color: red;">Failed</span>
+                                                        }
+                                                        else if (order.PaymentStatus == (int)(PaymentStatus.InCompleted))
+                                                        {
+                                                            <span style="color: #ff9800;">Incompleted</span>
+                                                        }
+                                                        else if (order.PaymentStatus == (int)(PaymentStatus.Cancel))
+                                                        {
+                                                            <span style="color: blue;">Cancel</span>
+                                                        }
+                                                        else if (order.PaymentStatus == (int)(PaymentStatus.Pending))
+                                                        {
+                                                            <span style="color: blue;">Pending</span>
+                                                        }
+                                                    }
+                                                </td>
+                                                <td>@order.Message</td>
                                             </tr>
                                             index += 1;
                                         }

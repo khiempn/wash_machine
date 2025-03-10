@@ -1,0 +1,8 @@
+{
+  "runtimeOptions": {
+    "additionalProbingPaths": [
+      "C:\\Users\\KHIEM\\.dotnet\\store\\|arch|\\|tfm|",
+      "C:\\Users\\KHIEM\\.nuget\\packages"
+    ]
+  }
+}

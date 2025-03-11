@@ -186,7 +186,7 @@ namespace WashMachine.Forms.Modules.PaidBy.PaidByItems
                             paymentAlertUI.Enabled = true;
                         });
                     }
-                    else if (paidByForm.FollowType == Login.FollowType.Normal)
+                    else if (paidByForm.FollowType == Login.FollowType.Normal || paidByForm.FollowType == Login.FollowType.TestMachineWithoutPayment)
                     {
                         Logger.Log($"PaymentProgressHandler Step 9 ");
                         waitingUI.Hide();

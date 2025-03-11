@@ -127,6 +127,10 @@ namespace WashMachine.Forms.Modules.Login
                 {
                     Program.ShopConfig = Program.AppConfig.GetShopConfig();
                     await Program.ShopConfig.ShopSetting.LoadImages();
+                   
+                }
+                finally
+                {
                     BeginInvoke((MethodInvoker)delegate
                     {
                         Cursor = Cursors.Default;
@@ -134,10 +138,6 @@ namespace WashMachine.Forms.Modules.Login
                         progressUI.Hide();
                         Refresh();
                     });
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
                 }
             });
         }

@@ -9,6 +9,12 @@
     .field-validation-error {
         color: red;
     }
+
+    .auth-box {
+        padding: 30px;
+        border: 1px solid #eee;
+        border-radius: 10px;
+    }
 </style>
 <div class="main-wrapper">
     <div class="preloader">
@@ -17,11 +23,17 @@
             <div class="lds-pos"></div>
         </div>
     </div>
-    <div class="auth-wrapper d-flex no-block justify-content-center align-items-center bg-light">
+    <div class="auth-wrapper d-flex no-block justify-content-center align-items-center bg-light" style="height: 100%">
         <div class="auth-box bg-light border-top border-secondary">
             <div id="loginform">
                 <div class="text-center pt-3 pb-3">
                     <h2 class="text-center">LOGIN</h2>
+                </div>
+                <div class="text-center">
+                    <img src="/theme//matrix-admin/assets/images/washmachine-favicon.png" width="30" height="30" />
+                </div>
+                <div class="text-center">
+                    <span class="text-center">Wash Machine System</span>
                 </div>
                 <!-- Form -->
                 <form class="form-horizontal mt-3" autocomplete="off" method="post" action="/login" novalidate="novalidate">

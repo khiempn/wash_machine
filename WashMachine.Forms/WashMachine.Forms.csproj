@@ -291,7 +291,13 @@
     <Content Include="lib\EFTPaymentsServer.dll" />
     <Content Include="lib\EFTPaymentsServer.pdb" />
     <Content Include="lib\System.Data.SQLite.dll" />
+    <Content Include="lrw.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Octopus\initial.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="rwl.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="SecurityKeys\rsaPrivateKey.txt">

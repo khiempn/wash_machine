@@ -594,7 +594,7 @@ namespace WashMachine.Forms.Modules.PaidBy.Machine.Octopus
         public void ExcecuteXFile()
         {
             if (!string.IsNullOrWhiteSpace(OctopusConfig.XFileHour)
-                && !string.IsNullOrWhiteSpace(OctopusConfig.XFileMinute) 
+                && !string.IsNullOrWhiteSpace(OctopusConfig.XFileMinute)
                 && IsCanRunXFile(ParseDatetimeJob(OctopusConfig.XFileHour, OctopusConfig.XFileMinute))
                 && !Program.octopusService.IsUserUsingApplication())
             {
@@ -807,7 +807,7 @@ namespace WashMachine.Forms.Modules.PaidBy.Machine.Octopus
 
         public void UploadFiles(Action<bool, string> done)
         {
-            if (!string.IsNullOrWhiteSpace(OctopusConfig.UploadHour) && !string.IsNullOrWhiteSpace(OctopusConfig.UploadMinute) 
+            if (!string.IsNullOrWhiteSpace(OctopusConfig.UploadHour) && !string.IsNullOrWhiteSpace(OctopusConfig.UploadMinute)
                 && IsCanRunUpload(ParseDatetimeJob(OctopusConfig.UploadHour, OctopusConfig.UploadMinute)))
             {
                 var config = OctopusINI.ReadFileConfig();
@@ -955,6 +955,18 @@ namespace WashMachine.Forms.Modules.PaidBy.Machine.Octopus
                     emailService.SendDownloadError();
                     LogEvent2("An error occurred while downloading the files.");
                 }
+            }
+        }
+
+        public void Disconnect()
+        {
+            try
+            {
+                PortClose();
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex);
             }
         }
     }

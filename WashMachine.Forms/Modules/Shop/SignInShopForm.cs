@@ -92,10 +92,6 @@ namespace WashMachine.Forms.Modules.Shop
                         }
                         Cursor = Cursors.Default;
                         Enabled = true;
-
-                        LoginForm loginForm = new LoginForm();
-                        loginForm.Show();
-                        loginForm.FormClosed += LoginForm_FormClosed;
                         Hide();
                     }
                     catch (Exception ex)

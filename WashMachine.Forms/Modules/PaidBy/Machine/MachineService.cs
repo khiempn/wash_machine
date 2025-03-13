@@ -4,6 +4,7 @@ using System;
 using System.IO.Ports;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Collections.Generic;
 
 namespace WashMachine.Forms.Modules.PaidBy.Machine
 {
@@ -136,7 +137,7 @@ namespace WashMachine.Forms.Modules.PaidBy.Machine
         {
             try
             {
-                if (octopusService != null && octopusService.InitialStatus)
+                if (octopusService != null && octopusService.IsInitialCompleted)
                 {
                     return octopusService;
                 }
@@ -148,7 +149,8 @@ namespace WashMachine.Forms.Modules.PaidBy.Machine
                         MessageCodes = new System.Collections.Generic.List<int>()
                         {
                             octopusService.LastRsInitialCOM
-                        }
+                        },
+                        IsStop = true
                     });
                 }
             }
@@ -172,11 +174,11 @@ namespace WashMachine.Forms.Modules.PaidBy.Machine
             return null;
         }
 
-        public Task<bool> DisconnectOctopus()
+        public Task<bool> DisconnectTimer()
         {
             try
             {
-                bool status = octopusService.Discope();
+                bool status = octopusService.DisconnectTimer();
                 if (status)
                 {
                     return Task.FromResult(true);
@@ -189,14 +191,9 @@ namespace WashMachine.Forms.Modules.PaidBy.Machine
             return Task.FromResult(false);
         }
 
-        public bool IsCancelPayment()
+        public void DisconnectOctopus()
         {
-            return octopusService.IsCancelPayment();
-        }
-
-        public void CancelPayment()
-        {
-            octopusService.CancelPayment();
+            octopusService.Disconnect();
         }
     }
 }

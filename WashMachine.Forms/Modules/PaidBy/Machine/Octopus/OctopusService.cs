@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Dynamic;
 
 namespace WashMachine.Forms.Modules.PaidBy.Machine.Octopus
 {
@@ -51,7 +52,7 @@ namespace WashMachine.Forms.Modules.PaidBy.Machine.Octopus
 
         public bool IsCancelPaymentRequest { get; set; } = false;
 
-        public bool InitialStatus { get; set; }
+        public bool IsInitialCompleted { get; set; }
 
         private Form currentForm;
 
@@ -70,7 +71,7 @@ namespace WashMachine.Forms.Modules.PaidBy.Machine.Octopus
         {
             if (Program.AppConfig.ScanOctopusMode == 0)
             {
-                InitialStatus = true;
+                IsInitialCompleted = true;
                 return true;
             }
             else
@@ -83,13 +84,18 @@ namespace WashMachine.Forms.Modules.PaidBy.Machine.Octopus
                 {
                     Logger.Log($"Initial Step 10 {r}");
                     Logger.Log($"InitComm = {r} Octopus message");
-                    InitialStatus = true;
+                    IsInitialCompleted = true;
                     return true;
                 }
                 else
                 {
                     Logger.Log($"Initial Step 9 {r}");
-                    PaymentProgressHandler?.Invoke(false, new OctopusPaymentResponseModel() { Rs = r });
+                    PaymentProgressHandler?.Invoke(false, new OctopusPaymentResponseModel()
+                    {
+                        Rs = r,
+                        MessageCodes = new List<int> { r },
+                        IsStop = true
+                    });
                     return false;
                 }
             }
@@ -217,7 +223,7 @@ namespace WashMachine.Forms.Modules.PaidBy.Machine.Octopus
                                 IsStop = true
                             });
                         }
-                        else
+                        else if (cardInfo.Rs <= 100000)
                         {
                             Logger.Log($"ExcecuteDeduct Start Step 3 {JsonConvert.SerializeObject(cardInfo)}");
                             cardInfo.Rs = octopusLibrary.ExcecuteDeduct((int)paymentInfo.Amount, paymentInfo.Id);
@@ -262,7 +268,7 @@ namespace WashMachine.Forms.Modules.PaidBy.Machine.Octopus
                                     MessageCodes = MessageCodes
                                 });
                             }
-                            else
+                            else if (cardInfo.Rs <= 100000)
                             {
                                 Logger.Log($"ExcecuteGetExtraInfo Start Step 5 {JsonConvert.SerializeObject(cardInfo)}");
                                 ExtraInfo extraInfo = octopusLibrary.ExcecuteGetExtraInfo();
@@ -283,6 +289,30 @@ namespace WashMachine.Forms.Modules.PaidBy.Machine.Octopus
                                     MessageCodes = new List<int>() { (int)OctopusPaymentStatus.SUCCESS }
                                 });
                             }
+                            else
+                            {
+                                PaymentProgressHandler?.Invoke(true, new OctopusPaymentResponseModel()
+                                {
+                                    Status = false,
+                                    Rs = cardInfo.Rs,
+                                    Message = "Payment error",
+                                    CardInfo = cardInfo,
+                                    IsStop = true,
+                                    MessageCodes = new List<int>() { (int)OctopusPaymentStatus.FAILURE }
+                                });
+                            }
+                        }
+                        else
+                        {
+                            PaymentProgressHandler?.Invoke(true, new OctopusPaymentResponseModel()
+                            {
+                                Status = false,
+                                Rs = cardInfo.Rs,
+                                Message = "Payment error",
+                                CardInfo = cardInfo,
+                                IsStop = true,
+                                MessageCodes = new List<int>() { (int)OctopusPaymentStatus.FAILURE }
+                            });
                         }
                     }
                 }
@@ -339,10 +369,6 @@ namespace WashMachine.Forms.Modules.PaidBy.Machine.Octopus
             });
 
             octopusLibrary.ExcecuteXFile();
-            //Task.Run(() =>
-            //{
-            //    RefreshConfig();
-            //});
         }
 
         public void RunAJobToCompleteFiles()
@@ -375,7 +401,7 @@ namespace WashMachine.Forms.Modules.PaidBy.Machine.Octopus
             }
         }
 
-        public bool Discope()
+        public bool DisconnectTimer()
         {
             try
             {
@@ -518,6 +544,11 @@ namespace WashMachine.Forms.Modules.PaidBy.Machine.Octopus
             {
                 SetUserIsUsingApp(false);
             }
+        }
+
+        public void Disconnect()
+        {
+            octopusLibrary.Disconnect();
         }
     }
 }

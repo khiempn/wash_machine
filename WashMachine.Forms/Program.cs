@@ -22,14 +22,7 @@ namespace WashMachine.Forms
             Application.SetCompatibleTextRenderingDefault(false);
             AppConfig = AppConfigModel.ReadAppConfig();
             AppConfig.ShopConfigPath = Path.Combine(Directory.GetCurrentDirectory(), "shop.config");
-            if (File.Exists(AppConfig.ShopConfigPath))
-            {
-                Application.Run(new LoginForm());
-            }
-            else
-            {
-                Application.Run(new SignInShopForm());
-            }
+            Application.Run(new LoginForm());
         }
     }
 }

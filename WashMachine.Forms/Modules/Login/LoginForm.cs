@@ -11,6 +11,8 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using WashMachine.Forms.Modules.Laundry;
+using WashMachine.Forms.Modules.Shop;
+using System.Threading;
 
 namespace WashMachine.Forms.Modules.Login
 {
@@ -38,7 +40,7 @@ namespace WashMachine.Forms.Modules.Login
             tlpLoginForm = new TableLayoutPanel()
             {
                 Width = 420,
-                Height = 290,
+                Height = 350,
                 Padding = new Padding(10),
                 Name = "MainLayout"
             };
@@ -48,6 +50,7 @@ namespace WashMachine.Forms.Modules.Login
             tlpLoginForm.Paint += TlpLoginForm_Paint;
             tlpLoginForm.RowStyles.Add(new RowStyle() { Height = 50, SizeType = SizeType.AutoSize });
             tlpLoginForm.RowStyles.Add(new RowStyle() { Height = 100, SizeType = SizeType.AutoSize });
+            tlpLoginForm.RowStyles.Add(new RowStyle() { Height = 50, SizeType = SizeType.AutoSize });
             tlpLoginForm.RowStyles.Add(new RowStyle() { Height = 50, SizeType = SizeType.AutoSize });
             tlpLoginForm.RowStyles.Add(new RowStyle() { Height = 50, SizeType = SizeType.AutoSize });
             tlpLoginForm.RowStyles.Add(new RowStyle() { Height = 50, SizeType = SizeType.AutoSize });
@@ -93,7 +96,7 @@ namespace WashMachine.Forms.Modules.Login
                 ShapeBorderColor = Color.Black
             };
             btnPayment.Click += BtnPayment_Click;
-            tlpLoginForm.Controls.Add(btnPayment, 0, 3);
+            tlpLoginForm.Controls.Add(btnPayment, 0, 2);
 
             ButtonRoundedUI btnMachineWithoutPayment = new ButtonRoundedUI()
             {
@@ -104,9 +107,21 @@ namespace WashMachine.Forms.Modules.Login
                 ShapeBorderColor = Color.Black
             };
             btnMachineWithoutPayment.Click += BtnMachine_Click;
-            tlpLoginForm.Controls.Add(btnMachineWithoutPayment, 0, 4);
+            tlpLoginForm.Controls.Add(btnMachineWithoutPayment, 0, 3);
+
+            ButtonRoundedUI btnLogout = new ButtonRoundedUI()
+            {
+                Height = 50,
+                Width = Width,
+                Text = "Logout",
+                ShapeBackgroudColor = ColorTranslator.FromHtml("#a5a5a5"),
+                ShapeBorderColor = Color.Black
+            };
+            btnLogout.Click += BtnLogout_Click;
+            tlpLoginForm.Controls.Add(btnLogout, 0, 4);
 
             Controls.Add(tlpLoginForm);
+            FormClosed += LoginForm_FormClosed;
 
             Program.octopusService = new OctopusService();
             Program.octopusService.SetCurrentForm(this);
@@ -114,6 +129,51 @@ namespace WashMachine.Forms.Modules.Login
             Program.octopusService.Initial();
             Program.octopusService.SetUserIsUsingApp(true);
             LoadSettingImagesAsync();
+
+            if (!File.Exists(Program.AppConfig.ShopConfigPath))
+            {
+                SignInShopForm signInShopForm = new SignInShopForm();
+                signInShopForm.ShowDialog();
+                signInShopForm.FormClosed += SignInShopForm_FormClosed;
+                Hide();
+            }
+        }
+
+        private void BtnLogout_Click(object sender, EventArgs e)
+        {
+            Program.AppConfig.ShopConfigPath = Path.Combine(Directory.GetCurrentDirectory(), "shop.config");
+            if (File.Exists(Program.AppConfig.ShopConfigPath))
+            {
+                File.Delete(Program.AppConfig.ShopConfigPath);
+            }
+
+            SignInShopForm signInShopForm = new SignInShopForm();
+            signInShopForm.ShowDialog();
+            signInShopForm.FormClosed += SignInShopForm_FormClosed;
+            Hide();
+        }
+
+        private void SignInShopForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            Program.AppConfig.ShopConfigPath = Path.Combine(Directory.GetCurrentDirectory(), "shop.config");
+            if (!File.Exists(Program.AppConfig.ShopConfigPath))
+            {
+                Application.Exit();
+            }
+            Show();
+        }
+
+        private void LoginForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            try
+            {
+                Program.octopusService.Disconnect();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex);
+            }
         }
 
         private void LoadSettingImagesAsync()
@@ -123,6 +183,7 @@ namespace WashMachine.Forms.Modules.Login
             progressUI.Show();
             Task.Run(async () =>
             {
+                Thread.Sleep(3000);
                 try
                 {
                     Program.ShopConfig = Program.AppConfig.GetShopConfig();

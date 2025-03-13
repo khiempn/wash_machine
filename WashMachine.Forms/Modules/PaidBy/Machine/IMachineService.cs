@@ -36,6 +36,6 @@ namespace WashMachine.Forms.Modules.PaidBy.Machine
         Task<bool> Disconnect(Form mainForm);
 
         OctopusService ConnectOctopusAsync();
-        Task<bool> DisconnectOctopus();
+        Task<bool> DisconnectTimer();
     }
 }

@@ -17,8 +17,8 @@ namespace WashMachine.Forms.Modules.PaidBy.Dialog
 
         public ScanWaitingUI(PaymentType paymentType, int amount)
         {
-            Width = 850;
-            Height = 700;
+            Width = (int)(Screen.PrimaryScreen.WorkingArea.Width * 0.5);
+            Height = (int)(Screen.PrimaryScreen.WorkingArea.Height * 0.8);
 
             TableLayoutPanel tblLayoutPanel = new TableLayoutPanel()
             {

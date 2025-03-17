@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
+using WashMachine.Forms.Common.Utils;
 
 namespace WashMachine.Forms.Modules.Main
 {
@@ -27,13 +28,13 @@ namespace WashMachine.Forms.Modules.Main
 
             tblMainForm = new TableLayoutPanel()
             {
-                Width = (int)(0.7 * Screen.PrimaryScreen.WorkingArea.Width),
-                Height = (int)(0.45 * Screen.PrimaryScreen.WorkingArea.Height)
+                Width = 250,
+                Height = 450
             };
 
-            tblMainForm.Font = new Font(Font.FontFamily, 14f, FontStyle.Regular);
+            Font = new Font(Font.FontFamily, 14f, FontStyle.Regular);
             tblMainForm.Location = new Point((Width - tblMainForm.Width) / 2, (Height - tblMainForm.Height) / 2);
-            tblMainForm.RowStyles.Add(new RowStyle() { Height = 100, SizeType = SizeType.Absolute });
+            tblMainForm.RowStyles.Add(new RowStyle() { Height = 1, SizeType = SizeType.Percent });
            
             List <IMainItem> cardItems = new List<IMainItem>
             {
@@ -42,10 +43,11 @@ namespace WashMachine.Forms.Modules.Main
                 new BuyeVoucherMainItem(this),
                 new VendingMachineMainItem(this),
             };
+            tblMainForm.Width = tblMainForm.Width * cardItems.Count;
 
             for (int i = 0; i < cardItems.Count; i++)
             {
-                tblMainForm.ColumnStyles.Add(new ColumnStyle() { Width = 100, SizeType = SizeType.Percent });
+                tblMainForm.ColumnStyles.Add(new ColumnStyle() { Width = 1, SizeType = SizeType.Percent });
 
                 IMainItem cardItem = cardItems[i];
                 Control cardItemTemplate = cardItem.GetTemplate();
@@ -57,7 +59,9 @@ namespace WashMachine.Forms.Modules.Main
 
         private void MainForm_Resize(object sender, EventArgs e)
         {
+            ScaleUtil.ScaleAll(Controls, this);
             tblMainForm.Location = new Point((Width - tblMainForm.Width) / 2, (Height - tblMainForm.Height) / 2);
+            Refresh();
         }
     }
 }

@@ -4,55 +4,67 @@ using WashMachine.Forms.Modules.PaidBy.Service.Model;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Dynamic;
 
 namespace WashMachine.Forms.Modules.PaidBy.Machine.Octopus
 {
     public class OctopusService : IOctopusService
     {
         OctopusLibrary octopusLibrary;
-        Timer timer;
+        static Timer jobTimer;
         HttpService httpService;
-        Timer pollTimer;
-        int pollCounter { get; set; } = 1000 * Program.AppConfig.ScanTimeout;
+        static Timer pollTimer;
+        static Timer healthCheckTimer;
+        int pollCounter { get; set; }
         public event EventHandler<OctopusPaymentResponseModel> PaymentProgressHandler;
         public event EventHandler<bool> PaymentLoopingHandler;
         public event EventHandler<CardInfo> CreateOrderIncompleteHandler;
 
         List<int> MessageCodes { get; set; } = new List<int>();
 
-        List<int> ErrorCodes = new List<int> {
-            100019
-            , 100021
-            , 100024
-            , 100035
-
-            , 100048
-            , 100049
-
-            , 100001
-            , int.MinValue
+        List<Code> PollErrors = new List<Code>()
+        {
+            new Code { Number = 100001, Retry = false, MustRetry = false, Comment = "R/W not connected" },
+            new Code { Number = 100005, Retry = true, MustRetry = false, Comment = "Invalid response from R/W" },
+            new Code { Number = 100016, Retry = true, MustRetry = false, Comment = "Card read error" },
+            new Code { Number = 100017, Retry = true, MustRetry = false, Comment = "Card write error" },
+            new Code { Number = 100019, Retry = false, MustRetry = false, Comment = "Card is blocked" },
+            new Code { Number = 100021, Retry = false, MustRetry = false, Comment = "The last add value date of card is greater than 1000 days" },
+            new Code { Number = 100023, Retry = false, MustRetry = false, Comment = "Transaction Log full" },
+            new Code { Number = 100024, Retry = false, MustRetry = false, Comment = "Card is blocked by this call. In this case, PollData contains the UD" },
+            new Code { Number = 100032, Retry = true, MustRetry = false, Comment = "No card present" },
+            new Code { Number = 100034, Retry = true, MustRetry = false, Comment = "Card authentication error" },
+            new Code { Number = 100035, Retry = false, MustRetry = false, Comment = "Card recover error" },
+            new Code { Number = 100066, Retry = false, MustRetry = false, Comment = "System time error" }
         };
 
-        List<int> ErrorRetryAgainCodes = new List<int> {
-            100016
-            , 100017
-            , 100020
-            , 100032
-            , 100034
+        List<Code> DeductErrors = new List<Code>()
+        {
+            new Code { Number = 100001, Retry = false, MustRetry = false, Comment = "R/W not connected" },
+            new Code { Number = 100003, Retry = false, MustRetry = false, Comment = "Invalid parameters" },
+            new Code { Number = 100005, Retry = true, MustRetry = false, Comment = "Invalid response from R/W" },
+            new Code { Number = 100016, Retry = true, MustRetry = false, Comment = "Card read error" },
+            new Code { Number = 100017, Retry = true, MustRetry = false, Comment = "The card polled before is not on the target or card communication has been\r\n\r\ninterrupted since last poll" },
+            new Code { Number = 100019, Retry = false, MustRetry = false, Comment = "Card is blocked. (A blocked card is a blacklisted card that should not be\r\n\r\naccepted for any transactions.)" },
+            new Code { Number = 100020, Retry = true, MustRetry = false, Comment = "Card has not been polled before or no card present" },
+            new Code { Number = 100022, Retry = true, MustRetry = true, Comment = "Incomplete transaction. Must retry\r\n\r\nNote: A 100022 (Must retry) occurs when the customer pull out the card too\r\nquickly. The R/W is not sure if the data is successfully written to the card or\r\nnot. Hence, the R/W returns with this error code to advise the customer to\r\npresent the card again. The R/W will correctly handle the different cases of\r\nretry; the same transaction will not be deducted twice. Refer to Volume A1 on\r\nIncomplete Transaction Handling." },
+            new Code { Number = 100025, Retry = true, MustRetry = true, Comment = "Incomplete transaction, retry please" },
+            new Code { Number = 100023, Retry = false, MustRetry = false, Comment = "Transaction Log full" },
+            new Code { Number = 100033, Retry = false, MustRetry = false, Comment = "The transaction amount is different from previous incomplete transaction." },
+            new Code { Number = 100048, Retry = false, MustRetry = false, Comment = "Card has insufficient fund" }
+        };
 
-            , 100022
+        List<Code> SpecificScenarioErrors = new List<Code>
+        {
+            new Code { Number = 100022, Retry = true, MustRetry = true, Comment = "Incomplete transaction. Must retry\r\n\r\nNote: A 100022 (Must retry) occurs when the customer pull out the card too\r\nquickly. The R/W is not sure if the data is successfully written to the card or\r\nnot. Hence, the R/W returns with this error code to advise the customer to\r\npresent the card again. The R/W will correctly handle the different cases of\r\nretry; the same transaction will not be deducted twice. Refer to Volume A1 on\r\nIncomplete Transaction Handling." },
+            new Code { Number = 100025, Retry = true, MustRetry = true, Comment = "Incomplete transaction, retry please" },
         };
 
         private bool IsUserUsingApp { get; set; }
 
-        public bool IsCancelPaymentRequest { get; set; } = false;
-
-        public bool IsInitialCompleted { get; set; }
+        public bool IsInitialSuccessfully { get; set; }
 
         private Form currentForm;
 
@@ -60,36 +72,40 @@ namespace WashMachine.Forms.Modules.PaidBy.Machine.Octopus
 
         public int LastRsInitialCOM { get; set; }
 
+        private CardInfo cardPollFirstly { get; set; }
+
         public OctopusService()
         {
             octopusLibrary = new OctopusLibrary();
             octopusLibrary.LogStart();
             httpService = new HttpService();
+
+            pollTimer = new Timer();
+
+            pollTimer.Enabled = true;
+            pollTimer.Interval = 1000;
         }
 
         public bool Initial()
         {
             if (Program.AppConfig.ScanOctopusMode == 0)
             {
-                IsInitialCompleted = true;
+                IsInitialSuccessfully = true;
                 return true;
             }
             else
             {
-                // Initialize Octopus payment
-                Logger.Log("Initial Step 1");
-                int r = octopusLibrary.ExecuteInitComm();
+                Logger.Log("InitComm");
+                int r = octopusLibrary.ExecuteInitCom();
+                Logger.Log($"InitComm = {r} Octopus message");
                 LastRsInitialCOM = r;
                 if (r == 0)
                 {
-                    Logger.Log($"Initial Step 10 {r}");
-                    Logger.Log($"InitComm = {r} Octopus message");
-                    IsInitialCompleted = true;
+                    IsInitialSuccessfully = true;
                     return true;
                 }
                 else
                 {
-                    Logger.Log($"Initial Step 9 {r}");
                     PaymentProgressHandler?.Invoke(false, new OctopusPaymentResponseModel()
                     {
                         Rs = r,
@@ -103,18 +119,18 @@ namespace WashMachine.Forms.Modules.PaidBy.Machine.Octopus
 
         public OctopusService StartWaitingPayment(PaymentModel payment)
         {
-            Logger.Log($"StartScanning Step 3 {JsonConvert.SerializeObject(payment)}");
+            Logger.Log($"StartWaitingPayment {JsonConvert.SerializeObject(payment)}");
             pollCounter = 1000 * Program.AppConfig.ScanTimeout;
-            IsCancelPaymentRequest = false;
+            cardPollFirstly = null;
             MessageCodes = new List<int>();
-
-            pollTimer = new Timer();
-            pollTimer.Tick += PollTimer_Tick;
+            pollTimer.Stop();
             pollTimer.Enabled = true;
-            pollTimer.Interval = 1000;
             pollTimer.Tag = payment;
+            pollTimer.Tick -= PollTimer_Tick;
+            pollTimer.Tick += PollTimer_Tick;
             pollTimer.Start();
-            Logger.Log($"StartScanning Step 4");
+
+            Logger.Log($"StartWaitingPayment Start");
             return this;
         }
 
@@ -123,7 +139,6 @@ namespace WashMachine.Forms.Modules.PaidBy.Machine.Octopus
             PaymentModel paymentInfo = (PaymentModel)pollTimer.Tag;
             PaymentLoopingHandler?.Invoke(sender, true);
 
-            //Logger.Log($"PollTimer_Tick start ExcecutePoll {JsonConvert.SerializeObject(paymentInfo)}.");
             if (Program.AppConfig.ScanOctopusMode == 0)
             {
                 CardInfo cardInfo = new CardInfo()
@@ -156,15 +171,17 @@ namespace WashMachine.Forms.Modules.PaidBy.Machine.Octopus
             }
             else
             {
-                Logger.Log($"ExcecutePoll Start Step 1");
+                Logger.Log($"1");
                 CardInfo cardInfo = octopusLibrary.ExcecutePoll(2, (byte)Program.AppConfig.ScanTimeout);
-                Logger.Log($"ExcecutePoll End Step 2 {JsonConvert.SerializeObject(cardInfo)}");
+                Logger.Log($"2 {JsonConvert.SerializeObject(cardInfo)}");
                 int currentTime = pollCounter;
+                currentTime -= 1000;
+                Logger.Log($"{currentTime}");
+                Int32 ERR_BASE = 100000;
                 if (currentTime > 0)
                 {
-                    currentTime -= 1000;
+                    Logger.Log($"3");
                     pollCounter = currentTime;
-
                     //Detect card info
                     if (cardInfo != null)
                     {
@@ -177,69 +194,44 @@ namespace WashMachine.Forms.Modules.PaidBy.Machine.Octopus
                         cardInfo.PaymentTypeId = paymentInfo.PaymentTypeId;
                         cardInfo.PaymentTypeName = paymentInfo.PaymentTypeName;
 
-                        Logger.Log($"PollTimer_Tick {cardInfo.Rs}");
+                        Logger.Log($"PollTimer_Tick rs: {cardInfo.Rs} card_id:{cardInfo.CardId}");
+                        Logger.Log($"4");
 
                         #region clear error code
                         MessageCodes.RemoveAll(x => x != 100022);
                         MessageCodes = MessageCodes.Distinct().ToList();
                         #endregion
 
-                        if (ErrorRetryAgainCodes.Exists(a => a == cardInfo.Rs))
+                        if (PollErrors.Exists(a => a.Number == cardInfo.Rs))
                         {
                             MessageCodes.Add(cardInfo.Rs);
 
-                            if (MessageCodes.Exists(x => x == 100022))
+                            //For second time retry with must try
+                            if (MessageCodes.Exists(x => SpecificScenarioErrors.Exists(a => a.Number == x)))
                             {
-                                CreateOrderIncompleteHandler?.Invoke(sender, cardInfo);
-                                MessageCodes.Add(-100022); // need to show message 請重試(八達通號碼 88888888)
-                            }
-
-                            PaymentProgressHandler?.Invoke(false, new OctopusPaymentResponseModel()
-                            {
-                                Rs = cardInfo.Rs,
-                                Message = "Retry Payment",
-                                CardInfo = cardInfo,
-                                IsStop = false,
-                                MessageCodes = MessageCodes,
-                            });
-
-                            ResetPollCounterToRetryAgain();
-                        }
-                        else if (ErrorCodes.Any(a => a == cardInfo.Rs))
-                        {
-                            MessageCodes.Add(cardInfo.Rs);
-
-                            if (MessageCodes.Exists(x => x == 100022))
-                            {
-                                MessageCodes.Add(-100022); // need to show message 請重試(八達通號碼 88888888)
-                            }
-
-                            PaymentProgressHandler?.Invoke(false, new OctopusPaymentResponseModel()
-                            {
-                                Rs = cardInfo.Rs,
-                                Message = "Can not complete Payment",
-                                CardInfo = cardInfo,
-                                MessageCodes = new List<int> { cardInfo.Rs },
-                                IsStop = true
-                            });
-                        }
-                        else if (cardInfo.Rs <= 100000)
-                        {
-                            Logger.Log($"ExcecuteDeduct Start Step 3 {JsonConvert.SerializeObject(cardInfo)}");
-                            cardInfo.Rs = octopusLibrary.ExcecuteDeduct((int)paymentInfo.Amount, paymentInfo.Id);
-                            Logger.Log($"ExcecuteDeduct End Step 4 {JsonConvert.SerializeObject(cardInfo)}");
-
-                            if (ErrorRetryAgainCodes.Exists(a => a == cardInfo.Rs))
-                            {
-                                MessageCodes.Add(cardInfo.Rs);
-
-                                if (MessageCodes.Exists(x => x == 100022))
+                                if (cardInfo.Rs == 100032) //Please tap card again
                                 {
-                                    CreateOrderIncompleteHandler?.Invoke(sender, cardInfo);
-                                    MessageCodes.Add(-100022); // need to show message 請重試(八達通號碼 88888888)
+                                    MessageCodes.Remove(cardInfo.Rs);
                                 }
 
-                                PaymentProgressHandler?.Invoke(false, new OctopusPaymentResponseModel()
+                                if (cardPollFirstly != null)
+                                {
+                                    if (!string.IsNullOrWhiteSpace(cardInfo.CardId) && cardInfo.CardId != cardPollFirstly.CardId)
+                                    {
+                                        AddLog("Different card presented");
+                                    }
+                                    cardInfo = cardPollFirstly;
+                                }
+
+                                MessageCodes.Add(-100022); // need to show message 請重試(八達通號碼 88888888)
+                            }
+
+                            Code pollError = PollErrors.First(f => f.Number == cardInfo.Rs);
+                            Logger.Log($"pollError {JsonConvert.SerializeObject(pollError)}");
+
+                            if (pollError.Retry)
+                            {
+                                PaymentProgressHandler?.Invoke(true, new OctopusPaymentResponseModel()
                                 {
                                     Rs = cardInfo.Rs,
                                     Message = "Retry Payment",
@@ -247,38 +239,94 @@ namespace WashMachine.Forms.Modules.PaidBy.Machine.Octopus
                                     IsStop = false,
                                     MessageCodes = MessageCodes,
                                 });
-
-                                ResetPollCounterToRetryAgain();
+                                pollTimer.Start();
                             }
-                            else if (ErrorCodes.Any(a => a == cardInfo.Rs))
+                            else
+                            {
+                                cardPollFirstly = null;
+                                pollTimer.Stop();
+                                PaymentProgressHandler?.Invoke(true, new OctopusPaymentResponseModel()
+                                {
+                                    Rs = cardInfo.Rs,
+                                    Message = "Stop Payment",
+                                    CardInfo = cardInfo,
+                                    IsStop = true,
+                                    MessageCodes = MessageCodes,
+                                });
+                            }
+                        }
+                        else if (cardInfo.Rs <= ERR_BASE)
+                        {
+                            System.Threading.Thread.Sleep(Program.AppConfig.DelayDeduct);
+                            cardInfo.Rs = octopusLibrary.ExcecuteDeduct((int)paymentInfo.Amount, paymentInfo.Id);
+                            Logger.Log($"8 {JsonConvert.SerializeObject(cardInfo)}");
+
+                            if (DeductErrors.Exists(a => a.Number == cardInfo.Rs))
                             {
                                 MessageCodes.Add(cardInfo.Rs);
 
-                                if (MessageCodes.Exists(x => x == 100022))
+                                if (MessageCodes.Exists(x => SpecificScenarioErrors.Exists(a => a.Number == x)))
                                 {
+                                    CreateOrderIncompleteHandler?.Invoke(sender, cardInfo);
                                     MessageCodes.Add(-100022); // need to show message 請重試(八達通號碼 88888888)
                                 }
 
-                                PaymentProgressHandler?.Invoke(false, new OctopusPaymentResponseModel()
+                                Code deductError = DeductErrors.First(f => f.Number == cardInfo.Rs);
+                                Logger.Log($"deductError {JsonConvert.SerializeObject(deductError)}");
+                                if (deductError.MustRetry)
                                 {
-                                    Rs = cardInfo.Rs,
-                                    Message = "Can not complete Payment",
-                                    CardInfo = cardInfo,
-                                    IsStop = true,
-                                    MessageCodes = MessageCodes
-                                });
+                                    AddLog($"{deductError.Number} - Enter retry loop");
+                                    if (cardPollFirstly == null)
+                                    {
+                                        cardPollFirstly = cardInfo;
+                                    }
+                                    ResetPollCounterToRetryAgain();
+                                    PaymentProgressHandler?.Invoke(true, new OctopusPaymentResponseModel()
+                                    {
+                                        Rs = cardInfo.Rs,
+                                        Message = "Must Retry Payment",
+                                        CardInfo = cardInfo,
+                                        IsStop = false,
+                                        MessageCodes = MessageCodes,
+                                    });
+                                    pollTimer.Start();
+                                }
+                                else if (deductError.Retry)
+                                {
+                                    PaymentProgressHandler?.Invoke(true, new OctopusPaymentResponseModel()
+                                    {
+                                        Rs = cardInfo.Rs,
+                                        Message = "Retry Payment",
+                                        CardInfo = cardInfo,
+                                        IsStop = false,
+                                        MessageCodes = MessageCodes,
+                                    });
+                                    pollTimer.Start();
+                                }
+                                else
+                                {
+                                    cardPollFirstly = null;
+                                    pollTimer.Stop();
+                                    PaymentProgressHandler?.Invoke(true, new OctopusPaymentResponseModel()
+                                    {
+                                        Rs = cardInfo.Rs,
+                                        Message = "Stop Payment",
+                                        CardInfo = cardInfo,
+                                        IsStop = true,
+                                        MessageCodes = MessageCodes,
+                                    });
+                                }
+                                Logger.Log($"9");
                             }
-                            else if (cardInfo.Rs <= 100000)
+                            else if (cardInfo.Rs <= ERR_BASE)
                             {
-                                Logger.Log($"ExcecuteGetExtraInfo Start Step 5 {JsonConvert.SerializeObject(cardInfo)}");
+                                Logger.Log($"11");
                                 ExtraInfo extraInfo = octopusLibrary.ExcecuteGetExtraInfo();
-                                Logger.Log($"ExcecuteGetExtraInfo End Step 6 {JsonConvert.SerializeObject(cardInfo)}");
-
                                 cardInfo.LastAddType = extraInfo.LastAddType;
                                 cardInfo.LastAddDate = extraInfo.LastAddDate;
                                 cardInfo.CardJson = JsonConvert.SerializeObject(cardInfo);
-                                Logger.Log($"PaymentProgressHandler End Step 7 {JsonConvert.SerializeObject(cardInfo)}");
-
+                                cardPollFirstly = null;
+                                pollTimer.Stop();
                                 PaymentProgressHandler?.Invoke(true, new OctopusPaymentResponseModel()
                                 {
                                     Status = true,
@@ -288,9 +336,12 @@ namespace WashMachine.Forms.Modules.PaidBy.Machine.Octopus
                                     IsStop = true,
                                     MessageCodes = new List<int>() { (int)OctopusPaymentStatus.SUCCESS }
                                 });
+                                Logger.Log($"12 {JsonConvert.SerializeObject(cardInfo)}");
                             }
                             else
                             {
+                                cardPollFirstly = null;
+                                pollTimer.Stop();
                                 PaymentProgressHandler?.Invoke(true, new OctopusPaymentResponseModel()
                                 {
                                     Status = false,
@@ -300,10 +351,13 @@ namespace WashMachine.Forms.Modules.PaidBy.Machine.Octopus
                                     IsStop = true,
                                     MessageCodes = new List<int>() { (int)OctopusPaymentStatus.FAILURE }
                                 });
+                                Logger.Log($"13");
                             }
                         }
                         else
                         {
+                            cardPollFirstly = null;
+                            pollTimer.Stop();
                             PaymentProgressHandler?.Invoke(true, new OctopusPaymentResponseModel()
                             {
                                 Status = false,
@@ -313,21 +367,50 @@ namespace WashMachine.Forms.Modules.PaidBy.Machine.Octopus
                                 IsStop = true,
                                 MessageCodes = new List<int>() { (int)OctopusPaymentStatus.FAILURE }
                             });
+                            Logger.Log($"14");
                         }
+                    }
+                    else
+                    {
+                        cardPollFirstly = null;
+                        pollTimer.Stop();
+                        PaymentProgressHandler?.Invoke(true, new OctopusPaymentResponseModel()
+                        {
+                            Rs = (int)OctopusPaymentStatus.MANUAL_TIMEOUT,
+                            Message = "Timeout when waiting scan card.",
+                            CardInfo = cardInfo,
+                            IsStop = true,
+                            MessageCodes = new List<int>() { (int)OctopusPaymentStatus.MANUAL_TIMEOUT }
+                        });
                     }
                 }
                 else
                 {
-                    PaymentProgressHandler?.Invoke(false, new OctopusPaymentResponseModel()
+                    cardPollFirstly = null;
+                    pollTimer.Stop();
+                    if (MessageCodes.Exists(x => SpecificScenarioErrors.Exists(a => a.Number == x)))
                     {
-                        Rs = 100022,
+                        AddLog("Incomplete transaction retry loop end");
+                    }
+
+                    AddLog("Incomplete transaction cancelled by system (timeout)");
+
+                    PaymentProgressHandler?.Invoke(true, new OctopusPaymentResponseModel()
+                    {
+                        Rs = (int)OctopusPaymentStatus.MANUAL_TIMEOUT,
                         Message = "Timeout when waiting scan card.",
                         CardInfo = cardInfo,
                         IsStop = true,
                         MessageCodes = new List<int>() { (int)OctopusPaymentStatus.MANUAL_TIMEOUT }
                     });
+                    Logger.Log($"15");
                 }
             }
+        }
+
+        public void AddLog(string message)
+        {
+            octopusLibrary.AddLog(message);
         }
 
         private void ResetPollCounterToRetryAgain()
@@ -335,23 +418,23 @@ namespace WashMachine.Forms.Modules.PaidBy.Machine.Octopus
             pollCounter = 1000 * Program.AppConfig.ScanTimeout;
         }
 
-        private bool LoopSetTimerInterval()
+        private bool LoopSetJobTimerInterval()
         {
             var jumping = 10;
             var time = DateTime.Now;
             var jump = time.Second % jumping;
             if (jump > 0)
             {
-                timer.Interval = jump;
+                jobTimer.Interval = jump;
                 return true;
             }
-            timer.Interval = jumping * 1000;
+            jobTimer.Interval = jumping * 1000;
             return false;
         }
 
-        private void Timer_Tick(object sender, EventArgs e)
+        private void JobTimer_Tick(object sender, EventArgs e)
         {
-            if (LoopSetTimerInterval()) return;
+            if (LoopSetJobTimerInterval()) return;
 
             octopusLibrary.UploadFiles((status, message) =>
             {
@@ -369,16 +452,20 @@ namespace WashMachine.Forms.Modules.PaidBy.Machine.Octopus
             });
 
             octopusLibrary.ExcecuteXFile();
+            //Task.Run(() =>
+            //{
+            //    RefreshConfig();
+            //});
         }
 
         public void RunAJobToCompleteFiles()
         {
             RefreshConfig().GetAwaiter().OnCompleted(() =>
             {
-                timer = new Timer();
-                timer.Tick += Timer_Tick;
-                timer.Enabled = true;
-                timer.Start();
+                jobTimer = new Timer();
+                jobTimer.Tick += JobTimer_Tick;
+                jobTimer.Enabled = true;
+                jobTimer.Start();
             });
         }
 
@@ -401,22 +488,12 @@ namespace WashMachine.Forms.Modules.PaidBy.Machine.Octopus
             }
         }
 
-        public bool DisconnectTimer()
+        public bool StopWaitingPayment()
         {
             try
             {
-                if (timer != null)
-                {
-                    timer.Stop();
-                    timer.Dispose();
-                }
-
-                if (pollTimer != null)
-                {
-                    pollTimer.Stop();
-                    pollTimer.Dispose();
-                }
-
+                cardPollFirstly = null;
+                pollTimer?.Stop();
                 return true;
             }
             catch (Exception ex)
@@ -424,16 +501,6 @@ namespace WashMachine.Forms.Modules.PaidBy.Machine.Octopus
                 Logger.Log(ex);
             }
             return false;
-        }
-
-        public bool IsCancelPayment()
-        {
-            return IsCancelPaymentRequest;
-        }
-
-        public void CancelPayment()
-        {
-            IsCancelPaymentRequest = true;
         }
 
         public void ShowOutOfService()
@@ -499,21 +566,15 @@ namespace WashMachine.Forms.Modules.PaidBy.Machine.Octopus
         public void SetUserIsUsingApp(bool isUsingApp)
         {
             IsUserUsingApp = isUsingApp;
-
-            if (timerUserUsingAppCounter != null)
-            {
-                timerUserUsingAppCounter.Stop();
-                timerUserUsingAppCounter.Dispose();
-            }
-
+            timerUserUsingAppCounter?.Stop();
             if (IsUserUsingApp)
             {
                 timerUserUsingAppCounter = new Timer();
                 timerUserUsingAppCounter.Tick += TimerUserUsingAppCounter_Tick;
                 timerUserUsingAppCounter.Enabled = true;
                 timerUserUsingAppCounter.Interval = 1000;
-                //after 30s will be set user is offline
-                timerUserUsingAppCounter.Tag = 1000 * 15;
+                //after 10s will be set user is offline
+                timerUserUsingAppCounter.Tag = 1000 * 10;
                 timerUserUsingAppCounter.Start();
             }
         }
@@ -524,11 +585,7 @@ namespace WashMachine.Forms.Modules.PaidBy.Machine.Octopus
         public void SetUserIsUsingAppWithScanning()
         {
             IsUserUsingApp = true;
-            if (timerUserUsingAppCounter != null)
-            {
-                timerUserUsingAppCounter.Stop();
-                timerUserUsingAppCounter.Dispose();
-            }
+            timerUserUsingAppCounter?.Stop();
         }
 
         private void TimerUserUsingAppCounter_Tick(object sender, EventArgs e)
@@ -538,7 +595,6 @@ namespace WashMachine.Forms.Modules.PaidBy.Machine.Octopus
             {
                 currentTime -= 1000;
                 timerUserUsingAppCounter.Tag = currentTime;
-                Debug.WriteLine($"TimerUserUsingAppCounter_Tick {timerUserUsingAppCounter.Tag}");
             }
             else
             {
@@ -546,9 +602,45 @@ namespace WashMachine.Forms.Modules.PaidBy.Machine.Octopus
             }
         }
 
-        public void Disconnect()
+        public void Disconect()
         {
             octopusLibrary.Disconnect();
         }
+
+        public void RunTimerHealthCheck()
+        {
+            healthCheckTimer = new Timer();
+            healthCheckTimer.Tick += HealthCheckTimer_Tick;
+            healthCheckTimer.Enabled = true;
+            // Set up the timer to trigger every 30 minutes (30 * 60 * 1000 milliseconds)
+            healthCheckTimer.Interval = 30 * 60 * 1000;
+            healthCheckTimer.Start();
+        }
+
+        private void HealthCheckTimer_Tick(object sender, EventArgs e)
+        {
+            Logger.Log($"HealthCheckTimer_Tick called");
+            if (octopusLibrary.IsConnected() == false)
+            {
+                IsInitialSuccessfully = false;
+                LastRsInitialCOM = 0;
+
+                Email.IEmailService emailService = new Email.EmailService();
+                emailService.SendDisconnectError();
+            }
+        }
+
+        public bool IsConnected()
+        {
+            return octopusLibrary.IsConnected();
+        }
+    }
+
+    public class Code
+    {
+        public int Number { get; set; }
+        public bool Retry { get; set; }
+        public bool MustRetry { get; set; }
+        public string Comment { get; set; }
     }
 }

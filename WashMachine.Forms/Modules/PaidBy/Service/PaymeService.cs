@@ -20,7 +20,7 @@ namespace WashMachine.Forms.Modules.PaidBy.Service
 
         public event EventHandler<string> CodeRecivedHandler;
         public event EventHandler<bool> PaymentLoopingHandler;
-        Timer timer;
+        static Timer payMetimer;
         OrderModel _orderModel;
 
         public PaymeService()
@@ -30,10 +30,10 @@ namespace WashMachine.Forms.Modules.PaidBy.Service
 
             machineService.CodeRecived += MachineService_CodeRecived;
             machineService.PaymentLoopingHandler += MachineService_PaymentLoopingHandler;
-            timer = new Timer();
-            timer.Tick += Timer_Tick;
-            timer.Interval = 1000;
-            timer.Tag = 1000 * Program.AppConfig.ScanTimeout;
+            payMetimer = new Timer();
+            payMetimer.Tick += Timer_Tick;
+            payMetimer.Interval = 1000;
+            payMetimer.Tag = 1000 * Program.AppConfig.ScanTimeout;
         }
 
         private void MachineService_PaymentLoopingHandler(object sender, bool e)
@@ -44,25 +44,25 @@ namespace WashMachine.Forms.Modules.PaidBy.Service
         private void Timer_Tick(object sender, EventArgs e)
         {
             PaymentLoopingHandler?.Invoke(sender, true);
-            int currentTime = (int)timer.Tag;
+            int currentTime = (int)payMetimer.Tag;
+            currentTime -= 1000;
             if (currentTime > 0)
             {
-                currentTime -= 1000;
-                timer.Tag = currentTime;
+                payMetimer.Tag = currentTime;
             }
             else
             {
-                timer.Stop();
+                payMetimer.Stop();
                 machineService.Disconnect();
                 CodeRecivedHandler?.Invoke(sender, "No action in 20 seconds");
             }
         }
 
-        private async void MachineService_CodeRecived(object sender, string barCode)
+        private void MachineService_CodeRecived(object sender, string barCode)
         {
             try
             {
-                timer.Stop();
+                payMetimer.Stop();
                 Logger.Log($"START PAYMENT FOR {barCode}");
                 CodeRecivedHandler?.Invoke(sender, barCode);
             }
@@ -81,7 +81,7 @@ namespace WashMachine.Forms.Modules.PaidBy.Service
                 bool isConnected = await machineService.ConnectAsync(appConfig.CouponCom, appConfig.CouponBaudRate, appConfig.CouponData, appConfig.CouponParity, appConfig.CouponStopBits);
                 if (isConnected)
                 {
-                    timer.Start();
+                    payMetimer.Start();
                 }
                 else
                 {
@@ -113,7 +113,8 @@ namespace WashMachine.Forms.Modules.PaidBy.Service
                 bool isConnected = await machineService.ConnectAsync(mainForm);
                 if (isConnected)
                 {
-                    timer.Start();
+                    payMetimer.Tag = 1000 * Program.AppConfig.ScanTimeout;
+                    payMetimer.Start();
                 }
                 else
                 {

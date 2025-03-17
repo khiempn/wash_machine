@@ -19,7 +19,7 @@ namespace WashMachine.Forms.Modules.PaidBy.Service
         EftPayService eftPayService;
         public event EventHandler<string> CodeRecivedHandler;
         public event EventHandler<bool> PaymentLoopingHandler;
-        Timer timer;
+        static Timer aliPaytimer;
         OrderModel _orderModel;
 
         public AlipayService()
@@ -29,10 +29,10 @@ namespace WashMachine.Forms.Modules.PaidBy.Service
 
             machineService.CodeRecived += MachineService_CodeRecived;
             machineService.PaymentLoopingHandler += MachineService_PaymentLoopingHandler;
-            timer = new Timer();
-            timer.Tick += Timer_Tick;
-            timer.Interval = 1000;
-            timer.Tag = 1000 * Program.AppConfig.ScanTimeout;
+            aliPaytimer = new Timer();
+            aliPaytimer.Tick += Timer_Tick;
+            aliPaytimer.Interval = 1000;
+            aliPaytimer.Tag = 1000 * Program.AppConfig.ScanTimeout;
         }
 
         private void MachineService_PaymentLoopingHandler(object sender, bool e)
@@ -44,15 +44,15 @@ namespace WashMachine.Forms.Modules.PaidBy.Service
         {
             PaymentLoopingHandler?.Invoke(sender, true);
 
-            int currentTime = (int)timer.Tag;
+            int currentTime = (int)aliPaytimer.Tag;
+            currentTime -= 1000;
             if (currentTime > 0)
             {
-                currentTime -= 1000;
-                timer.Tag = currentTime;
+                aliPaytimer.Tag = currentTime;
             }
             else
             {
-                timer.Stop();
+                aliPaytimer.Stop();
                 machineService.Disconnect();
                 CodeRecivedHandler?.Invoke(sender, "No action in 20 seconds");
             }
@@ -62,7 +62,7 @@ namespace WashMachine.Forms.Modules.PaidBy.Service
         {
             try
             {
-                timer.Stop();
+                aliPaytimer.Stop();
                 Logger.Log($"START PAYMENT FOR {barCode}");
                 CodeRecivedHandler?.Invoke(sender, barCode);
             }
@@ -81,7 +81,7 @@ namespace WashMachine.Forms.Modules.PaidBy.Service
                 bool isConnected = await machineService.ConnectAsync(appConfig.CouponCom, appConfig.CouponBaudRate, appConfig.CouponData, appConfig.CouponParity, appConfig.CouponStopBits);
                 if (isConnected)
                 {
-                    timer.Start();
+                    aliPaytimer.Start();
                 }
                 else
                 {
@@ -113,7 +113,8 @@ namespace WashMachine.Forms.Modules.PaidBy.Service
                 bool isConnected = await machineService.ConnectAsync(mainForm);
                 if (isConnected)
                 {
-                    timer.Start();
+                    aliPaytimer.Tag = 1000 * Program.AppConfig.ScanTimeout;
+                    aliPaytimer.Start();
                 }
                 else
                 {

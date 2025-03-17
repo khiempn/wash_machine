@@ -64,8 +64,7 @@ namespace WashMachine.Forms.Modules.LaundryWashOption.PaymentItems
         {
             ButtonRoundedUI btnPaymentItem = new ButtonRoundedUI()
             {
-                Height = 65,
-                Width = 150,
+                Dock = DockStyle.Fill,
                 Text = "付款 Payment",
                 ShapeBackgroudColor = ColorTranslator.FromHtml("#3a7d22"),
                 ShapeBorderColor = Color.Black,

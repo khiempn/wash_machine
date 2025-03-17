@@ -10,7 +10,7 @@ namespace WashMachine.Forms.Modules.PaidBy.Machine.Octopus
 
         bool Initial();
 
-        bool DisconnectTimer();
+        bool StopWaitingPayment();
 
         /// <summary>
         /// Start a timer to upload files or download file from server

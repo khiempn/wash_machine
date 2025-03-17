@@ -1,5 +1,4 @@
-﻿using WashMachine.Forms.Modules.Login;
-using WashMachine.Forms.Modules.PaidBy.PaidByItems.Enum;
+﻿using WashMachine.Forms.Modules.PaidBy.PaidByItems.Enum;
 using System;
 using System.Drawing;
 using System.IO;
@@ -17,8 +16,8 @@ namespace WashMachine.Forms.Modules.PaidBy.Dialog
 
         public ScanWaitingUI(PaymentType paymentType, int amount)
         {
-            Width = (int)(Screen.PrimaryScreen.WorkingArea.Width * 0.5);
-            Height = (int)(Screen.PrimaryScreen.WorkingArea.Height * 0.8);
+            Width = 700;
+            Height = 650;
 
             TableLayoutPanel tblLayoutPanel = new TableLayoutPanel()
             {
@@ -27,19 +26,20 @@ namespace WashMachine.Forms.Modules.PaidBy.Dialog
 
             tblLayoutPanel.Font = new Font(tblLayoutPanel.Font.FontFamily, 14f, FontStyle.Regular);
 
-            tblLayoutPanel.RowStyles.Add(new RowStyle() { Height = 100, SizeType = SizeType.Absolute });
-            tblLayoutPanel.RowStyles.Add(new RowStyle() { Height = 30, SizeType = SizeType.Percent });
-            tblLayoutPanel.RowStyles.Add(new RowStyle() { Height = 70, SizeType = SizeType.Absolute });
-            tblLayoutPanel.RowStyles.Add(new RowStyle() { Height = 20, SizeType = SizeType.Absolute });
+            tblLayoutPanel.RowStyles.Add(new RowStyle() { Height = 1, SizeType = SizeType.Percent });
+            tblLayoutPanel.RowStyles.Add(new RowStyle() { Height = 1, SizeType = SizeType.Percent });
+            tblLayoutPanel.RowStyles.Add(new RowStyle() { Height = 1, SizeType = SizeType.Percent });
+            tblLayoutPanel.RowStyles.Add(new RowStyle() { Height = 3, SizeType = SizeType.Percent });
+            tblLayoutPanel.RowStyles.Add(new RowStyle() { Height = 4, SizeType = SizeType.AutoSize });
+            tblLayoutPanel.RowStyles.Add(new RowStyle() { Height = 1, SizeType = SizeType.Percent });
+            tblLayoutPanel.RowStyles.Add(new RowStyle() { Height = 1, SizeType = SizeType.AutoSize });
 
-            tblLayoutPanel.ColumnStyles.Add(new ColumnStyle() { Width = 100, SizeType = SizeType.Percent });
+            tblLayoutPanel.ColumnStyles.Add(new ColumnStyle() { Width = 1, SizeType = SizeType.Percent });
             Label lbTitle = new Label()
             {
                 ForeColor = Color.White,
-                Width = Width,
-                Height = 100,
                 TextAlign = ContentAlignment.MiddleCenter,
-                Text = ""
+                Dock = DockStyle.Fill
             };
             if (paymentType == PaymentType.Alipay)
             {
@@ -62,52 +62,25 @@ namespace WashMachine.Forms.Modules.PaidBy.Dialog
             pnHeader.Controls.Add(lbTitle);
             tblLayoutPanel.Controls.Add(pnHeader, 0, 0);
 
-            TableLayoutPanel tblBody = new TableLayoutPanel()
-            {
-                Dock = DockStyle.Fill
-            };
-            tblBody.RowStyles.Add(new RowStyle() { Height = 80, SizeType = SizeType.Absolute });
-            tblBody.RowStyles.Add(new RowStyle() { Height = 70, SizeType = SizeType.Absolute });
-            tblBody.RowStyles.Add(new RowStyle() { Height = 30, SizeType = SizeType.Percent });
-            tblBody.RowStyles.Add(new RowStyle() { Height = 120, SizeType = SizeType.Absolute });
-            tblBody.ColumnStyles.Add(new ColumnStyle() { Width = 100, SizeType = SizeType.Percent });
-
             Label lbBodyTitle = new Label()
             {
                 ForeColor = ColorTranslator.FromHtml("#81C784"),
-                Width = Width,
-                TextAlign = ContentAlignment.TopCenter,
-                Height = 100,
+                TextAlign = ContentAlignment.MiddleCenter,
+                Dock = DockStyle.Fill,
                 Text = "請把 {二維碼 / 八達通} 放在 {掃描器/讀卡機 } 上\r\nPlease put the {Octopus / QRCode} to {the reader of the scanner}"
             };
-
-            Panel pnBody = new Panel()
-            {
-                BackColor = Color.White,
-                Dock = DockStyle.Fill
-            };
-
-            pnBody.Controls.Add(lbBodyTitle);
-            tblBody.Controls.Add(pnBody, 0, 0);
+            tblLayoutPanel.Controls.Add(lbBodyTitle, 0, 1);
 
             Label lbBodyMoney = new Label()
             {
                 ForeColor = ColorTranslator.FromHtml("#81C784"),
-                Width = Width,
-                TextAlign = ContentAlignment.TopCenter,
-                Height = 100,
                 Text = amount.ToString("n1"),
-                Font = new Font(tblLayoutPanel.Font.FontFamily, 50f, FontStyle.Regular)
-            };
-
-            Panel pnMoney = new Panel()
-            {
-                BackColor = Color.White,
+                Font = new Font(tblLayoutPanel.Font.FontFamily, 50f, FontStyle.Regular),
+                TextAlign = ContentAlignment.MiddleCenter,
                 Dock = DockStyle.Fill
             };
 
-            pnMoney.Controls.Add(lbBodyMoney);
-            tblBody.Controls.Add(pnMoney, 0, 1);
+            tblLayoutPanel.Controls.Add(lbBodyMoney, 0, 2);
 
             byte[] bytes = null;
 
@@ -155,59 +128,43 @@ namespace WashMachine.Forms.Modules.PaidBy.Dialog
                     }
                 }
             }
-            Panel pnBg = new Panel()
-            {
-                BackgroundImage = imgBg,
-                Width = 330,
-                Height = 200,
-                BackgroundImageLayout = ImageLayout.Stretch,
-            };
-
-            pnBg.Location = new Point((Width - pnBg.Width) / 2, 0);
-
-            Panel panelBg = new Panel()
+            
+            TableLayoutPanel tblBg = new TableLayoutPanel()
             {
                 Dock = DockStyle.Fill
             };
-            panelBg.Controls.Add(pnBg);
-            tblBody.Controls.Add(panelBg, 0, 2);
+            tblBg.RowStyles.Add(new RowStyle() { Height = 1, SizeType = SizeType.Percent });
+            tblBg.ColumnStyles.Add(new ColumnStyle() { Width = 1, SizeType = SizeType.Percent });
+            tblBg.ColumnStyles.Add(new ColumnStyle() { Width = 2, SizeType = SizeType.Percent });
+            tblBg.ColumnStyles.Add(new ColumnStyle() { Width = 1, SizeType = SizeType.Percent });
+
+            tblBg.Controls.Add(new Panel() { Dock = DockStyle.Fill }, 0, 0);
+            tblBg.Controls.Add(new Panel() { BackgroundImage = imgBg, BackgroundImageLayout = ImageLayout.Stretch, Dock = DockStyle.Fill  }, 1, 0);
+            tblBg.Controls.Add(new Panel() { Dock = DockStyle.Fill }, 2, 0);
+            tblLayoutPanel.Controls.Add(tblBg, 0, 3);
 
             Label lbBodyMessage = new Label()
             {
                 Name = "lbMessage",
-                ForeColor = ColorTranslator.FromHtml("#81C784"),
-                Width = Width,
-                TextAlign = ContentAlignment.TopCenter,
-                Height = 100,
-                Font = new Font(Font.FontFamily, 12f),
-                Text = ""
+                TextAlign = ContentAlignment.MiddleCenter,
+                Dock = DockStyle.Fill
             };
 
-            Panel pnBodyMessage = new Panel()
-            {
-                BackColor = Color.White,
-                Dock = DockStyle.Fill,
-                Name = "pnMessage",
-                Visible = true
-            };
-
-            pnBodyMessage.Controls.Add(lbBodyMessage);
-            tblBody.Controls.Add(pnBodyMessage, 0, 3);
-
-            tblLayoutPanel.Controls.Add(tblBody, 0, 1);
+            tblLayoutPanel.Controls.Add(lbBodyMessage, 0, 4);
 
             TableLayoutPanel tblFooter = new TableLayoutPanel()
             {
                 Dock = DockStyle.Fill
             };
-            tblFooter.RowStyles.Add(new RowStyle() { Height = 50, SizeType = SizeType.Absolute });
-            tblFooter.ColumnStyles.Add(new ColumnStyle() { Width = 100, SizeType = SizeType.Percent });
+            tblFooter.RowStyles.Add(new RowStyle() { Height = 1, SizeType = SizeType.Percent });
+            tblFooter.ColumnStyles.Add(new ColumnStyle() { Width = 1, SizeType = SizeType.Percent });
+            tblFooter.ColumnStyles.Add(new ColumnStyle() { Width = 1, SizeType = SizeType.Percent });
 
             bytes = Convert.FromBase64String("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");
             ms = new MemoryStream(bytes);
             Image imgBack = Image.FromStream(ms);
 
-            Panel pnBack = new Panel() { Name = "pnBack", BackgroundImage = imgBack, Width = 120, BackgroundImageLayout = ImageLayout.Stretch, Height = 50 };
+            Panel pnBack = new Panel() { Name = "pnBack", BackgroundImage = imgBack, Dock = DockStyle.Left, BackgroundImageLayout = ImageLayout.Stretch };
             pnBack.Click += BtnCancel_Click;
             pnBack.Paint += PnBack_Paint;
             tblFooter.Controls.Add(pnBack, 0, 0);
@@ -216,14 +173,13 @@ namespace WashMachine.Forms.Modules.PaidBy.Dialog
             ms = new MemoryStream(bytes);
             Image imgBackHome = Image.FromStream(ms);
 
-            Panel pnBackHome = new Panel() { Name = "pnBackHome", BackgroundImage = imgBackHome, Width = 120, BackgroundImageLayout = ImageLayout.Stretch, Height = 50 };
+            Panel pnBackHome = new Panel() { Name = "pnBackHome", BackgroundImage = imgBackHome, Dock = DockStyle.Right, BackgroundImageLayout = ImageLayout.Stretch };
             pnBackHome.Click += BtnHome_Click;
             pnBackHome.Paint += PnBackHome_Paint;
             tblFooter.Controls.Add(pnBackHome, 1, 0);
 
-            tblLayoutPanel.Controls.Add(tblFooter, 0, 2);
-            tblLayoutPanel.Controls.Add(new Label() { ForeColor = SystemColors.InfoText, Name = "lbTimeCounter", Text = "", Font = new Font(Font.FontFamily, 8f), }, 0, 3);
-
+            tblLayoutPanel.Controls.Add(tblFooter, 0, 5);
+            tblLayoutPanel.Controls.Add(new Label() { ForeColor = SystemColors.InfoText, Name = "lbTimeCounter", Dock = DockStyle.Fill }, 0, 6);
 
             BackColor = Color.White;
 
@@ -312,7 +268,14 @@ namespace WashMachine.Forms.Modules.PaidBy.Dialog
 
         private void Parent_SizeChanged(object sender, EventArgs e)
         {
-            Location = new Point((Parent.Width - Width) / 2, (Parent.Height - Height) / 2);
+            try
+            {
+                Location = new Point((Parent.Width - Width) / 2, (Parent.Height - Height) / 2);
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
         }
 
         public void ResetDefault()
@@ -334,11 +297,8 @@ namespace WashMachine.Forms.Modules.PaidBy.Dialog
                 {
                     lbMessage.Text = message;
                     lbMessage.ForeColor = Color.Red;
-                }
-                else
-                {
-                    lbMessage.Text = string.Empty;
-                    lbMessage.ForeColor = Color.Green;
+                    Size sz = TextRenderer.MeasureText(lbMessage.Text, lbMessage.Font);
+                    lbMessage.Height = sz.Height;
                 }
             }
         }
@@ -352,6 +312,8 @@ namespace WashMachine.Forms.Modules.PaidBy.Dialog
                 {
                     lbMessage.Text = message;
                     lbMessage.ForeColor = Color.Green;
+                    Size sz = TextRenderer.MeasureText(lbMessage.Text, lbMessage.Font);
+                    lbMessage.Height = sz.Height;
                 }
             }
         }
@@ -386,19 +348,21 @@ namespace WashMachine.Forms.Modules.PaidBy.Dialog
 
         public void StartTimerCloseAlert()
         {
-            if (timerCloseAlert != null)
-            {
-                timerCloseAlert.Stop();
-                timerCloseAlert.Dispose();
-            }
+            timerCloseAlert?.Stop();
             EnableButtons();
             timerCloseAlert = new Timer();
             timerCloseAlert.Tick += TimerCloseAlert_Tick;
             timerCloseAlert.Enabled = true;
             timerCloseAlert.Interval = 1000;
-            //after 15s alter will be close
-            timerCloseAlert.Tag = 1000 * 8;
+            //after 10s alter will be close
+            timerCloseAlert.Tag = 1000 * 10;
             timerCloseAlert.Start();
+        }
+
+        public void StopTimerCloseAlert()
+        {
+            timerCloseAlert?.Stop();
+            EnableButtons();
         }
 
         private void TimerCloseAlert_Tick(object sender, EventArgs e)
@@ -406,6 +370,8 @@ namespace WashMachine.Forms.Modules.PaidBy.Dialog
             try
             {
                 int currentTime = int.Parse(timerCloseAlert.Tag.ToString());
+                currentTime -= 1000;
+                timerCloseAlert.Tag = currentTime;
                 if (currentTime > 0)
                 {
                     if (Controls.Find("lbTimeCounter", true).Any())
@@ -416,17 +382,10 @@ namespace WashMachine.Forms.Modules.PaidBy.Dialog
                         lbTimeCounter.Width = sizeText.Width;
                         lbTimeCounter.Height = sizeText.Height;
                     }
-                    else
-                    {
-                        timerCloseAlert.Stop();
-                        timerCloseAlert.Dispose();
-                    }
-
-                    currentTime -= 1000;
-                    timerCloseAlert.Tag = currentTime;
                 }
                 else
                 {
+                    timerCloseAlert.Stop();
                     HomeHandler.Invoke(this, true);
                 }
             }

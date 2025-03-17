@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using WashMachine.Forms.Common.UI;
+using WashMachine.Forms.Common.Utils;
 using WashMachine.Forms.Modules.Laundry;
 using WashMachine.Forms.Modules.LaundryDryerOption.LaundryOptionItems;
 using WashMachine.Forms.Modules.LaundryDryerOption.PaymentItems;
@@ -37,13 +38,13 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption
 
             tblLaundryForm = new TableLayoutPanel()
             {
-                Width = (int)(0.8 * Screen.PrimaryScreen.WorkingArea.Width),
-                Height = (int)(0.6 * Screen.PrimaryScreen.WorkingArea.Height),
+                Width = 250,
+                Height = 550,
                 Name = "MainLayout"
             };
-            tblLaundryForm.RowStyles.Add(new RowStyle() { Height = 100, SizeType = SizeType.Percent });
-            tblLaundryForm.RowStyles.Add(new RowStyle() { Height = 80, SizeType = SizeType.Absolute });
-            tblLaundryForm.ColumnStyles.Add(new ColumnStyle() { Width = 70, SizeType = SizeType.Percent });
+            tblLaundryForm.RowStyles.Add(new RowStyle() { Height = 4, SizeType = SizeType.Percent });
+            tblLaundryForm.RowStyles.Add(new RowStyle() { Height = 1, SizeType = SizeType.Percent });
+            tblLaundryForm.ColumnStyles.Add(new ColumnStyle() { Width = 1, SizeType = SizeType.Percent });
 
             Resize += WashMachineForm_Resize;
 
@@ -51,18 +52,18 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption
             {
                 Dock = DockStyle.Fill
             };
-            tblLaundryBody.RowStyles.Add(new RowStyle() { Height = 100, SizeType = SizeType.Percent });
-            tblLaundryBody.ColumnStyles.Add(new ColumnStyle() { Width = 70, SizeType = SizeType.Percent });
-            tblLaundryBody.ColumnStyles.Add(new ColumnStyle() { Width = 310, SizeType = SizeType.Absolute });
+            tblLaundryBody.RowStyles.Add(new RowStyle() { Height = 1, SizeType = SizeType.Percent });
+            tblLaundryBody.ColumnStyles.Add(new ColumnStyle() { Width = 3, SizeType = SizeType.Percent });
+            tblLaundryBody.ColumnStyles.Add(new ColumnStyle() { Width = 1, SizeType = SizeType.Percent });
 
             TableLayoutPanel tblLaundryItemsForm = new TableLayoutPanel()
             {
                 Dock = DockStyle.Fill
             };
 
-            tblLaundryItemsForm.RowStyles.Add(new RowStyle() { Height = 100, SizeType = SizeType.Percent });
-            tblLaundryItemsForm.RowStyles.Add(new RowStyle() { Height = 100, SizeType = SizeType.Percent });
-            tblLaundryItemsForm.RowStyles.Add(new RowStyle() { Height = 70, SizeType = SizeType.Absolute });
+            tblLaundryItemsForm.RowStyles.Add(new RowStyle() { Height = 1, SizeType = SizeType.Percent });
+            tblLaundryItemsForm.RowStyles.Add(new RowStyle() { Height = 1, SizeType = SizeType.Percent });
+            tblLaundryItemsForm.RowStyles.Add(new RowStyle() { Height = 1, SizeType = SizeType.Percent });
 
             List<ILaundryOptionItem> cardItems = new List<ILaundryOptionItem>
             {
@@ -71,10 +72,11 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption
                 new Dryer03LaundryItem(laundryItem, this),
                 new Dryer04LaundryItem(laundryItem, this),
             };
+            tblLaundryForm.Width = tblLaundryForm.Width * (cardItems.Count + 1);
 
             for (int i = 0; i < cardItems.Count; i++)
             {
-                tblLaundryItemsForm.ColumnStyles.Add(new ColumnStyle() { Width = 70, SizeType = SizeType.Percent });
+                tblLaundryItemsForm.ColumnStyles.Add(new ColumnStyle() { Width = 1, SizeType = SizeType.Percent });
 
                 ILaundryOptionItem cardItem = cardItems[i];
                 Control cardItemTemplate = cardItem.GetTemplate();
@@ -117,16 +119,16 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption
             {
                 Dock = DockStyle.Fill
             };
-            tblLaundryOptionItems.RowStyles.Add(new RowStyle() { Height = 100, SizeType = SizeType.Absolute });
-            tblLaundryOptionItems.RowStyles.Add(new RowStyle() { Height = 100, SizeType = SizeType.Percent });
-            tblLaundryOptionItems.ColumnStyles.Add(new ColumnStyle() { Width = 70, SizeType = SizeType.Percent });
+            tblLaundryOptionItems.RowStyles.Add(new RowStyle() { Height = 1, SizeType = SizeType.Percent });
+            tblLaundryOptionItems.RowStyles.Add(new RowStyle() { Height = 3, SizeType = SizeType.Percent });
+            tblLaundryOptionItems.ColumnStyles.Add(new ColumnStyle() { Width = 1, SizeType = SizeType.Percent });
 
 
             TableLayoutPanel tblLaundryTempOption = new TableLayoutPanel()
             {
                 Dock = DockStyle.Fill
             };
-            tblLaundryTempOption.RowStyles.Add(new RowStyle() { Height = 100, SizeType = SizeType.Percent });
+            tblLaundryTempOption.RowStyles.Add(new RowStyle() { Height = 1, SizeType = SizeType.Percent });
 
             List<ITempOptionItem> tempOptionItems = new List<ITempOptionItem>()
             {
@@ -137,7 +139,7 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption
 
             for (int i = 0; i < tempOptionItems.Count; i++)
             {
-                tblLaundryTempOption.ColumnStyles.Add(new ColumnStyle() { Width = 70, SizeType = SizeType.Percent });
+                tblLaundryTempOption.ColumnStyles.Add(new ColumnStyle() { Width = 1, SizeType = SizeType.Percent });
 
                 ITempOptionItem tempOptionItem = tempOptionItems[i];
                 Control tempItemTemplate = tempOptionItem.GetTemplate();
@@ -154,11 +156,11 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption
             {
                 Dock = DockStyle.Fill
             };
-            tblLaundryTimeOption.RowStyles.Add(new RowStyle() { Height = 100, SizeType = SizeType.Percent });
-            tblLaundryTimeOption.RowStyles.Add(new RowStyle() { Height = 100, SizeType = SizeType.Percent });
-            tblLaundryTimeOption.RowStyles.Add(new RowStyle() { Height = 100, SizeType = SizeType.Percent });
-            tblLaundryTimeOption.RowStyles.Add(new RowStyle() { Height = 100, SizeType = SizeType.Percent });
-            tblLaundryTimeOption.ColumnStyles.Add(new ColumnStyle() { Width = 70, SizeType = SizeType.Percent });
+            tblLaundryTimeOption.RowStyles.Add(new RowStyle() { Height = 1, SizeType = SizeType.Percent });
+            tblLaundryTimeOption.RowStyles.Add(new RowStyle() { Height = 1, SizeType = SizeType.Percent });
+            tblLaundryTimeOption.RowStyles.Add(new RowStyle() { Height = 1, SizeType = SizeType.Percent });
+            tblLaundryTimeOption.RowStyles.Add(new RowStyle() { Height = 1, SizeType = SizeType.Percent });
+            tblLaundryTimeOption.ColumnStyles.Add(new ColumnStyle() { Width = 1, SizeType = SizeType.Percent });
 
             List<ITimeOptionItem> timeOptionItems = new List<ITimeOptionItem>()
             {
@@ -188,17 +190,21 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption
             {
                 Dock = DockStyle.Fill
             };
-            tblLaundryFooter.RowStyles.Add(new RowStyle() { Height = 100, SizeType = SizeType.Percent });
-            tblLaundryFooter.ColumnStyles.Add(new ColumnStyle() { Width = 70, SizeType = SizeType.Percent });
+            tblLaundryFooter.RowStyles.Add(new RowStyle() { Height = 1, SizeType = SizeType.Percent });
+            tblLaundryFooter.ColumnStyles.Add(new ColumnStyle() { Width = 1, SizeType = SizeType.Percent });
+            tblLaundryFooter.ColumnStyles.Add(new ColumnStyle() { Width = 1, SizeType = SizeType.Percent });
+            tblLaundryFooter.ColumnStyles.Add(new ColumnStyle() { Width = 1, SizeType = SizeType.Percent });
+            tblLaundryFooter.ColumnStyles.Add(new ColumnStyle() { Width = 1, SizeType = SizeType.Percent });
+            tblLaundryFooter.ColumnStyles.Add(new ColumnStyle() { Width = 1, SizeType = SizeType.Percent });
 
             TableLayoutPanel tblCardReturn = new TableLayoutPanel()
             {
                 Dock = DockStyle.Fill,
-                BackColor = Color.Transparent,
+                BackColor = Color.Transparent
             };
-            tblCardReturn.RowStyles.Add(new RowStyle() { Height = 150, SizeType = SizeType.Absolute });
-            tblCardReturn.ColumnStyles.Add(new ColumnStyle() { Width = 90, SizeType = SizeType.Absolute });
-            tblCardReturn.ColumnStyles.Add(new ColumnStyle() { Width = 20, SizeType = SizeType.Absolute });
+            tblCardReturn.RowStyles.Add(new RowStyle() { Height = 1, SizeType = SizeType.Percent });
+            tblCardReturn.ColumnStyles.Add(new ColumnStyle() { Width = 2, SizeType = SizeType.Percent });
+            tblCardReturn.ColumnStyles.Add(new ColumnStyle() { Width = 1, SizeType = SizeType.Percent });
 
             CardItemProperty cardReturnItem = new CardItemProperty()
             {
@@ -211,8 +217,6 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption
             CardButtonRoundedUI cardReturnUI = new CardButtonRoundedUI()
             {
                 Padding = new Padding(10),
-                Height = 70,
-                Width = 140,
                 ShapeBackgroudColor = Color.Gray,
                 ShapeBorderColor = Color.Black,
                 CornerRadius = 30,
@@ -220,7 +224,7 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption
             };
             cardReturnUI.Click += CardReturnUI_Click;
 
-            Label lbReturn = new Label() { Text = cardReturnItem.Title, Height = 70 };
+            Label lbReturn = new Label() { Text = cardReturnItem.Title, Dock = DockStyle.Fill, TextAlign = ContentAlignment.MiddleLeft };
             lbReturn.Tag = cardReturnUI;
             lbReturn.MouseHover += CardItem_MouseHover;
             lbReturn.MouseLeave += CardItem_MouseLeave;
@@ -228,28 +232,29 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption
 
             Panel pnReturn = new Panel
             {
-                Height = 35,
-                Width = 45,
+                Dock = DockStyle.Fill,
                 BackgroundImage = cardReturnItem.GetCoverImage(),
                 BackgroundImageLayout = ImageLayout.Stretch,
-                Enabled = false
+                Tag = cardReturnUI
             };
+            pnReturn.MouseHover += CardItem_MouseHover;
+            pnReturn.MouseLeave += CardItem_MouseLeave;
+            pnReturn.Click += CardReturnUI_Click;
 
             tblCardReturn.Controls.Add(lbReturn, 0, 0);
             tblCardReturn.Controls.Add(pnReturn, 1, 0);
             cardReturnUI.Controls.Add(tblCardReturn);
 
-            IPaymentItem paymentItem = new PaymentItem(followType, this);
-            FlowLayoutPanel flowLayoutFooter = new FlowLayoutPanel()
+            Panel pnReturnItems = new Panel()
             {
-                Dock = DockStyle.Fill,
-                FlowDirection = FlowDirection.RightToLeft,
-                Height = 70
+                Dock = DockStyle.Fill
             };
-            flowLayoutFooter.Controls.Add(paymentItem.GetTemplate());
-            flowLayoutFooter.Controls.Add(cardReturnUI);
+            pnReturnItems.Controls.Add(cardReturnUI);
 
-            tblLaundryFooter.Controls.Add(flowLayoutFooter, 0, 0);
+            IPaymentItem paymentItem = new PaymentItem(followType, this);
+            tblLaundryFooter.Controls.Add(pnReturnItems, 3, 0);
+            tblLaundryFooter.Controls.Add(paymentItem.GetTemplate(), 4, 0);
+
             tblLaundryForm.Controls.Add(tblLaundryFooter, 0, 1);
 
             Controls.Add(tblLaundryForm);
@@ -275,7 +280,9 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption
 
         private void WashMachineForm_Resize(object sender, EventArgs e)
         {
+            ScaleUtil.ScaleAll(Controls, this);
             tblLaundryForm.Location = new Point((Width - tblLaundryForm.Width) / 2, (Height - tblLaundryForm.Height) / 2);
+            Refresh();
         }
     }
 }

@@ -13,16 +13,23 @@ namespace WashMachine.Forms.Common.UI
         {
             TableLayoutPanel tblLayoutPanel = new TableLayoutPanel()
             {
-                Dock = DockStyle.Fill,
-                
+                Dock = DockStyle.Fill
             };
 
-            tblLayoutPanel.Font = new Font(tblLayoutPanel.Font.FontFamily, 14f, FontStyle.Regular);
+            Font = new Font(tblLayoutPanel.Font.FontFamily, 14f, FontStyle.Regular);
 
-            tblLayoutPanel.RowStyles.Add(new RowStyle() { Height = 70, SizeType = SizeType.Absolute });
-            tblLayoutPanel.RowStyles.Add(new RowStyle() { Height = 30, SizeType = SizeType.Absolute });
-            tblLayoutPanel.ColumnStyles.Add(new ColumnStyle() { Width = 200, SizeType = SizeType.Percent });
-            tblLayoutPanel.Controls.Add(new Label() { ForeColor = Color.Blue, Width = 200, TextAlign = ContentAlignment.MiddleCenter, Text = "PROCCESSING..." }, 0, 0);
+            tblLayoutPanel.RowStyles.Add(new RowStyle() { Height = 2, SizeType = SizeType.Percent });
+            tblLayoutPanel.RowStyles.Add(new RowStyle() { Height = 2, SizeType = SizeType.Percent });
+            tblLayoutPanel.RowStyles.Add(new RowStyle() { Height = 1, SizeType = SizeType.Percent });
+            tblLayoutPanel.ColumnStyles.Add(new ColumnStyle() { Width = 1, SizeType = SizeType.Percent });
+            tblLayoutPanel.Controls.Add(new Label()
+            {
+                ForeColor = Color.Blue,
+                TextAlign = ContentAlignment.MiddleCenter,
+                Text = "LOADING...",
+                Dock = DockStyle.Fill
+            },
+            0, 0);
 
             byte[] bytes = Convert.FromBase64String(GifLoadingIcon);
             MemoryStream ms = new MemoryStream(bytes);
@@ -32,18 +39,24 @@ namespace WashMachine.Forms.Common.UI
             {
                 SizeMode = PictureBoxSizeMode.StretchImage,
                 Image = iconLoading,
-                Width = 30,
-                Height = 30,
-                Location = new Point(70, 0)
+                Dock = DockStyle.Fill
             };
-            Panel panelIcon = new Panel()
-            {
-                Dock = DockStyle.Fill,
-            };
-            panelIcon.Controls.Add(pbIcon);
 
-            tblLayoutPanel.Controls.Add(panelIcon);
-            Padding = new Padding(10);
+            TableLayoutPanel tblIcons = new TableLayoutPanel()
+            {
+                Dock = DockStyle.Fill
+            };
+            tblIcons.RowStyles.Add(new RowStyle() { Height = 1, SizeType = SizeType.Percent });
+            tblIcons.ColumnStyles.Add(new ColumnStyle() { Width = 1, SizeType = SizeType.Percent });
+            tblIcons.ColumnStyles.Add(new ColumnStyle() { Width = 1, SizeType = SizeType.Percent });
+            tblIcons.ColumnStyles.Add(new ColumnStyle() { Width = 1, SizeType = SizeType.Percent });
+
+            tblIcons.Controls.Add(new Control() { Dock = DockStyle.Fill }, 0, 0);
+            tblIcons.Controls.Add(pbIcon, 1, 0);
+            tblIcons.Controls.Add(new Control() { Dock = DockStyle.Fill }, 2, 0);
+
+            tblLayoutPanel.Controls.Add(tblIcons, 0, 1);
+            tblLayoutPanel.Controls.Add(new Control() { Dock = DockStyle.Fill }, 0, 2);
             BackColor = Color.LightGray;
             Width = 200;
             Height = 200;
@@ -96,7 +109,17 @@ namespace WashMachine.Forms.Common.UI
         }
         private void Parent_SizeChanged(object sender, EventArgs e)
         {
-            Location = new Point((Parent.Width - Width) / 2, (Parent.Height - Height) / 2);
+            try
+            {
+                if (Parent != null)
+                {
+                    Location = new Point((Parent.Width - Width) / 2, (Parent.Height - Height) / 2);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
         }
     }
 }

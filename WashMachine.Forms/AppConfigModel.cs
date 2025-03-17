@@ -75,6 +75,7 @@ namespace WashMachine.Forms
         public string OctopusRwlInitPath { get; set; }
         public string ShopConfigPath { get; set; }
         public int ScanTimeout { get; set; }
+        public int DelayDeduct { get; set; }
 
         public string WashMachineCom { get; set; }
         public int WashMachineBaudRate { get; set; }

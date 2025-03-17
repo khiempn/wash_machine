@@ -1,4 +1,5 @@
-﻿using WashMachine.Forms.Common.Http;
+﻿using EFTSolutions;
+using WashMachine.Forms.Common.Http;
 using WashMachine.Forms.Common.UI;
 using WashMachine.Forms.Modules.PaidBy.Dialog;
 using WashMachine.Forms.Modules.PaidBy.Machine.Octopus;
@@ -7,6 +8,7 @@ using WashMachine.Forms.Modules.PaidBy.Service;
 using WashMachine.Forms.Modules.PaidBy.Service.Eft;
 using WashMachine.Forms.Modules.PaidBy.Service.Model;
 using WashMachine.Forms.Modules.Payment;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -65,7 +67,7 @@ namespace WashMachine.Forms.Modules.PaidBy.PaidByItems
                     InsertTime = DateTime.Now,
                     PaymentStatus = (int)PaymentStatus.InCompleted,
                     OctopusNo = cardInfo.OctopusNo,
-                    Message = "Incompleted with 100022 status"
+                    Message = $"Incomplete with status code {cardInfo.Rs}."
                 };
 
                 await shopService.CreateIncompletedPayment(orderRequest);
@@ -85,17 +87,21 @@ namespace WashMachine.Forms.Modules.PaidBy.PaidByItems
         {
             try
             {
+                waitingUI.StopTimerCloseAlert();
+                IsCancelPayment = true;
                 ProgressUI progressUI = new ProgressUI();
                 progressUI.SetParent(mainForm);
                 progressUI.Show();
 
                 octopusService.StopScan();
-                IsCancelPayment = true;
-                await shopService.CancelPayment(new PaymentModel()
+                if (_payment != null)
                 {
-                    Id = _payment.Id,
-                    Message = "Cancel request payment by press back home button"
-                });
+                    await shopService.CancelPayment(new PaymentModel()
+                    {
+                        Id = _payment.Id,
+                        Message = "Cancel the payment request by pressing the home button."
+                    });
+                }
 
                 progressUI.Hide();
                 mainForm.Controls.Remove(progressUI);
@@ -113,131 +119,107 @@ namespace WashMachine.Forms.Modules.PaidBy.PaidByItems
         {
             try
             {
-                Logger.Log($"PaymentProgressHandler Step 8 ");
-
                 if (IsCancelPayment)
                 {
-                    waitingUI.StartTimerCloseAlert();
-                    octopusService.StopScan();
-                    Program.octopusService.SetUserIsUsingApp(false);
                     return;
-                }
-
-                if (e.IsStop)
-                {
-                    octopusService.StopScan();
                 }
 
                 if (e.Status)
                 {
-                    Program.octopusService.SetUserIsUsingAppWithScanning();
-                    OrderModel orderRequest = new OrderModel()
-                    {
-                        ShopCode = e.CardInfo.ShopCode,
-                        ShopName = e.CardInfo.ShopName,
-                        Amount = e.CardInfo.Amount,
-                        Quantity = 1,
-                        PaymentId = e.CardInfo.PaymentId,
-                        PaymentTypeId = e.CardInfo.PaymentTypeId,
-                        PaymentTypeName = e.CardInfo.PaymentTypeName,
-                        DeviceId = e.CardInfo.DeviceId,
-                        CardJson = e.CardInfo.CardJson,
-                        InsertTime = DateTime.Now,
-                        OctopusNo = e.CardInfo.OctopusNo,
-                        Message = "Payment successfully!"
-                    };
-
                     PaidByForm paidByForm = (PaidByForm)mainForm;
-
                     if (paidByForm.FollowType == Login.FollowType.TestPaymentOnly)
                     {
+                        Program.octopusService.SetUserIsUsingAppWithScanning();
+                        waitingUI.SetSuccessMessage("付款成功\nPayment successfully!");
+                        waitingUI.StopTimerCloseAlert();
                         ProgressUI progressUI = new ProgressUI();
                         progressUI.SetParent(mainForm);
                         progressUI.Show();
 
-                        AlertSuccessfullyUI paymentAlertUI = new AlertSuccessfullyUI();
-                        paymentAlertUI.SetParent(mainForm);
-                        paymentAlertUI.SetPrintOrderModel(orderRequest);
-                        paymentAlertUI.HomeClick += PaymentAlertUI_HomeClick;
-                        paymentAlertUI.PrinterClick += PaymentAlertUI_PrinterClick;
-                        paymentAlertUI.SetOctopusInvoice(orderRequest);
-                        paymentAlertUI.Enabled = false;
-
-                        if (e.MessageCodes.Count > 0)
+                        OrderModel orderRequest = new OrderModel()
                         {
-                            int messageCode = e.MessageCodes.Last();
-                            string message = e.GetMessage(messageCode);
-                            waitingUI.SetSuccessMessage(message);
-                        }
-                        else
-                        {
-                            waitingUI.SetSuccessMessage("付款成功\nPayment successfully!");
-                        }
+                            ShopCode = e.CardInfo.ShopCode,
+                            ShopName = e.CardInfo.ShopName,
+                            Amount = e.CardInfo.Amount,
+                            Quantity = 1,
+                            PaymentId = e.CardInfo.PaymentId,
+                            PaymentTypeId = e.CardInfo.PaymentTypeId,
+                            PaymentTypeName = e.CardInfo.PaymentTypeName,
+                            DeviceId = e.CardInfo.DeviceId,
+                            CardJson = e.CardInfo.CardJson,
+                            InsertTime = DateTime.Now,
+                            OctopusNo = e.CardInfo.OctopusNo,
+                            Message = "Payment successfully!"
+                        };
 
                         await shopService.CompletePayment(orderRequest);
-
                         await shopService.UpdatePayment(new PaymentModel()
                         {
                             Id = _payment.Id,
                             PaymentStatus = (int)PaymentStatus.Completed,
-                            Message = "付款成功\nPayment successfully!"
+                            Message = "Payment successfully!"
                         });
-
-                        progressUI.Hide();
-                        mainForm.Controls.Remove(progressUI);
-
-                        paymentAlertUI.Show();
 
                         paymentItem.PaymentCompletedCallBack.Invoke(mainForm, () =>
                         {
-                            paymentAlertUI.Enabled = true;
+                            progressUI.Hide();
+                            mainForm.Controls.Remove(progressUI);
+
+                            AlertSuccessfullyUI paymentAlertUI = new AlertSuccessfullyUI();
+                            paymentAlertUI.SetParent(mainForm);
+                            paymentAlertUI.SetPrintOrderModel(orderRequest);
+                            paymentAlertUI.HomeClick += PaymentAlertUI_HomeClick;
+                            paymentAlertUI.PrinterClick += PaymentAlertUI_PrinterClick;
+                            paymentAlertUI.SetOctopusInvoice(orderRequest);
+                            paymentAlertUI.Show();
                         });
                     }
-                    else if (paidByForm.FollowType == Login.FollowType.Normal || paidByForm.FollowType == Login.FollowType.TestMachineWithoutPayment)
+                    else if (paidByForm.FollowType == Login.FollowType.Normal)
                     {
-                        Logger.Log($"PaymentProgressHandler Step 9 ");
+                        Program.octopusService.SetUserIsUsingAppWithScanning();
+                        waitingUI.SetSuccessMessage("付款成功\nPayment successfully!");
+                        waitingUI.StopTimerCloseAlert();
                         ProgressUI progressUI = new ProgressUI();
                         progressUI.SetParent(mainForm);
                         progressUI.Show();
 
-                        AlertSuccessfullyUI paymentAlertUI = new AlertSuccessfullyUI();
-                        paymentAlertUI.SetParent(mainForm);
-                        paymentAlertUI.SetPrintOrderModel(orderRequest);
-                        paymentAlertUI.HomeClick += PaymentAlertUI_HomeClick;
-                        paymentAlertUI.PrinterClick += PaymentAlertUI_PrinterClick;
-                        paymentAlertUI.SetOctopusInvoice(orderRequest);
-                        paymentAlertUI.Enabled = false;
-                        paymentAlertUI.Show();
-
-                        if (e.MessageCodes.Count > 0)
+                        OrderModel orderRequest = new OrderModel()
                         {
-                            int messageCode = e.MessageCodes.Last();
-                            string message = e.GetMessage(messageCode);
-                            waitingUI.SetSuccessMessage(message);
-                        }
-                        else
-                        {
-                            waitingUI.SetSuccessMessage("付款成功\nPayment successfully!");
-                        }
+                            ShopCode = e.CardInfo.ShopCode,
+                            ShopName = e.CardInfo.ShopName,
+                            Amount = e.CardInfo.Amount,
+                            Quantity = 1,
+                            PaymentId = e.CardInfo.PaymentId,
+                            PaymentTypeId = e.CardInfo.PaymentTypeId,
+                            PaymentTypeName = e.CardInfo.PaymentTypeName,
+                            DeviceId = e.CardInfo.DeviceId,
+                            CardJson = e.CardInfo.CardJson,
+                            InsertTime = DateTime.Now,
+                            OctopusNo = e.CardInfo.OctopusNo,
+                            Message = "Payment successfully!"
+                        };
+                        waitingUI.SetSuccessMessage("付款成功\nPayment successfully!");
 
-                        Logger.Log($"PaymentProgressHandler Step 10 ");
                         await shopService.CompletePayment(orderRequest);
-
                         await shopService.UpdatePayment(new PaymentModel()
                         {
                             Id = _payment.Id,
-                            PaymentStatus = 3,
-                            Message = "付款成功\nPayment successfully!"
+                            PaymentStatus = (int)PaymentStatus.Completed,
+                            Message = "Payment successfully!"
                         });
-
-                        progressUI.Hide();
-                        mainForm.Controls.Remove(progressUI);
-
-                        paymentAlertUI.Show();
 
                         paymentItem.PaymentCompletedCallBack.Invoke(mainForm, () =>
                         {
-                            paymentAlertUI.Enabled = true;
+                            progressUI.Hide();
+                            mainForm.Controls.Remove(progressUI);
+
+                            AlertSuccessfullyUI paymentAlertUI = new AlertSuccessfullyUI();
+                            paymentAlertUI.SetParent(mainForm);
+                            paymentAlertUI.SetPrintOrderModel(orderRequest);
+                            paymentAlertUI.HomeClick += PaymentAlertUI_HomeClick;
+                            paymentAlertUI.PrinterClick += PaymentAlertUI_PrinterClick;
+                            paymentAlertUI.SetOctopusInvoice(orderRequest);
+                            paymentAlertUI.Show();
                         });
                     }
                 }
@@ -258,19 +240,24 @@ namespace WashMachine.Forms.Modules.PaidBy.PaidByItems
                             message = message.Replace("88888888", e.CardInfo.CardId);
                         }
                         waitingUI.SetErrorMessage(message);
+                        Logger.Log(message);
                     }
                     else
                     {
                         string message = new OctopusPaymentResponseModel().GetMessageDefault();
+                        Logger.Log(message);
                         waitingUI.SetErrorMessage(message);
                     }
 
                     if (e.IsStop)
                     {
                         waitingUI.StartTimerCloseAlert();
+                        Program.octopusService.SetUserIsUsingApp(false);
                     }
-
-                    Program.octopusService.SetUserIsUsingApp(false);
+                    else
+                    {
+                        Program.octopusService.SetUserIsUsingApp(true);
+                    }
                 }
             }
             catch (Exception ex)
@@ -289,21 +276,15 @@ namespace WashMachine.Forms.Modules.PaidBy.PaidByItems
             octopusService.Printer(orderModel);
         }
 
-        private async void PaymentAlertUI_HomeClick(object sender, EventArgs e)
+        private void PaymentAlertUI_HomeClick(object sender, EventArgs e)
         {
             try
             {
                 ProgressUI progressUI = new ProgressUI();
                 progressUI.SetParent(mainForm);
                 progressUI.Show();
-
                 octopusService.StopScan();
-                IsCancelPayment = true;
-                await shopService.CancelPayment(new PaymentModel()
-                {
-                    Id = _payment.Id,
-                    Message = "Cancel request payment by press back button"
-                });
+                IsCancelPayment = false;
                 progressUI.Hide();
                 mainForm.Controls.Remove(progressUI);
             }
@@ -320,17 +301,23 @@ namespace WashMachine.Forms.Modules.PaidBy.PaidByItems
         {
             try
             {
+                waitingUI.StopTimerCloseAlert();
+                IsCancelPayment = true;
                 ProgressUI progressUI = new ProgressUI();
                 progressUI.SetParent(mainForm);
                 progressUI.Show();
 
                 octopusService.StopScan();
-                IsCancelPayment = true;
-                await shopService.CancelPayment(new PaymentModel()
+
+                if (_payment != null)
                 {
-                    Id = _payment.Id,
-                    Message = "Cancel request payment by press back button"
-                });
+                    Program.octopusService.AddLog("Incomplete transaction cancel by user");
+                    await shopService.CancelPayment(new PaymentModel()
+                    {
+                        Id = _payment.Id,
+                        Message = "Cancel the payment request by pressing the back button."
+                    });
+                }
 
                 progressUI.Hide();
                 mainForm.Controls.Remove(progressUI);
@@ -366,8 +353,6 @@ namespace WashMachine.Forms.Modules.PaidBy.PaidByItems
             CardButtonRoundedUI cardButton = new CardButtonRoundedUI()
             {
                 Dock = DockStyle.Fill,
-                Height = 170,
-                Width = 50,
                 Padding = new Padding(10),
                 ShapeBackgroudColor = ColorTranslator.FromHtml(cardItem.BackgroundColor),
                 ShapeBorderColor = Color.Black,
@@ -387,7 +372,7 @@ namespace WashMachine.Forms.Modules.PaidBy.PaidByItems
             {
                 Text = "Octopus",
                 BackColor = Color.Transparent,
-                Width = 100,
+                Dock = DockStyle.Fill,
                 ForeColor = Color.White,
                 TextAlign = ContentAlignment.MiddleCenter,
                 Enabled = false
@@ -421,16 +406,20 @@ namespace WashMachine.Forms.Modules.PaidBy.PaidByItems
                 waitingUI.SetParent(mainForm);
                 waitingUI.CancelHandler += WaitingUI_CancelHandlerAsync;
                 waitingUI.HomeHandler += WaitingUI_HomeHandler;
-
                 waitingUI.ResetDefault();
                 waitingUI.DisabledButtons();
                 waitingUI.Show();
-                
-                if (!Program.octopusService.IsInitialCompleted)
-                {
-                    Program.octopusService.Initial();
-                }
+                mainForm.Refresh();
 
+                if (Program.octopusService.IsInitialSuccessfully == false || Program.octopusService.IsConnected() == false)
+                {
+                    waitingUI.SetSuccessMessage("Connecting to Octopus, please wait…");
+                    Program.octopusService.Initial();
+                    if (Program.octopusService.IsInitialSuccessfully)
+                    {
+                        waitingUI.SetSuccessMessage(string.Empty);
+                    }
+                }
                 _payment = null;
                 IsCancelPayment = false;
                 PaymentModel payment = await shopService.CreateNewPayment(new PaymentModel()
@@ -444,21 +433,22 @@ namespace WashMachine.Forms.Modules.PaidBy.PaidByItems
                 });
                 _payment = payment;
 
-                if (payment != null)
+                if (_payment == null)
                 {
-                    await octopusService.StartScanning(payment);
+                    waitingUI.SetErrorMessage("Unable to create a payment for Octopus. Please try again.");
+                    waitingUI.StartTimerCloseAlert();
+                    Program.octopusService.SetUserIsUsingApp(false);
+                    return;
                 }
                 else
                 {
-                    waitingUI.StartTimerCloseAlert();
-                    waitingUI.SetErrorMessage("Can not complete Payment");
-                    Program.octopusService.SetUserIsUsingApp(false);
+                    await octopusService.StartScanning(payment);
                 }
             }
             catch (Exception ex)
             {
                 waitingUI.StartTimerCloseAlert();
-                waitingUI.SetErrorMessage("Can not complete Payment");
+                waitingUI.SetErrorMessage("There is an exception during the initial payment.");
                 Program.octopusService.SetUserIsUsingApp(false);
                 Logger.Log(ex);
             }

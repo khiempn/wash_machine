@@ -1,12 +1,12 @@
-﻿using WashMachine.Forms.Modules.Login;
-using WashMachine.Forms.Modules.Shop.Model;
-using WashMachine.Forms.Modules.Shop.Service;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Drawing;
 using System.IO;
 using System.Text;
 using System.Windows.Forms;
+using WashMachine.Forms.Common.Utils;
+using WashMachine.Forms.Modules.Shop.Model;
+using WashMachine.Forms.Modules.Shop.Service;
 
 namespace WashMachine.Forms.Modules.Shop
 {
@@ -20,52 +20,63 @@ namespace WashMachine.Forms.Modules.Shop
         public SignInShopForm()
         {
             InitializeComponent();
+            Text = "Wash Machines System";
+
             ResizeRedraw = false;
             Padding = new Padding(10);
             WindowState = FormWindowState.Maximized;
             StartPosition = FormStartPosition.CenterParent;
 
             FormBorderStyle = FormBorderStyle.FixedSingle;
-            Resize += SignInShopForm_Resize;
             shopService = new ShopService();
+            Font = new Font(Font.FontFamily, 14f, FontStyle.Regular);
 
             tlpSignInShopForm = new TableLayoutPanel()
             {
-                Width = 400,
-                Height = 130,
+                Width = 450,
+                Height = 150,
                 Padding = new Padding(10),
                 Name = "MainLayout",
             };
 
-            tlpSignInShopForm.Font = new Font(Font.FontFamily, 14f, FontStyle.Regular);
             tlpSignInShopForm.Paint += TlpSignInShopForm_Paint;
-            tlpSignInShopForm.RowStyles.Add(new RowStyle() { Height = 50, SizeType = SizeType.Absolute });
-            tlpSignInShopForm.RowStyles.Add(new RowStyle() { Height = 50, SizeType = SizeType.Absolute });
-            tlpSignInShopForm.ColumnStyles.Add(new ColumnStyle() { Width = 250, SizeType = SizeType.Absolute });
-            tlpSignInShopForm.ColumnStyles.Add(new ColumnStyle() { Width = 130, SizeType = SizeType.AutoSize });
+            tlpSignInShopForm.RowStyles.Add(new RowStyle() { Height = 1, SizeType = SizeType.Percent });
+            tlpSignInShopForm.RowStyles.Add(new RowStyle() { Height = 2, SizeType = SizeType.Percent });
+            tlpSignInShopForm.ColumnStyles.Add(new ColumnStyle() { Width = 2, SizeType = SizeType.Percent });
+            tlpSignInShopForm.ColumnStyles.Add(new ColumnStyle() { Width = 1, SizeType = SizeType.Percent });
 
-            tlpSignInShopForm.Controls.Add(new Label() { Text = "Sign In" });
+            tlpSignInShopForm.Controls.Add(new Label() { Text = "Wellcome to Wash Machines System", Dock = DockStyle.Fill });
 
-            tbShopCode = new TextBox() { Multiline = true, Height = 45, Width = 250, MaxLength = 3 };
+            tbShopCode = new TextBox() { Multiline = true, Height = 45, Width = 250, MaxLength = 3, Dock = DockStyle.Fill };
+            tbShopCode.KeyUp += TbShopCode_KeyUp;
             tlpSignInShopForm.Controls.Add(tbShopCode, 0, 1);
 
             Panel pnlButton = new Panel()
             {
-                Dock = DockStyle.Fill,
-                Width = 130,
+                Dock = DockStyle.Fill
             };
-            btnSignIn = new Button() { Text = "Sign In", Height = 46, Width = 130 };
+            btnSignIn = new Button() { Text = "Login", Dock = DockStyle.Fill };
             btnSignIn.Click += BtnSignIn_Click;
             pnlButton.Controls.Add(btnSignIn);
 
             tlpSignInShopForm.Controls.Add(pnlButton, 1, 1);
-
             Controls.Add(tlpSignInShopForm);
+            Resize += SignInShopForm_Resize;
+        }
+
+        private void TbShopCode_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                BtnSignIn_Click(sender, e);
+            }
         }
 
         private void SignInShopForm_Resize(object sender, System.EventArgs e)
         {
+            ScaleUtil.ScaleAll(Controls, this);
             tlpSignInShopForm.Location = new Point((Width - tlpSignInShopForm.Width) / 2, (Height - tlpSignInShopForm.Height) / 2);
+            Refresh();
         }
 
         private async void BtnSignIn_Click(object sender, System.EventArgs e)
@@ -92,7 +103,8 @@ namespace WashMachine.Forms.Modules.Shop
                         }
                         Cursor = Cursors.Default;
                         Enabled = true;
-                        Hide();
+
+                        Close();
                     }
                     catch (Exception ex)
                     {
@@ -107,11 +119,6 @@ namespace WashMachine.Forms.Modules.Shop
             {
                 MessageBox.Show("Please enter shop code is active.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
-        }
-
-        private void LoginForm_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            Application.Exit();
         }
 
         private void TlpSignInShopForm_Paint(object sender, PaintEventArgs e)

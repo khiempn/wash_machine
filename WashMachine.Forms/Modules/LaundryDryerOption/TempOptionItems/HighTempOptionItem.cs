@@ -50,7 +50,7 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.TempOptionItems
                 ShapeBackgroudColor = ColorTranslator.FromHtml("#ffffff"),
                 ShapeSelectedBackgroudColor = ColorTranslator.FromHtml("#156082"),
                 ShapeBorderColor = Color.Black,
-                CornerRadius = 79,
+                CornerRadius = 30,
                 Dock = DockStyle.Fill,
                 ForeColor = ColorTranslator.FromHtml("#156082"),
                 Font = new Font(new Label().Font.FontFamily, 10),

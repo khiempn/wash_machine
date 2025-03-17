@@ -52,8 +52,6 @@ namespace WashMachine.Forms.Modules.Laundry.LaundryItems
             {
                 Dock = DockStyle.Fill,
                 Padding = new Padding(10),
-                Height = 50,
-                Width = 300,
                 ShapeBackgroudColor = ColorTranslator.FromHtml(cardItem.BackgroundColor),
                 ShapeBorderColor = Color.Black,
                 CornerRadius = 50,
@@ -68,9 +66,10 @@ namespace WashMachine.Forms.Modules.Laundry.LaundryItems
                 Enabled = false
             };
 
-            tblCardItem.RowStyles.Add(new RowStyle() { Height = 130, SizeType = SizeType.Absolute });
-            tblCardItem.RowStyles.Add(new RowStyle() { Height = 170, SizeType = SizeType.AutoSize });
-            tblCardItem.ColumnStyles.Add(new ColumnStyle() { Width = 100, SizeType = SizeType.Percent });
+            tblCardItem.RowStyles.Add(new RowStyle() { Height = 1, SizeType = SizeType.Percent });
+            tblCardItem.RowStyles.Add(new RowStyle() { Height = 1, SizeType = SizeType.Percent });
+            tblCardItem.ColumnStyles.Add(new ColumnStyle() { Width = 1, SizeType = SizeType.Percent });
+
             Panel pnCover = new Panel
             {
                 BackColor = ColorTranslator.FromHtml(cardItem.BackgroundColor),
@@ -118,9 +117,10 @@ namespace WashMachine.Forms.Modules.Laundry.LaundryItems
 
                     string remainAt = MachineService.GetRemainTimeAsFormat(machine);
                     string tempName = MachineService.GetTempName(machine.Temp);
-                    lbInfor.Text = $"Remain Time: {remainAt}";
+                    lbInfor.Text = $"Remaining Time: {remainAt}";
                     tblCardItem.Controls.Add(lbInfor, 0, 1);
                     cardButton.IsDisabled = true;
+                    lbTitle.ForeColor = Color.Green;
                 }
             }
 
@@ -154,7 +154,7 @@ namespace WashMachine.Forms.Modules.Laundry.LaundryItems
                     Label lbInfor = mainForm.Controls.Find(lbInforName, true).First() as Label;
                     string remainAt = MachineService.GetRemainTimeAsFormat(machine);
                     string tempName = MachineService.GetTempName(machine.Temp);
-                    lbInfor.Text = $"Remain Time: {remainAt}";
+                    lbInfor.Text = $"Remaining Time: {remainAt}";
                 }
             }
             catch (Exception ex)

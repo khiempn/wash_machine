@@ -1,10 +1,11 @@
-﻿using WashMachine.Forms.Modules.PaidBy.PaidByItems;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using WashMachine.Forms.Common.UI;
+using WashMachine.Forms.Common.Utils;
 using WashMachine.Forms.Modules.Login;
+using WashMachine.Forms.Modules.PaidBy.PaidByItems;
 using WashMachine.Forms.Modules.Payment;
 
 namespace WashMachine.Forms.Modules.PaidBy
@@ -18,7 +19,10 @@ namespace WashMachine.Forms.Modules.PaidBy
         public PaidByForm(FollowType followType, IPaymentItem paymentItem)
         {
             InitializeComponent();
+            Text = "Coins System";
+
             FollowType = followType;
+       
 
             ResizeRedraw = false;
             Padding = new Padding(10);
@@ -31,45 +35,42 @@ namespace WashMachine.Forms.Modules.PaidBy
 
             tblPaidByForm = new TableLayoutPanel()
             {
-                Width = 800,
-                Height = 300,
+                Width = 350,
+                Height = 340,
                 Name = "MainLayout"
             };
-            tblPaidByForm.RowStyles.Add(new RowStyle() { Height = 50, SizeType = SizeType.Absolute });
-            tblPaidByForm.RowStyles.Add(new RowStyle() { Height = 500, SizeType = SizeType.Percent });
-            tblPaidByForm.RowStyles.Add(new RowStyle() { Height = 70, SizeType = SizeType.Absolute });
+            tblPaidByForm.RowStyles.Add(new RowStyle() { Height = 2, SizeType = SizeType.Percent });
+            tblPaidByForm.RowStyles.Add(new RowStyle() { Height = 1, SizeType = SizeType.AutoSize });
 
-            tblPaidByForm.ColumnStyles.Add(new ColumnStyle() { Width = 100, SizeType = SizeType.Percent });
+            tblPaidByForm.ColumnStyles.Add(new ColumnStyle() { Width = 1, SizeType = SizeType.Percent });
 
             TableLayoutPanel tblPaymentItems = new TableLayoutPanel()
             {
                 Dock = DockStyle.Fill
             };
 
-            tblPaymentItems.RowStyles.Add(new RowStyle() { Height = 200, SizeType = SizeType.AutoSize });
+            tblPaymentItems.RowStyles.Add(new RowStyle() { Height = 1, SizeType = SizeType.Percent });
 
             List<IPaidByItem> cardItems = new List<IPaidByItem>
             {
                 new OctopusPaidByItem(this, paymentItem),
                 new AliPayPaidByItem(this, paymentItem),
                 new PayMePaidByItem(this, paymentItem)
-             };
+            };
+            tblPaidByForm.Width = tblPaidByForm.Width * cardItems.Count;
 
             for (int i = 0; i < cardItems.Count; i++)
             {
-                tblPaymentItems.ColumnStyles.Add(new ColumnStyle() { Width = 100, SizeType = SizeType.Percent });
-
+                tblPaymentItems.ColumnStyles.Add(new ColumnStyle() { Width = 1, SizeType = SizeType.Percent });
                 IPaidByItem cardItem = cardItems[i];
                 Control cardItemTemplate = cardItem.GetTemplate();
-                tblPaymentItems.Controls.Add(cardItemTemplate, i, 1);
+                tblPaymentItems.Controls.Add(cardItemTemplate, i, 0);
             }
 
             CardButtonRoundedUI cardReturn = new CardButtonRoundedUI()
             {
                 Dock = DockStyle.Fill,
                 Padding = new Padding(10),
-                Height = 50,
-                Width = Width,
                 ShapeBackgroudColor = Color.Gray,
                 ShapeBorderColor = Color.Black,
                 CornerRadius = 50
@@ -82,9 +83,9 @@ namespace WashMachine.Forms.Modules.PaidBy
                 Dock = DockStyle.Fill,
                 BackColor = Color.Transparent
             };
-            tblCardReturn.RowStyles.Add(new RowStyle() { Height = 150, SizeType = SizeType.Absolute });
-            tblCardReturn.ColumnStyles.Add(new ColumnStyle() { Width = 90, SizeType = SizeType.Absolute });
-            tblCardReturn.ColumnStyles.Add(new ColumnStyle() { Width = 20, SizeType = SizeType.Absolute });
+            tblCardReturn.RowStyles.Add(new RowStyle() { Height = 1, SizeType = SizeType.Percent });
+            tblCardReturn.ColumnStyles.Add(new ColumnStyle() { Width = 2, SizeType = SizeType.Percent });
+            tblCardReturn.ColumnStyles.Add(new ColumnStyle() { Width = 1, SizeType = SizeType.Percent });
 
             CardItemProperty cardReturnItem = new CardItemProperty()
             {
@@ -97,8 +98,6 @@ namespace WashMachine.Forms.Modules.PaidBy
             CardButtonRoundedUI cardReturnUI = new CardButtonRoundedUI()
             {
                 Padding = new Padding(10),
-                Height = 70,
-                Width = 140,
                 ShapeBackgroudColor = Color.Gray,
                 ShapeBorderColor = Color.Black,
                 CornerRadius = 30,
@@ -106,7 +105,7 @@ namespace WashMachine.Forms.Modules.PaidBy
             };
             cardReturnUI.Click += CardReturnUI_Click;
 
-            Label lbReturn = new Label() { Text = cardReturnItem.Title, Height = 70 };
+            Label lbReturn = new Label() { Text = cardReturnItem.Title, Dock = DockStyle.Fill };
             lbReturn.Tag = cardReturnUI;
             lbReturn.MouseHover += CardItem_MouseHover;
             lbReturn.MouseLeave += CardItem_MouseLeave;
@@ -114,8 +113,7 @@ namespace WashMachine.Forms.Modules.PaidBy
 
             Panel pnReturn = new Panel
             {
-                Height = 35,
-                Width = 45,
+                Dock = DockStyle.Fill,
                 BackgroundImage = cardReturnItem.GetCoverImage(),
                 BackgroundImageLayout = ImageLayout.Stretch,
                 Tag = cardReturnUI
@@ -134,8 +132,8 @@ namespace WashMachine.Forms.Modules.PaidBy
             };
             pnReturnItems.Controls.Add(cardReturnUI);
 
-            tblPaidByForm.Controls.Add(tblPaymentItems, 0, 1);
-            tblPaidByForm.Controls.Add(pnReturnItems, 0, 2);
+            tblPaidByForm.Controls.Add(tblPaymentItems, 0, 0);
+            tblPaidByForm.Controls.Add(pnReturnItems, 0, 1);
             Controls.Add(tblPaidByForm);
 
             Program.octopusService.SetCurrentForm(this);
@@ -144,7 +142,7 @@ namespace WashMachine.Forms.Modules.PaidBy
 
         private void DropcoinCompletedAction(bool arg1, string arg2)
         {
-           
+
         }
 
         private void CardReturnUI_Click(object sender, EventArgs e)
@@ -168,7 +166,9 @@ namespace WashMachine.Forms.Modules.PaidBy
 
         private void PaidByForm_Resize(object sender, EventArgs e)
         {
+            ScaleUtil.ScaleAll(Controls, this);
             tblPaidByForm.Location = new Point((Width - tblPaidByForm.Width) / 2, (Height - tblPaidByForm.Height) / 2);
+            Refresh();
         }
     }
 }

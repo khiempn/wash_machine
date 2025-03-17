@@ -1,18 +1,18 @@
-﻿using WashMachine.Forms.Common.UI;
+﻿using System;
+using System.Drawing;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using WashMachine.Forms.Common.UI;
+using WashMachine.Forms.Common.Utils;
+using WashMachine.Forms.Modules.Laundry;
 using WashMachine.Forms.Modules.Login.Account;
 using WashMachine.Forms.Modules.Main;
 using WashMachine.Forms.Modules.PaidBy;
 using WashMachine.Forms.Modules.PaidBy.Machine.Octopus;
-using WashMachine.Forms.Modules.Payment;
 using WashMachine.Forms.Modules.Payment.PaymentItems;
-using System;
-using System.Drawing;
-using System.IO;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using WashMachine.Forms.Modules.Laundry;
 using WashMachine.Forms.Modules.Shop;
-using System.Threading;
 
 namespace WashMachine.Forms.Modules.Login
 {
@@ -27,6 +27,8 @@ namespace WashMachine.Forms.Modules.Login
         public LoginForm()
         {
             InitializeComponent();
+            Text = "Wash Machines System";
+
             accountService = new AccountService();
             progressUI = new ProgressUI();
             progressUI.SetParent(this);
@@ -39,22 +41,21 @@ namespace WashMachine.Forms.Modules.Login
 
             tlpLoginForm = new TableLayoutPanel()
             {
-                Width = 420,
-                Height = 350,
+                Width = 450,
+                Height = 380,
                 Padding = new Padding(10),
                 Name = "MainLayout"
             };
 
-            tlpLoginForm.Font = new Font(Font.FontFamily, 14f, FontStyle.Regular);
-            //tlpLoginForm.Location = new Point((Width - tlpLoginForm.Width) / 2, (Height - tlpLoginForm.Height) / 2);
+            Font = new Font(Font.FontFamily, 14f, FontStyle.Regular);
             tlpLoginForm.Paint += TlpLoginForm_Paint;
-            tlpLoginForm.RowStyles.Add(new RowStyle() { Height = 50, SizeType = SizeType.AutoSize });
-            tlpLoginForm.RowStyles.Add(new RowStyle() { Height = 100, SizeType = SizeType.AutoSize });
-            tlpLoginForm.RowStyles.Add(new RowStyle() { Height = 50, SizeType = SizeType.AutoSize });
-            tlpLoginForm.RowStyles.Add(new RowStyle() { Height = 50, SizeType = SizeType.AutoSize });
-            tlpLoginForm.RowStyles.Add(new RowStyle() { Height = 50, SizeType = SizeType.AutoSize });
-            tlpLoginForm.RowStyles.Add(new RowStyle() { Height = 50, SizeType = SizeType.AutoSize });
-            tlpLoginForm.ColumnStyles.Add(new ColumnStyle() { Width = 100, SizeType = SizeType.Percent });
+            tlpLoginForm.RowStyles.Add(new RowStyle() { Height = 1, SizeType = SizeType.Percent });
+            tlpLoginForm.RowStyles.Add(new RowStyle() { Height = 2, SizeType = SizeType.Percent });
+            tlpLoginForm.RowStyles.Add(new RowStyle() { Height = 1, SizeType = SizeType.Percent });
+            tlpLoginForm.RowStyles.Add(new RowStyle() { Height = 1, SizeType = SizeType.Percent });
+            tlpLoginForm.RowStyles.Add(new RowStyle() { Height = 1, SizeType = SizeType.Percent });
+            tlpLoginForm.RowStyles.Add(new RowStyle() { Height = 1, SizeType = SizeType.Percent });
+            tlpLoginForm.ColumnStyles.Add(new ColumnStyle() { Width = 1, SizeType = SizeType.Percent });
 
             ButtonRoundedUI btnLogin = new ButtonRoundedUI()
             {
@@ -69,27 +70,26 @@ namespace WashMachine.Forms.Modules.Login
 
             TableLayoutPanel tblInputs = new TableLayoutPanel()
             {
-                Dock = DockStyle.Fill,
-                Height = 100
+                Dock = DockStyle.Fill
             };
-            tblInputs.RowStyles.Add(new RowStyle() { Height = 50, SizeType = SizeType.Absolute });
-            tblInputs.RowStyles.Add(new RowStyle() { Height = 50, SizeType = SizeType.Absolute });
-            tblInputs.ColumnStyles.Add(new ColumnStyle() { Width = 130, SizeType = SizeType.Absolute });
-            tblInputs.ColumnStyles.Add(new ColumnStyle() { Width = 100, SizeType = SizeType.Percent });
-            tbUserName = new TextBox() { Dock = DockStyle.Fill, Text = "admin@boxcut.hk" };
-            tbPassword = new TextBox() { Dock = DockStyle.Fill, Text = "admin@123", PasswordChar = '*' };
+            tblInputs.RowStyles.Add(new RowStyle() { Height = 1, SizeType = SizeType.Percent });
+            tblInputs.RowStyles.Add(new RowStyle() { Height = 1, SizeType = SizeType.Percent });
+            tblInputs.ColumnStyles.Add(new ColumnStyle() { Width = 1, SizeType = SizeType.Percent });
+            tblInputs.ColumnStyles.Add(new ColumnStyle() { Width = 2, SizeType = SizeType.Percent });
+            tbUserName = new TextBox() { Dock = DockStyle.Fill, Text = "admin@boxcut.hk", Multiline = true };
+            tbPassword = new TextBox() { Dock = DockStyle.Fill, Text = "admin@123", PasswordChar = '*', Multiline = true };
 
-            tblInputs.Controls.Add(new Label() { Text = "USER ID:", Width = 130, Height = 30, TextAlign = ContentAlignment.MiddleLeft }, 0, 0);
+            tblInputs.Controls.Add(new Label() { Text = "USER ID:", Dock = DockStyle.Fill, TextAlign = ContentAlignment.MiddleLeft }, 0, 0);
             tblInputs.Controls.Add(tbUserName, 1, 0);
 
-            tblInputs.Controls.Add(new Label() { Text = "PASSWORD:", Width = 170, Height = 30, TextAlign = ContentAlignment.MiddleLeft }, 0, 1);
+            tblInputs.Controls.Add(new Label() { Text = "PASSWORD:", Dock = DockStyle.Fill, TextAlign = ContentAlignment.MiddleLeft }, 0, 1);
             tblInputs.Controls.Add(tbPassword, 1, 1);
 
             tlpLoginForm.Controls.Add(tblInputs, 0, 1);
 
             ButtonRoundedUI btnPayment = new ButtonRoundedUI()
             {
-                Height = 50,
+                Dock = DockStyle.Fill,
                 Width = Width,
                 Text = "Test Payment Only",
                 ShapeBackgroudColor = ColorTranslator.FromHtml("#a5a5a5"),
@@ -100,7 +100,7 @@ namespace WashMachine.Forms.Modules.Login
 
             ButtonRoundedUI btnMachineWithoutPayment = new ButtonRoundedUI()
             {
-                Height = 50,
+                Dock = DockStyle.Fill,
                 Width = Width,
                 Text = "Test Machine without Payment",
                 ShapeBackgroudColor = ColorTranslator.FromHtml("#a5a5a5"),
@@ -111,7 +111,7 @@ namespace WashMachine.Forms.Modules.Login
 
             ButtonRoundedUI btnLogout = new ButtonRoundedUI()
             {
-                Height = 50,
+                Dock = DockStyle.Fill,
                 Width = Width,
                 Text = "Logout",
                 ShapeBackgroudColor = ColorTranslator.FromHtml("#a5a5a5"),
@@ -123,19 +123,13 @@ namespace WashMachine.Forms.Modules.Login
             Controls.Add(tlpLoginForm);
             FormClosed += LoginForm_FormClosed;
 
-            Program.octopusService = new OctopusService();
-            Program.octopusService.SetCurrentForm(this);
-            Program.octopusService.RunAJobToCompleteFiles();
-            Program.octopusService.Initial();
-            Program.octopusService.SetUserIsUsingApp(true);
-            LoadSettingImagesAsync();
+            InitialData();
 
             if (!File.Exists(Program.AppConfig.ShopConfigPath))
             {
                 SignInShopForm signInShopForm = new SignInShopForm();
                 signInShopForm.ShowDialog();
                 signInShopForm.FormClosed += SignInShopForm_FormClosed;
-                Hide();
             }
         }
 
@@ -150,7 +144,19 @@ namespace WashMachine.Forms.Modules.Login
             SignInShopForm signInShopForm = new SignInShopForm();
             signInShopForm.ShowDialog();
             signInShopForm.FormClosed += SignInShopForm_FormClosed;
-            Hide();
+        }
+
+        private void InitialOctopusAsync()
+        {
+            //Start a timer to upload files or download file from server
+            if (Program.octopusService == null)
+            {
+                Program.octopusService = new OctopusService();
+                Program.octopusService.SetCurrentForm(this);
+                Program.octopusService.RunAJobToCompleteFiles();
+                Program.octopusService.Initial();
+                Program.octopusService.RunTimerHealthCheck();
+            }
         }
 
         private void SignInShopForm_FormClosed(object sender, FormClosedEventArgs e)
@@ -161,14 +167,14 @@ namespace WashMachine.Forms.Modules.Login
                 Application.Exit();
             }
             Show();
+            InitialData();
         }
 
         private void LoginForm_FormClosed(object sender, FormClosedEventArgs e)
         {
             try
             {
-                Program.octopusService.Disconnect();
-
+                Program.octopusService.Disconect();
             }
             catch (Exception ex)
             {
@@ -176,24 +182,26 @@ namespace WashMachine.Forms.Modules.Login
             }
         }
 
-        private void LoadSettingImagesAsync()
+        private void InitialData()
         {
             Cursor = Cursors.WaitCursor;
             tlpLoginForm.Enabled = false;
             progressUI.Show();
+
             Task.Run(async () =>
             {
-                Thread.Sleep(3000);
+                //Thread.Sleep(5000);
                 try
                 {
-                    Program.ShopConfig = Program.AppConfig.GetShopConfig();
-                    await Program.ShopConfig.ShopSetting.LoadImages();
-                   
+                    //Program.ShopConfig = Program.AppConfig.GetShopConfig();
+                    //await Program.ShopConfig.ShopSetting.LoadImages();
                 }
                 finally
                 {
                     BeginInvoke((MethodInvoker)delegate
                     {
+                        InitialOctopusAsync();
+                        Program.octopusService.SetUserIsUsingApp(true);
                         Cursor = Cursors.Default;
                         tlpLoginForm.Enabled = true;
                         progressUI.Hide();
@@ -271,7 +279,9 @@ namespace WashMachine.Forms.Modules.Login
 
         private void LoginForm_Resize(object sender, EventArgs e)
         {
+            ScaleUtil.ScaleAll(Controls, this);
             tlpLoginForm.Location = new Point((Width - tlpLoginForm.Width) / 2, (Height - tlpLoginForm.Height) / 2);
+            Refresh();
         }
     }
 }

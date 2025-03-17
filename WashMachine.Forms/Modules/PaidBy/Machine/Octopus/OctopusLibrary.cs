@@ -4,10 +4,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Ports;
+using System.Linq;
 using System.Net.Http;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace WashMachine.Forms.Modules.PaidBy.Machine.Octopus
 {
@@ -172,44 +174,7 @@ namespace WashMachine.Forms.Modules.PaidBy.Machine.Octopus
             return b;
         }
 
-        private bool CheckPortAvailble(string comName, int baudrate)
-        {
-            try
-            {
-                SerialPort port = new SerialPort(comName, baudrate);
-                var name = port.PortName;
-                port.Open();
-                port.Close();
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-                return false;
-            }
-        }
-
-        public void ReInitComm(bool alway = false)
-        {
-            if (TimeOver.DeviceId == "0" || alway)
-            {
-                LogEvent2("ReInitComm");
-                ExecuteInitComm();
-                return;
-            }
-            var config = OctopusINI.ReadFileConfig();
-            if (config == null) return;
-
-            var comName = "COM" + config.Port;
-            var comAvailable = CheckPortAvailble(comName, config.Port);
-            if (comAvailable)
-            {
-                LogEvent2("ReInitComm.");
-                ExecuteInitComm();
-            }
-        }
-
-        public int ExecuteInitComm()
+        public int ExecuteInitCom()
         {
             Logger.Log("Initial Step 2");
             var config = OctopusINI.ReadFileConfig();
@@ -300,8 +265,6 @@ namespace WashMachine.Forms.Modules.PaidBy.Machine.Octopus
         {
             try
             {
-                Logger.Log($"ExcecutePoll Step 1 {subcom} {timeout}");
-
                 int idx = 0;
                 int i = 0;
 
@@ -310,7 +273,6 @@ namespace WashMachine.Forms.Modules.PaidBy.Machine.Octopus
 
                 MemsetHGlobal(gBufPtr, BUFSIZE);
                 Int32 r = Poll(subcom, timeout, gBufPtr);
-                Logger.Log($"ExcecutePoll Step 2 {r}");
 
                 CardInfo card = new CardInfo
                 {
@@ -394,7 +356,6 @@ namespace WashMachine.Forms.Modules.PaidBy.Machine.Octopus
                         }
                     }
                 }
-                Logger.Log($"ExcecutePoll Step 3 {JsonConvert.SerializeObject(card)}");
 
                 return card;
             }
@@ -556,7 +517,7 @@ namespace WashMachine.Forms.Modules.PaidBy.Machine.Octopus
 
         private bool IsCanRunXFile(DateTime dateTimeJob)
         {
-            string folderPath = Path.Combine(Directory.GetCurrentDirectory(), "jobs_tracking");
+            string folderPath = Path.Combine(Directory.GetCurrentDirectory(), "JobTracking");
 
             if (!Directory.Exists(folderPath))
             {
@@ -652,7 +613,7 @@ namespace WashMachine.Forms.Modules.PaidBy.Machine.Octopus
 
         private bool IsCanRunUpload(DateTime dateTimeJob)
         {
-            string folderPath = Path.Combine(Directory.GetCurrentDirectory(), "jobs_tracking");
+            string folderPath = Path.Combine(Directory.GetCurrentDirectory(), "JobTracking");
 
             if (!Directory.Exists(folderPath))
             {
@@ -684,7 +645,7 @@ namespace WashMachine.Forms.Modules.PaidBy.Machine.Octopus
 
         private bool IsCanRunDownload(DateTime dateTimeJob)
         {
-            string folderPath = Path.Combine(Directory.GetCurrentDirectory(), "jobs_tracking");
+            string folderPath = Path.Combine(Directory.GetCurrentDirectory(), "JobTracking");
 
             if (!Directory.Exists(folderPath))
             {
@@ -969,8 +930,52 @@ namespace WashMachine.Forms.Modules.PaidBy.Machine.Octopus
                 Logger.Log(ex);
             }
         }
-    }
 
+        public void AddLog(string message)
+        {
+            LogEvent2(message);
+        }
+
+        public bool IsConnected()
+        {
+            try
+            {
+                string[] ports = SerialPort.GetPortNames();
+                if (ports.Length == 0)
+                {
+                    return false;
+                }
+
+                var config = OctopusINI.ReadFileConfig();
+                if (config == null) return true;
+
+                string portName = "COM" + config.Port;
+                if (ports.Any(a => a.Equals(portName, StringComparison.OrdinalIgnoreCase)))
+                {
+                    using (SerialPort serialPort = new SerialPort(portName))
+                    {
+                        serialPort.Open();
+                        serialPort.Close();
+                        Console.WriteLine($"The port {portName} is available.");
+                        return false;
+                    }
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch (UnauthorizedAccessException)
+            {
+                Console.WriteLine($"The port is not available (it might be in use).");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"The port is not available: {ex.Message}");
+            }
+            return true;
+        }
+    }
     public class CardInfo
     {
         public string ShopCode { get; set; }

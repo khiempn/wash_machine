@@ -31,11 +31,6 @@ namespace WashMachine.Forms
                         string message = JsonConvert.SerializeObject(ex) + Environment.NewLine;
 
                         file.Write(DateTime.Now.ToString("MM/dd/yyyy hh:mm:ss tt") + ": " + message);
-
-                        Task.Run(() =>
-                        {
-                            new HttpService().Post($"{Program.AppConfig.AppHost}/LogApi/Log?message={message}", new { }).GetAwaiter();
-                        });
                     }
                 }
             }
@@ -47,18 +42,20 @@ namespace WashMachine.Forms
 
         public static void Log(string v)
         {
-            if (!string.IsNullOrWhiteSpace(v))
+            try
             {
-                var path = GetPath();
-                using (var file = new StreamWriter(path, true))
+                if (!string.IsNullOrWhiteSpace(v))
                 {
-                    file.Write(DateTime.Now.ToString("MM/dd/yyyy hh:mm:ss tt") + ": " + v + Environment.NewLine);
+                    var path = GetPath();
+                    using (var file = new StreamWriter(path, true))
+                    {
+                        file.Write(DateTime.Now.ToString("MM/dd/yyyy hh:mm:ss tt") + ": " + v + Environment.NewLine);
+                    }
                 }
-
-                Task.Run(() =>
-                {
-                    new HttpService().Post($"{Program.AppConfig.AppHost}/LogApi/Log?message={v}", new { }).GetAwaiter();
-                });
+            }
+            catch(Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
             }
         }
 

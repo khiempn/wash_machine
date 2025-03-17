@@ -46,18 +46,16 @@ namespace WashMachine.Forms.Modules.PaidBy.Service
 
         public void StopScan()
         {
-            machineService.DisconnectTimer();
+            machineService.StopWaitingPayment();
         }
 
         public Task StartScanning(PaymentModel payment)
         {
             try
             {
-                Logger.Log($"StartScanning Step 1");
                 var octopusService = machineService.ConnectOctopusAsync();
                 if (octopusService != null)
                 {
-                    Logger.Log($"StartScanning Step 2");
                     machineService.StartWaitingPayment(payment);
                 }
                 else
@@ -76,6 +74,7 @@ namespace WashMachine.Forms.Modules.PaidBy.Service
                 });
                 Logger.Log(ex);
             }
+
             return Task.FromResult(true);
         }
 
@@ -167,11 +166,6 @@ namespace WashMachine.Forms.Modules.PaidBy.Service
             //};
 
             //previewDialog.ShowDialog();
-        }
-
-        public void DisconnectOcotopus()
-        {
-            machineService.DisconnectOctopus();
         }
     }
 }

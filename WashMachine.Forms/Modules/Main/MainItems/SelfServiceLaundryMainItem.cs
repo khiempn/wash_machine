@@ -42,8 +42,6 @@ namespace WashMachine.Forms.Modules.Main.MainItems
             {
                 Dock = DockStyle.Fill,
                 Padding = new Padding(10),
-                Height = 50,
-                Width = 300,
                 ShapeBackgroudColor = ColorTranslator.FromHtml(cardItem.BackgroundColor),
                 ShapeBorderColor = Color.Black,
                 CornerRadius = 50,
@@ -59,9 +57,9 @@ namespace WashMachine.Forms.Modules.Main.MainItems
                 Enabled = false
             };
 
-            tblCardItem.RowStyles.Add(new RowStyle() { Height = 180, SizeType = SizeType.Absolute });
-            tblCardItem.RowStyles.Add(new RowStyle() { Height = 100, SizeType = SizeType.Absolute });
-            tblCardItem.ColumnStyles.Add(new ColumnStyle() { Width = 100, SizeType = SizeType.Percent });
+            tblCardItem.RowStyles.Add(new RowStyle() { Height = 1, SizeType = SizeType.Percent });
+            tblCardItem.RowStyles.Add(new RowStyle() { Height = 1, SizeType = SizeType.Percent });
+            tblCardItem.ColumnStyles.Add(new ColumnStyle() { Width = 1, SizeType = SizeType.Percent });
             Panel pnCover = new Panel
             {
                 BackgroundImage = cardItem.GetCoverImage(),

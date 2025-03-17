@@ -58,6 +58,9 @@ namespace WashMachine.Forms.Modules.PaidBy.PaidByItems
         {
             try
             {
+                waitingUI.StopTimerCloseAlert();
+                IsCancelPayment = true;
+
                 ProgressUI progressUI = new ProgressUI();
                 progressUI.SetParent(mainForm);
                 progressUI.Show();
@@ -70,12 +73,14 @@ namespace WashMachine.Forms.Modules.PaidBy.PaidByItems
                 {
                     paymeService.StopScan();
                 }
-                IsCancelPayment = true;
-                await shopService.CancelPayment(new PaymentModel()
+                if (_payment != null)
                 {
-                    Id = _payment.Id,
-                    Message = "Cancel request payment by press back home button"
-                });
+                    await shopService.CancelPayment(new PaymentModel()
+                    {
+                        Id = _payment.Id,
+                        Message = "Cancel the payment request by pressing the home button."
+                    });
+                }
 
                 progressUI.Hide();
                 mainForm.Controls.Remove(progressUI);
@@ -104,14 +109,13 @@ namespace WashMachine.Forms.Modules.PaidBy.PaidByItems
 
                 if (IsCancelPayment)
                 {
-                    Program.octopusService.SetUserIsUsingApp(false);
                     return;
                 }
 
                 if (string.IsNullOrWhiteSpace(message))
                 {
                     Logger.Log("SCAN BAR CODE IS EMPTY");
-                    waitingUI.SetErrorMessage("Can not complete payment Payme, please try again.");
+                    waitingUI.SetErrorMessage("Unable to complete the payment.");
                     Program.octopusService.SetUserIsUsingApp(false);
                     waitingUI.StartTimerCloseAlert();
                     return;
@@ -119,7 +123,7 @@ namespace WashMachine.Forms.Modules.PaidBy.PaidByItems
 
                 if (message == "No action in 20 seconds")
                 {
-                    waitingUI.SetErrorMessage("TIMEOUT: Please put your QR Code or Barcode to scanner.");
+                    waitingUI.SetErrorMessage("TIMEOUT: Please place your QR code or barcode on the scanner.");
                     Program.octopusService.SetUserIsUsingApp(false);
                     waitingUI.StartTimerCloseAlert();
                 }
@@ -128,8 +132,6 @@ namespace WashMachine.Forms.Modules.PaidBy.PaidByItems
                     EftPayResponseModel paymentResponse;
                     if (Program.AppConfig.ScanAlipayMode == 1)
                     {
-                        Logger.Log($"{nameof(PayMePaidByItem)} Step 1");
-
                         paymentResponse = await EftSale(new EftPayRequestModel()
                         {
                             TilNumber = Program.AppConfig.EftTilNumber,
@@ -154,7 +156,6 @@ namespace WashMachine.Forms.Modules.PaidBy.PaidByItems
                             CardJson = JsonConvert.SerializeObject(new TransactionRecord() { originalTraceNum = "123" }),
                         };
 
-                        waitingUI.Hide();
                         AlertSuccessfullyUI paymentAlertUI2 = new AlertSuccessfullyUI();
                         paymentAlertUI2.SetParent(mainForm);
                         paymentAlertUI2.SetPrintOrderModel(orderModel);
@@ -173,13 +174,17 @@ namespace WashMachine.Forms.Modules.PaidBy.PaidByItems
                     {
                         if (paymentResponse.IsSuccess)
                         {
-                            Logger.Log($"{nameof(PayMePaidByItem)} Step 14");
-                            Logger.Log($"{nameof(PayMePaidByItem)} Payment Successfully!.\n  {JsonConvert.SerializeObject(paymentResponse)}");
                             Service.Eft.ResponseCodeModel responseCode = paymentResponse.GetErrorResposeMessage();
 
                             if (paymentResponse.IsPaymentCompleted())
                             {
-                                OrderModel orderModel = await shopService.CompletePayment(new OrderModel()
+                                Program.octopusService.SetUserIsUsingAppWithScanning();
+                                waitingUI.SetSuccessMessage("付款成功\nPayment successfully!");
+                                waitingUI.StopTimerCloseAlert();
+                                ProgressUI progressUI = new ProgressUI();
+                                progressUI.SetParent(mainForm);
+                                progressUI.Show();
+                                OrderModel orderRequest = new OrderModel()
                                 {
                                     ShopCode = _payment.ShopCode,
                                     ShopName = _payment.ShopName,
@@ -190,56 +195,34 @@ namespace WashMachine.Forms.Modules.PaidBy.PaidByItems
                                     PaymentTypeName = _payment.PaymentTypeName,
                                     DeviceId = System.Environment.MachineName,
                                     CardJson = JsonConvert.SerializeObject(paymentResponse.TransactionRecord),
+                                    Message = "Payment successfully!"
+                                };
+
+                                await shopService.CompletePayment(orderRequest);
+                                await shopService.UpdatePayment(new PaymentModel()
+                                {
+                                    Id = _payment.Id,
+                                    PaymentStatus = (int)PaymentStatus.Completed,
+                                    Message = "Payment successfully!"
                                 });
 
-                                if (orderModel != null)
+                                paymentItem.PaymentCompletedCallBack.Invoke(mainForm, () =>
                                 {
-                                    Program.octopusService.SetUserIsUsingAppWithScanning();
-                                    waitingUI.Hide();
-                                    waitingUI.SetSuccessMessage("Payment successfully!");
-
-                                    Logger.Log($"{nameof(PayMePaidByItem)} {JsonConvert.SerializeObject(paymentResponse)}");
-                                    Logger.Log($"{nameof(PayMePaidByItem)} Step 14");
+                                    progressUI.Hide();
+                                    mainForm.Controls.Remove(progressUI);
 
                                     AlertSuccessfullyUI paymentAlertUI = new AlertSuccessfullyUI();
                                     paymentAlertUI.SetParent(mainForm);
-                                    paymentAlertUI.SetPrintOrderModel(orderModel);
+                                    paymentAlertUI.SetPrintOrderModel(orderRequest);
                                     paymentAlertUI.HomeClick += PaymentAlertUI_HomeClick;
                                     paymentAlertUI.PrinterClick += PaymentAlertUI_PrinterClick;
-                                    paymentAlertUI.SetPaymeInvoice(orderModel);
-                                    paymentAlertUI.Enabled = false;
+                                    paymentAlertUI.SetPaymeInvoice(orderRequest);
                                     paymentAlertUI.Show();
-
-                                    await shopService.UpdatePayment(new PaymentModel()
-                                    {
-                                        Id = _payment.Id,
-                                        PaymentStatus = (int)PaymentStatus.Completed,
-                                        Message = "Payment successfully!"
-                                    });
-
-                                    paymentItem.PaymentCompletedCallBack.Invoke(mainForm, () =>
-                                    {
-                                        paymentAlertUI.Enabled = true;
-                                    });
-                                }
-                                else
-                                {
-                                    Logger.Log($"Can not create order througt API.");
-                                    waitingUI.SetErrorMessage("Can not complete payment Payme, please try again.");
-                                    await shopService.UpdatePayment(new PaymentModel()
-                                    {
-                                        Id = _payment.Id,
-                                        PaymentStatus = (int)PaymentStatus.Failed,
-                                        Message = $"Can not create order througt API."
-                                    });
-                                    waitingUI.StartTimerCloseAlert();
-                                    Program.octopusService.SetUserIsUsingApp(false);
-                                }
+                                });
                             }
                             else
                             {
                                 string messagesResponse = "Can not complete payment Payme, please try again.";
-
                                 if (responseCode != null)
                                 {
                                     messagesResponse = $"RESPONSE CODE: {responseCode.Code}\n{responseCode.En_Message}\n{responseCode.Cn_Message}";
@@ -258,7 +241,6 @@ namespace WashMachine.Forms.Modules.PaidBy.PaidByItems
                         }
                         else
                         {
-                            Logger.Log($"{nameof(PayMePaidByItem)} Can not complete payment. {JsonConvert.SerializeObject(paymentResponse)}");
                             waitingUI.SetErrorMessage("Can not complete payment Payme, please try again.");
                             await shopService.UpdatePayment(new PaymentModel()
                             {
@@ -274,13 +256,18 @@ namespace WashMachine.Forms.Modules.PaidBy.PaidByItems
                     {
                         if (paymentResponse.IsSuccess)
                         {
-                            Logger.Log($"{nameof(PayMePaidByItem)} Step 14");
-                            Logger.Log($"{nameof(PayMePaidByItem)} Payment Successfully!.\n  {JsonConvert.SerializeObject(paymentResponse)}");
                             Service.Eft.ResponseCodeModel responseCode = paymentResponse.GetErrorResposeMessage();
 
                             if (paymentResponse.IsPaymentCompleted())
                             {
-                                OrderModel orderModel = await shopService.CompletePayment(new OrderModel()
+                                Program.octopusService.SetUserIsUsingAppWithScanning();
+                                waitingUI.StopTimerCloseAlert();
+                                waitingUI.SetSuccessMessage("付款成功\nPayment successfully!");
+                                ProgressUI progressUI = new ProgressUI();
+                                progressUI.SetParent(mainForm);
+                                progressUI.Show();
+
+                                OrderModel orderRequest = new OrderModel()
                                 {
                                     ShopCode = _payment.ShopCode,
                                     ShopName = _payment.ShopName,
@@ -292,48 +279,29 @@ namespace WashMachine.Forms.Modules.PaidBy.PaidByItems
                                     DeviceId = System.Environment.MachineName,
                                     CardJson = JsonConvert.SerializeObject(paymentResponse.TransactionRecord),
                                     Message = "Payment successfully!"
+                                };
+
+                                await shopService.CompletePayment(orderRequest);
+                                await shopService.UpdatePayment(new PaymentModel()
+                                {
+                                    Id = _payment.Id,
+                                    PaymentStatus = (int)PaymentStatus.Completed,
+                                    Message = "Payment successfully!"
                                 });
 
-                                if (orderModel != null)
+                                paymentItem.PaymentCompletedCallBack.Invoke(mainForm, () =>
                                 {
-                                    Program.octopusService.SetUserIsUsingAppWithScanning();
-                                    waitingUI.Hide();
-                                    waitingUI.SetSuccessMessage("Payment successfully!");
+                                    progressUI.Hide();
+                                    mainForm.Controls.Remove(progressUI);
 
                                     AlertSuccessfullyUI paymentAlertUI = new AlertSuccessfullyUI();
                                     paymentAlertUI.SetParent(mainForm);
-                                    paymentAlertUI.SetPrintOrderModel(orderModel);
+                                    paymentAlertUI.SetPrintOrderModel(orderRequest);
                                     paymentAlertUI.HomeClick += PaymentAlertUI_HomeClick;
                                     paymentAlertUI.PrinterClick += PaymentAlertUI_PrinterClick;
-                                    paymentAlertUI.SetPaymeInvoice(orderModel);
-                                    paymentAlertUI.Enabled = false;
+                                    paymentAlertUI.SetPaymeInvoice(orderRequest);
                                     paymentAlertUI.Show();
-
-                                    await shopService.UpdatePayment(new PaymentModel()
-                                    {
-                                        Id = _payment.Id,
-                                        PaymentStatus = (int)PaymentStatus.Completed,
-                                        Message = "Payment successfully!"
-                                    });
-
-                                    paymentItem.PaymentCompletedCallBack.Invoke(mainForm, () =>
-                                    {
-                                        paymentAlertUI.Enabled = true;
-                                    });
-                                }
-                                else
-                                {
-                                    Logger.Log($"Can not create order througt API.");
-                                    waitingUI.SetErrorMessage("Can not complete payment Payme, please try again.");
-                                    await shopService.UpdatePayment(new PaymentModel()
-                                    {
-                                        Id = _payment.Id,
-                                        PaymentStatus = (int)PaymentStatus.Failed,
-                                        Message = "Can not create order througt API."
-                                    });
-                                    waitingUI.StartTimerCloseAlert();
-                                    Program.octopusService.SetUserIsUsingApp(false);
-                                }
+                                });
                             }
                             else
                             {
@@ -341,9 +309,7 @@ namespace WashMachine.Forms.Modules.PaidBy.PaidByItems
                                 if (responseCode != null)
                                 {
                                     messageResponse = $"RESPONSE CODE: {responseCode.Code}\n{responseCode.En_Message}\n{responseCode.Cn_Message}";
-                                    
                                 }
-                                Logger.Log(messageResponse);
                                 waitingUI.SetErrorMessage(messageResponse);
                                 await shopService.UpdatePayment(new PaymentModel()
                                 {
@@ -357,22 +323,18 @@ namespace WashMachine.Forms.Modules.PaidBy.PaidByItems
                         }
                         else
                         {
-                            Logger.Log($"{nameof(PayMePaidByItem)} Step 14");
-                            Logger.Log($"{nameof(PayMePaidByItem)} Payment Failed!. {JsonConvert.SerializeObject(paymentResponse)}");
                             Service.Eft.ResponseCodeModel responseCode = paymentResponse.GetErrorResposeMessage();
                             ErrorCodeModel errorCode = paymentResponse.GetErrorMessage();
                             string messageResponse = "Payment Failed!.";
                             if (responseCode != null)
                             {
                                 messageResponse = $"RESPONSE CODE: {responseCode.Code}\n{responseCode.En_Message}\n{responseCode.Cn_Message}";
-
                                 waitingUI.SetErrorMessage(messageResponse);
                             }
                             else if (errorCode != null)
                             {
                                 messageResponse = $"ERROR CODE: {errorCode.Code}\n{errorCode.En_Message}\n{errorCode.Cn_Message}";
                             }
-                            Logger.Log(messageResponse);
                             await shopService.UpdatePayment(new PaymentModel()
                             {
                                 Id = _payment.Id,
@@ -401,7 +363,7 @@ namespace WashMachine.Forms.Modules.PaidBy.PaidByItems
             paymeService.Printer(orderModel);
         }
 
-        private async void PaymentAlertUI_HomeClick(object sender, EventArgs e)
+        private void PaymentAlertUI_HomeClick(object sender, EventArgs e)
         {
             try
             {
@@ -417,14 +379,7 @@ namespace WashMachine.Forms.Modules.PaidBy.PaidByItems
                 {
                     paymeService.StopScan();
                 }
-                IsCancelPayment = true;
-
-                await shopService.CancelPayment(new PaymentModel()
-                {
-                    Id = _payment.Id,
-                    Message = "Cancel request payment by press back button"
-                });
-
+                IsCancelPayment = false;
                 progressUI.Hide();
                 mainForm.Controls.Remove(progressUI);
             }
@@ -440,6 +395,9 @@ namespace WashMachine.Forms.Modules.PaidBy.PaidByItems
         {
             try
             {
+                waitingUI.StopTimerCloseAlert();
+                IsCancelPayment = true;
+
                 ProgressUI progressUI = new ProgressUI();
                 progressUI.SetParent(mainForm);
                 progressUI.Show();
@@ -452,13 +410,15 @@ namespace WashMachine.Forms.Modules.PaidBy.PaidByItems
                 {
                     paymeService.StopScan();
                 }
-                IsCancelPayment = true;
 
-                await shopService.CancelPayment(new PaymentModel()
+                if (_payment != null)
                 {
-                    Id = _payment.Id,
-                    Message = "Cancel request payment by press back button"
-                });
+                    await shopService.CancelPayment(new PaymentModel()
+                    {
+                        Id = _payment.Id,
+                        Message = "Cancel the payment request by pressing the back button."
+                    });
+                }
 
                 progressUI.Hide();
                 mainForm.Controls.Remove(progressUI);
@@ -494,8 +454,6 @@ namespace WashMachine.Forms.Modules.PaidBy.PaidByItems
             CardButtonRoundedUI cardButton = new CardButtonRoundedUI()
             {
                 Dock = DockStyle.Fill,
-                Height = 170,
-                Width = 50,
                 Padding = new Padding(10),
                 ShapeBackgroudColor = ColorTranslator.FromHtml(cardItem.BackgroundColor),
                 ShapeBorderColor = Color.Black,
@@ -512,9 +470,7 @@ namespace WashMachine.Forms.Modules.PaidBy.PaidByItems
             };
             Label lbTitle = new Label()
             {
-                Text = "",
                 BackColor = Color.Transparent,
-                Width = 100,
                 ForeColor = Color.White,
                 TextAlign = ContentAlignment.MiddleCenter,
                 Tag = cardButton,
@@ -558,9 +514,11 @@ namespace WashMachine.Forms.Modules.PaidBy.PaidByItems
                     Amount = paymentItem.PaymentAmount
                 });
                 _payment = payment;
+
                 if (_payment == null)
                 {
-                    waitingUI.SetErrorMessage("Can not complete payment Payme, please try again.");
+                    waitingUI.SetErrorMessage("Unable to create a payment for Payme. Please try again.");
+                    waitingUI.StartTimerCloseAlert();
                     Program.octopusService.SetUserIsUsingApp(false);
                     return;
                 }
@@ -590,7 +548,7 @@ namespace WashMachine.Forms.Modules.PaidBy.PaidByItems
             }
             catch (Exception ex)
             {
-                waitingUI.SetErrorMessage("Can not complete payment Payme, please try again.");
+                waitingUI.SetErrorMessage("There is an exception during the initial payment.");
                 Program.octopusService.SetUserIsUsingApp(false);
                 Logger.Log(ex);
             }

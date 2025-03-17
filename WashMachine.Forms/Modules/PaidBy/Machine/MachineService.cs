@@ -4,7 +4,6 @@ using System;
 using System.IO.Ports;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Collections.Generic;
 
 namespace WashMachine.Forms.Modules.PaidBy.Machine
 {
@@ -137,7 +136,7 @@ namespace WashMachine.Forms.Modules.PaidBy.Machine
         {
             try
             {
-                if (octopusService != null && octopusService.IsInitialCompleted)
+                if (octopusService != null && octopusService.IsInitialSuccessfully)
                 {
                     return octopusService;
                 }
@@ -174,11 +173,11 @@ namespace WashMachine.Forms.Modules.PaidBy.Machine
             return null;
         }
 
-        public Task<bool> DisconnectTimer()
+        public Task<bool> StopWaitingPayment()
         {
             try
             {
-                bool status = octopusService.DisconnectTimer();
+                bool status = octopusService.StopWaitingPayment();
                 if (status)
                 {
                     return Task.FromResult(true);
@@ -189,11 +188,6 @@ namespace WashMachine.Forms.Modules.PaidBy.Machine
                 Logger.Log(ex);
             }
             return Task.FromResult(false);
-        }
-
-        public void DisconnectOctopus()
-        {
-            octopusService.Disconnect();
         }
     }
 }

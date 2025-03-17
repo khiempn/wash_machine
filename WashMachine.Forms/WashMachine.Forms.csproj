@@ -99,6 +99,7 @@
     <Compile Include="Common\UI\ProgressUI.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Common\Utils\ScaleUtil.cs" />
     <Compile Include="CryptLibrary.cs" />
     <Compile Include="Database\Context\AppDbContext.cs" />
     <Compile Include="Database\Tables\ICRUD.cs" />

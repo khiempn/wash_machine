@@ -57,8 +57,6 @@ namespace WashMachine.Forms.Modules.LaundryWashOption.TimeOptionItems
         {
             ButtonRoundedUI btn = new ButtonRoundedUI()
             {
-                Height = 65,
-                Width = 150,
                 Text = "15 分鐘 (mins) / HKD 15",
                 ShapeBackgroudColor = ColorTranslator.FromHtml("#ffc000"),
                 ShapeSelectedBackgroudColor = Color.Blue,

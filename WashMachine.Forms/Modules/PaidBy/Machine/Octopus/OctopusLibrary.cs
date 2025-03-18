@@ -990,11 +990,20 @@ namespace WashMachine.Forms.Modules.PaidBy.Machine.Octopus
         public string CardId { get; set; }
         public DateTime CreateDated { get; set; }
         public string OctopusNo { get { return CardId; } }
+        /// <summary>
+        /// Returns Remaining Value if successful or Error Code otherwise.
+        /// </summary>
         public int RemainValue { get { return Rs; } }
         public List<TransactionInfo> Transactions { get; set; }
+        /// <summary>
+        /// In the format <Octopus Type>-<AV mach>-<Class>-<Lang>-<Avail Fund>
+        /// </summary>
         public string CustomerInfo { get; set; }
         public string IDm { get; set; }
-        public string CardType
+        /// <summary>
+        /// For Octopus Type 1, the whole line of the Remaining Value (terms and value) should not be  displayed and/or printed
+        /// </summary>
+        public int OctopusType
         {
             get
             {
@@ -1002,9 +1011,9 @@ namespace WashMachine.Forms.Modules.PaidBy.Machine.Octopus
                 string[] items = info.Split('-');
                 if (items.Length > 0)
                 {
-                    return items[0];
+                    return int.Parse(items[0]);
                 }
-                return string.Empty;
+                return -1;
             }
         }
         public string LastAddType { get; set; }

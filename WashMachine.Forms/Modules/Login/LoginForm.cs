@@ -190,11 +190,11 @@ namespace WashMachine.Forms.Modules.Login
 
             Task.Run(async () =>
             {
-                //Thread.Sleep(5000);
+                Thread.Sleep(5000);
                 try
                 {
-                    //Program.ShopConfig = Program.AppConfig.GetShopConfig();
-                    //await Program.ShopConfig.ShopSetting.LoadImages();
+                    Program.ShopConfig = Program.AppConfig.GetShopConfig();
+                    await Program.ShopConfig.ShopSetting.LoadImages();
                 }
                 finally
                 {

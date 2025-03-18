@@ -259,9 +259,13 @@ namespace WashMachine.Forms.Modules.PaidBy.Dialog
                 $"總額 (Total): HKD {FormatDecimal(orderModel.Amount)}",
                 "八達通付款(Octopus payment)",
                 $"八達通號碼(Octopus no.): {cardInfo.OctopusNo}",
-                $"扣除金額 (Amount deducted): -HKD {FormatDecimal(orderModel.Amount, 1)}",
-                $"餘額 (Remaining Value)： HKD {FormatDecimal(cardInfo.RemainValue, 1)}"
+                $"扣除金額 (Amount deducted): -HKD {FormatDecimal(orderModel.Amount, 1)}"
             };
+
+            if (cardInfo.OctopusType != -1 && cardInfo.OctopusType != 1)
+            {
+                lines.Add($"餘額 (Remaining Value)： HKD {FormatDecimal(cardInfo.RemainValue, 1)}");
+            }
 
             if (!string.IsNullOrEmpty(lastAddValueMessageEn))
             {

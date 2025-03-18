@@ -19,6 +19,7 @@
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
     <TargetFrameworkProfile />
+    <IsWebBootstrapper>false</IsWebBootstrapper>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -31,7 +32,6 @@
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
@@ -53,6 +53,9 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>c18z4557.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="EFTPaymentsServer, Version=4.0.5.72, Culture=neutral, processorArchitecture=x86">
@@ -256,11 +259,26 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ShopConfigModel.cs" />
+    <EmbeddedResource Include="Modules\LaundryDryerOption\LaundryDryerOptionForm.resx">
+      <DependentUpon>LaundryDryerOptionForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Modules\LaundryWashOption\LaundryWashOptionForm.resx">
+      <DependentUpon>LaundryWashOptionForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Modules\Laundry\LaundryForm.resx">
+      <DependentUpon>LaundryForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Modules\Login\LoginForm.resx">
       <DependentUpon>LoginForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Modules\Main\MainForm.resx">
+      <DependentUpon>MainForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Modules\PaidBy\PaidByForm.resx">
       <DependentUpon>PaidByForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Modules\Shop\SignInShopForm.resx">
+      <DependentUpon>SignInShopForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -289,6 +307,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="c18z4557.ico" />
+    <Content Include="Icon\c18z4557.ico" />
+    <Content Include="Icon\c18z4557.png" />
     <Content Include="lib\EFTPaymentsServer.dll" />
     <Content Include="lib\EFTPaymentsServer.pdb" />
     <Content Include="lib\System.Data.SQLite.dll" />

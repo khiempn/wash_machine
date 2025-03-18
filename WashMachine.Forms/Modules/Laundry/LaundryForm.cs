@@ -17,7 +17,7 @@ namespace WashMachine.Forms.Modules.Laundry
         public LaundryForm(FollowType followType)
         {
             InitializeComponent();
-
+            Text = "Wash Machines System";
             FollowType = followType;
 
             ResizeRedraw = false;

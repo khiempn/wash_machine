@@ -33,7 +33,7 @@ namespace WashMachine.Forms.Modules.Shop
 
             tlpSignInShopForm = new TableLayoutPanel()
             {
-                Width = 450,
+                Width = 550,
                 Height = 150,
                 Padding = new Padding(10),
                 Name = "MainLayout",
@@ -42,7 +42,7 @@ namespace WashMachine.Forms.Modules.Shop
             tlpSignInShopForm.Paint += TlpSignInShopForm_Paint;
             tlpSignInShopForm.RowStyles.Add(new RowStyle() { Height = 1, SizeType = SizeType.Percent });
             tlpSignInShopForm.RowStyles.Add(new RowStyle() { Height = 2, SizeType = SizeType.Percent });
-            tlpSignInShopForm.ColumnStyles.Add(new ColumnStyle() { Width = 2, SizeType = SizeType.Percent });
+            tlpSignInShopForm.ColumnStyles.Add(new ColumnStyle() { Width = 5, SizeType = SizeType.Percent });
             tlpSignInShopForm.ColumnStyles.Add(new ColumnStyle() { Width = 1, SizeType = SizeType.Percent });
 
             tlpSignInShopForm.Controls.Add(new Label() { Text = "Wellcome to Wash Machines System", Dock = DockStyle.Fill });

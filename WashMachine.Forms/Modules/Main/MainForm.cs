@@ -17,6 +17,7 @@ namespace WashMachine.Forms.Modules.Main
         public MainForm(FollowType followType)
         {
             InitializeComponent();
+            Text = "Wash Machines System";
             FollowType = followType;
 
             ResizeRedraw = false;

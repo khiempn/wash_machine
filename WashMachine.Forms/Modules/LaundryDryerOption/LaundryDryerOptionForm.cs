@@ -26,7 +26,7 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption
         public LaundryDryerOptionForm(ILaundryItem laundryItem, FollowType followType)
         {
             InitializeComponent();
-
+            Text = "Wash Machines System";
             FollowType = followType;
 
             ResizeRedraw = false;

@@ -19,7 +19,7 @@ namespace WashMachine.Forms.Modules.PaidBy
         public PaidByForm(FollowType followType, IPaymentItem paymentItem)
         {
             InitializeComponent();
-            Text = "Coins System";
+            Text = "Wash Machines System";
 
             FollowType = followType;
        

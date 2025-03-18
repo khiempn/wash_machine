@@ -10,6 +10,7 @@ using WashMachine.Forms.Modules.LaundryWashOption.LaundryOptionItems;
 using WashMachine.Forms.Modules.LaundryWashOption.PaymentItems;
 using WashMachine.Forms.Modules.LaundryWashOption.TimeOptionItems;
 using WashMachine.Forms.Modules.Login;
+using WashMachine.Forms.Properties;
 
 namespace WashMachine.Forms.Modules.LaundryWashOption
 {
@@ -23,7 +24,7 @@ namespace WashMachine.Forms.Modules.LaundryWashOption
         public LaundryWashOptionForm(ILaundryItem laundryItem, FollowType followType)
         {
             InitializeComponent();
-
+            Text = "Wash Machines System";
             FollowType = followType;
 
             ResizeRedraw = false;

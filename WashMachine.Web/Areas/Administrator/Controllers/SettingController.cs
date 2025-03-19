@@ -87,5 +87,37 @@ namespace WashMachine.Web.Areas.Administrator.Controllers
             var systemInfo = service.GetSystemInfo(userId);
             return View("OctopusSetting", systemInfo.Setting);
         }
+
+
+        public IActionResult WashmachineCommand()
+        {
+            var service = _business.GetService<SettingService>();
+            var userInfo = HttpContext.GetUserInfo();
+            var userId = TextUtilities.GetInt(userInfo.Id);
+            var systemInfo = service.GetSystemInfo(userId);
+            return View("WashmachineCommand", systemInfo.Setting);
+        }
+
+        [HttpPost]
+        public IActionResult WashmachineCommand(SettingModel model)
+        {
+            var errors = ModelState.Values.SelectMany(v => v.Errors);
+            if (!ModelState.IsValid) return View(model);
+
+            var service = _business.GetService<SettingService>();
+            var result = service.SaveSetting(model);
+            if (!result.Success)
+            {
+                ModelState.AddModelError(result.Name, result.Message);
+                return View(model);
+            }
+            TempData.SetMessage(result.Message);
+
+            var userInfo = HttpContext.GetUserInfo();
+            var userId = TextUtilities.GetInt(userInfo.Id);
+            var systemInfo = service.GetSystemInfo(userId);
+            return View("GeneralSetting", systemInfo.Setting);
+        }
+
     }
 }

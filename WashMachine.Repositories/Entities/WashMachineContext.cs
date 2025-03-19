@@ -23,6 +23,7 @@ namespace WashMachine.Repositories.Entities
         public virtual DbSet<ShopCom> ShopCom { get; set; }
         public virtual DbSet<Log> Log { get; set; }
         public virtual DbSet<EmailTemplate> EmailTemplate { get; set; }
+        public virtual DbSet<MachineCommand> MachineCommand { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

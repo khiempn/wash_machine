@@ -1,0 +1,157 @@
+﻿@model WashMachine.Business.Models.MachineCommandModel
+@{
+    ViewData["Title"] = "Wash machine commands";
+}
+<div class="mannager-content">
+    <div class="manager-list">
+        <nav>
+            <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                <a class="nav-link active" data-toggle="tab" href="#" tab="#octopus_job_tab" role="tab" aria-controls="nav-home" aria-selected="true">Information</a>
+            </div>
+        </nav>
+        <div class="tab-content w-100" id="nav-tabContent" style="padding-top: 15px;">
+            <form class="body-content" action="/administrator/setting/OctopusSetting" name="form" enctype="multipart/form-data" method="post">
+                <div class="tab-pane box-15" id="octopus_job_tab" role="tabpanel" aria-labelledby="nav-home-tab">
+                    <div class="wap-500">
+                        <div class="form-area form-editor">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5>Command of washing machine</h5>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <table class="table" id="shop_list">
+                                                <thead>
+                                                    <tr>
+                                                        <th rowspan="2" style="text-align: center;vertical-align: middle;">Name</th>
+                                                        <th rowspan="2" style="text-align: center;vertical-align: middle;">Machine</th>
+                                                        <th rowspan="2" style="text-align: center;vertical-align: middle;">Address</th>
+                                                        <th colspan="4" style="text-align: center;">Command</th>
+                                                    </tr>
+                                                    <tr>
+                                                        <th style="text-align: center;">Machine 1</th>
+                                                        <th style="text-align: center;">Machine 2</th>
+                                                        <th style="text-align: center;">Machine 3</th>
+                                                        <th style="text-align: center;">Machine 4</th>
+                                                    </tr>
+                                                </thead>
+                                                
+                                                <tbody>
+                                                    <tr>
+                                                        <td rowspan="4" style="vertical-align: middle;">Select Program</td>
+                                                        <td>Machine 1</td>
+                                                        <td rowspan="4" style="vertical-align: middle;">0x126</td>
+                                                        <td><input name="@(nameof(Model.Wash01LaundryItem_Minute15TimeOptionItem))" value="@Model.Wash01LaundryItem_Minute15TimeOptionItem" /></td>
+                                                        <td><input name="@(nameof(Model.Wash02LaundryItem_Minute15TimeOptionItem))" value="@Model.Wash02LaundryItem_Minute15TimeOptionItem" /></td>
+                                                        <td><input name="@(nameof(Model.Wash03LaundryItem_Minute15TimeOptionItem))" value="@Model.Wash03LaundryItem_Minute15TimeOptionItem" /></td>
+                                                        <td><input name="@(nameof(Model.Wash04LaundryItem_Minute15TimeOptionItem))" value="@Model.Wash04LaundryItem_Minute15TimeOptionItem" /></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Machine 2</td>
+                                                        <td><input name="@(nameof(Model.Wash01LaundryItem_Minute30TimeOptionItem))" value="@Model.Wash01LaundryItem_Minute30TimeOptionItem" /></td>
+                                                        <td><input name="@(nameof(Model.Wash02LaundryItem_Minute30TimeOptionItem))" value="@Model.Wash02LaundryItem_Minute30TimeOptionItem" /></td>
+                                                        <td><input name="@(nameof(Model.Wash03LaundryItem_Minute30TimeOptionItem))" value="@Model.Wash03LaundryItem_Minute30TimeOptionItem" /></td>
+                                                        <td><input name="@(nameof(Model.Wash04LaundryItem_Minute30TimeOptionItem))" value="@Model.Wash04LaundryItem_Minute30TimeOptionItem" /></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Machine 3</td>
+                                                        <td><input name="@(nameof(Model.Wash01LaundryItem_Minute40TimeOptionItem))" value="@Model.Wash01LaundryItem_Minute40TimeOptionItem" /></td>
+                                                        <td><input name="@(nameof(Model.Wash02LaundryItem_Minute40TimeOptionItem))" value="@Model.Wash02LaundryItem_Minute40TimeOptionItem" /></td>
+                                                        <td><input name="@(nameof(Model.Wash03LaundryItem_Minute40TimeOptionItem))" value="@Model.Wash03LaundryItem_Minute40TimeOptionItem" /></td>
+                                                        <td><input name="@(nameof(Model.Wash04LaundryItem_Minute40TimeOptionItem))" value="@Model.Wash04LaundryItem_Minute40TimeOptionItem" /></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Machine 4</td>
+                                                        <td><input name="@(nameof(Model.Wash01LaundryItem_Minute45TimeOptionItem))" value="@Model.Wash01LaundryItem_Minute45TimeOptionItem" /></td>
+                                                        <td><input name="@(nameof(Model.Wash02LaundryItem_Minute45TimeOptionItem))" value="@Model.Wash02LaundryItem_Minute45TimeOptionItem" /></td>
+                                                        <td><input name="@(nameof(Model.Wash03LaundryItem_Minute45TimeOptionItem))" value="@Model.Wash03LaundryItem_Minute45TimeOptionItem" /></td>
+                                                        <td><input name="@(nameof(Model.Wash04LaundryItem_Minute45TimeOptionItem))" value="@Model.Wash04LaundryItem_Minute45TimeOptionItem" /></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Implement</td>
+                                                        <td></td>
+                                                        <td>0x127</td>
+                                                        <td><input name="@(nameof(Model.Wash01LaundryItem_ImplementCommand))" value="@Model.Wash01LaundryItem_ImplementCommand" /></td>
+                                                        <td><input name="@(nameof(Model.Wash02LaundryItem_ImplementCommand))" value="@Model.Wash02LaundryItem_ImplementCommand" /></td>
+                                                        <td><input name="@(nameof(Model.Wash03LaundryItem_ImplementCommand))" value="@Model.Wash03LaundryItem_ImplementCommand" /></td>
+                                                        <td><input name="@(nameof(Model.Wash04LaundryItem_ImplementCommand))" value="@Model.Wash04LaundryItem_ImplementCommand" /></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td rowspan="2" style="vertical-align: middle;">ukno</td>
+                                                        <td>Stop</td>
+                                                        <td rowspan="2" style="vertical-align: middle;">0x127</td>
+                                                        <td><input name="@(nameof(Model.Wash01LaundryItem_StopCommand))" value="@Model.Wash01LaundryItem_StopCommand" /></td>
+                                                        <td><input name="@(nameof(Model.Wash02LaundryItem_StopCommand))" value="@Model.Wash02LaundryItem_StopCommand" /></td>
+                                                        <td><input name="@(nameof(Model.Wash03LaundryItem_StopCommand))" value="@Model.Wash03LaundryItem_StopCommand" /></td>
+                                                        <td><input name="@(nameof(Model.Wash04LaundryItem_StopCommand))" value="@Model.Wash04LaundryItem_StopCommand" /></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Unlock</td>
+                                                        <td><input name="@(nameof(Model.Wash01LaundryItem_UnlockCommand))" value="@Model.Wash01LaundryItem_UnlockCommand" /></td>
+                                                        <td><input name="@(nameof(Model.Wash02LaundryItem_UnlockCommand))" value="@Model.Wash02LaundryItem_UnlockCommand" /></td>
+                                                        <td><input name="@(nameof(Model.Wash03LaundryItem_UnlockCommand))" value="@Model.Wash03LaundryItem_UnlockCommand" /></td>
+                                                        <td><input name="@(nameof(Model.Wash04LaundryItem_UnlockCommand))" value="@Model.Wash04LaundryItem_UnlockCommand" /></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5>Command of Dryer</h5>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <table class="table" id="shop_list">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Name</th>
+                                                        <th>Action</th>
+                                                        <th>Address</th>
+                                                        <th>Dryer No.1</th>
+                                                        <th>Dryer No.2</th>
+                                                        <th>Dryer No.3</th>
+                                                        <th>Dryer No.4</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td rowspan="3" style="vertical-align: middle;">Select the temperature</td>
+                                                        <td>High</td>
+                                                        <td rowspan="3" style="vertical-align: middle;">0x166</td>
+                                                        <td><input /></td>
+                                                        <td><input /></td>
+                                                        <td><input /></td>
+                                                        <td><input /></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Medium</td>
+                                                        <td><input /></td>
+                                                        <td><input /></td>
+                                                        <td><input /></td>
+                                                        <td><input /></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Low</td>
+                                                        <td><input /></td>
+                                                        <td><input /></td>
+                                                        <td><input /></td>
+                                                        <td><input /></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-button" style="float: right">
+                    <a class="btn btn-secondary" href="@Context.GetBaseUrl()">Back</a>
+                    <button type="submit" class="btn btn-primary"><i class="far fa-save"></i> Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -10,6 +10,7 @@ using WashMachine.Forms.Database.Tables.Machine;
 using WashMachine.Forms.Modules.Laundry;
 using WashMachine.Forms.Modules.LaundryDryerOption.TempOptionItems;
 using WashMachine.Forms.Modules.LaundryDryerOption.TimeOptionItems;
+using WashMachine.Forms.Modules.Shop.Model;
 
 namespace WashMachine.Forms.Modules.LaundryDryerOption.LaundryOptionItems
 {
@@ -17,14 +18,14 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.LaundryOptionItems
     {
         public string Name => nameof(Dryer01LaundryItem);
 
-        public Dictionary<string, string> TemperatureCommands => new Dictionary<string, string>()
+        public Dictionary<string, string> TemperatureCommands { get; set; } = new Dictionary<string, string>()
         {
             { nameof(HighTempOptionItem), "01 06 01 66 00 01 A9 E9" },
             { nameof(MidTempOptionItem), "01 06 01 66 00 01 E9 E8" },
             { nameof(LowTempOptionItem), "01 06 01 66 00 01 28 28" },
         };
 
-        public Dictionary<string, string> TimeCommands => new Dictionary<string, string>()
+        public Dictionary<string, string> TimeCommands { get; set; } = new Dictionary<string, string>()
         {
             { nameof(Minute30TimeOptionItem), "01 06 01 67 00 1E B9 E1" },
             { nameof(Minute40TimeOptionItem), "01 06 01 67 00 3C 39 F8" },
@@ -32,7 +33,8 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.LaundryOptionItems
             { nameof(Minute60TimeOptionItem), "01 06 01 67 00 78 39 CB" }
         };
 
-        public string ImplementCommand => "01 06 01 68 00 01 C8 2A";
+        public string ImplementCommand { get; set; } = "01 06 01 68 00 01 C8 2A";
+        public string StopCommand { get; set; }
 
         Form mainForm;
 
@@ -42,6 +44,31 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.LaundryOptionItems
         {
             mainForm = parent;
             machineService = new Machine.MachineService();
+            LoadConfig();
+        }
+
+        private void LoadConfig()
+        {
+            ShopConfigModel shopConfig = Program.ShopConfig;
+            MachineCommandModel command = shopConfig.ShopSetting.MachineCommandConfig;
+
+            TemperatureCommands = new Dictionary<string, string>()
+            {
+                { nameof(HighTempOptionItem), command.Dryer01LaundryItem_HighTempOptionItem },
+                { nameof(MidTempOptionItem), command.Dryer01LaundryItem_MidTempOptionItem },
+                { nameof(LowTempOptionItem), command.Dryer01LaundryItem_LowTempOptionItem },
+            };
+
+            TimeCommands = new Dictionary<string, string>()
+            {
+                { nameof(Minute30TimeOptionItem), command.Dryer01LaundryItem_Minute30TimeOptionItem },
+                { nameof(Minute40TimeOptionItem), command.Dryer01LaundryItem_Minute40TimeOptionItem },
+                { nameof(Minute50TimeOptionItem), command.Dryer01LaundryItem_Minute50TimeOptionItem },
+                { nameof(Minute60TimeOptionItem), command.Dryer01LaundryItem_Minute60TimeOptionItem }
+            };
+
+            ImplementCommand = command.Dryer01LaundryItem_ImplementCommand;
+            StopCommand = command.Dryer01LaundryItem_StopCommand;
         }
 
         public void Click()
@@ -135,7 +162,7 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.LaundryOptionItems
                 Logger.Log($"{nameof(Dryer01LaundryItem)} Step 2 {JsonConvert.SerializeObject(appConfig)}");
                 bool isConnected = await machineService.ConnectAsync(appConfig.DollarCom, appConfig.DollarBaudRate, appConfig.DollarData, appConfig.DollarParity, appConfig.DollarStopBits);
 
-                if (isConnected || true)
+                if (isConnected)
                 {
                     Logger.Log($"{nameof(Dryer01LaundryItem)} Step 3");
                     string tempCommand = TemperatureCommands[$"{form.TempOptionItemSelected.Name}"];
@@ -155,6 +182,7 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.LaundryOptionItems
                 }
                 else
                 {
+                    MessageBox.Show("Unable connect to device, please try agiain", "Warning!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     Logger.Log($"{nameof(Dryer01LaundryItem)} Can not connect device.");
                 }
             });

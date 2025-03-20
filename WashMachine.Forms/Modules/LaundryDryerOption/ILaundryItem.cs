@@ -10,15 +10,16 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption
         /// <summary>
         /// Temperature Command List
         /// </summary>
-        Dictionary<string, string> TemperatureCommands { get; }
+        Dictionary<string, string> TemperatureCommands { get; set; }
         /// <summary>
         /// Time Command List
         /// </summary>
-        Dictionary<string, string> TimeCommands { get; }
+        Dictionary<string, string> TimeCommands { get; set; }
         /// <summary>
         /// Start Command
         /// </summary>
-        string ImplementCommand { get; }
+        string ImplementCommand { get; set; }
+        string StopCommand { get; set; }
         void Click();
         Control GetTemplate();
         void DisableItem(Control control);

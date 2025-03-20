@@ -1,6 +1,4 @@
-﻿using System;
-using System.Drawing;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace WashMachine.Forms.Modules.Shop.Model
 {
@@ -23,6 +21,8 @@ namespace WashMachine.Forms.Modules.Shop.Model
         public byte[] OctopusPaymentImg { get; set; }
         public byte[] PaymePaymentImg { get; set; }
         public byte[] AlipayPaymentImg { get; set; }
+
+        public MachineCommandModel MachineCommandConfig { get; set; } = new MachineCommandModel();
 
         public async Task LoadImages()
         {

@@ -160,19 +160,16 @@ namespace WashMachine.Forms.Modules.PaidBy.PaidByItems
                             Message = "Payment successfully!"
                         });
 
-                        paymentItem.PaymentCompletedCallBack.Invoke(mainForm, () =>
-                        {
-                            progressUI.Hide();
-                            mainForm.Controls.Remove(progressUI);
+                        progressUI.Hide();
+                        mainForm.Controls.Remove(progressUI);
 
-                            AlertSuccessfullyUI paymentAlertUI = new AlertSuccessfullyUI();
-                            paymentAlertUI.SetParent(mainForm);
-                            paymentAlertUI.SetPrintOrderModel(orderRequest);
-                            paymentAlertUI.HomeClick += PaymentAlertUI_HomeClick;
-                            paymentAlertUI.PrinterClick += PaymentAlertUI_PrinterClick;
-                            paymentAlertUI.SetOctopusInvoice(orderRequest);
-                            paymentAlertUI.Show();
-                        });
+                        AlertSuccessfullyUI paymentAlertUI = new AlertSuccessfullyUI();
+                        paymentAlertUI.SetParent(mainForm);
+                        paymentAlertUI.SetPrintOrderModel(orderRequest);
+                        paymentAlertUI.HomeClick += PaymentAlertUI_HomeClick;
+                        paymentAlertUI.PrinterClick += PaymentAlertUI_PrinterClick;
+                        paymentAlertUI.SetOctopusInvoice(orderRequest);
+                        paymentAlertUI.Show();
                     }
                     else if (paidByForm.FollowType == Login.FollowType.Normal)
                     {

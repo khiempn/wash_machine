@@ -91,33 +91,35 @@ namespace WashMachine.Web.Areas.Administrator.Controllers
 
         public IActionResult WashmachineCommand()
         {
-            var service = _business.GetService<SettingService>();
+            var service = _business.GetService<MachineCommadService>();
             var userInfo = HttpContext.GetUserInfo();
             var userId = TextUtilities.GetInt(userInfo.Id);
-            var systemInfo = service.GetSystemInfo(userId);
-            return View("WashmachineCommand", systemInfo.Setting);
+            var machineCommandModel = service.GetAll();
+            return View("WashmachineCommand", machineCommandModel);
         }
 
         [HttpPost]
-        public IActionResult WashmachineCommand(SettingModel model)
+        public IActionResult WashmachineCommand(MachineCommandModel model)
         {
             var errors = ModelState.Values.SelectMany(v => v.Errors);
             if (!ModelState.IsValid) return View(model);
 
-            var service = _business.GetService<SettingService>();
-            var result = service.SaveSetting(model);
+            var IsResetDefault = HttpContext.Request.Form["IsResetDefault"].ToString().Equals("1");
+            if (IsResetDefault)
+            {
+                model = new MachineCommandModel();
+            }
+
+            var service = _business.GetService<MachineCommadService>();
+            var result = service.SaveAll(model);
             if (!result.Success)
             {
                 ModelState.AddModelError(result.Name, result.Message);
                 return View(model);
             }
             TempData.SetMessage(result.Message);
-
-            var userInfo = HttpContext.GetUserInfo();
-            var userId = TextUtilities.GetInt(userInfo.Id);
-            var systemInfo = service.GetSystemInfo(userId);
-            return View("GeneralSetting", systemInfo.Setting);
+            var machineCommandModel = service.GetAll();
+            return View("WashmachineCommand", machineCommandModel);
         }
-
     }
 }

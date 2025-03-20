@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace WashMachine.Business.Models
+﻿namespace WashMachine.Forms.Modules.Shop.Model
 {
     public class MachineCommandModel
     {

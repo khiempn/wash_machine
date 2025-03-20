@@ -6,6 +6,7 @@ using Libraries;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace WashMachine.Business.Services
 {
@@ -14,6 +15,7 @@ namespace WashMachine.Business.Services
         private readonly IMapper _mapper;
         private readonly WashMachineContext _dbContext;
         IHttpContextAccessor _httpContextAccessor;
+
         public SettingService(IMapper mapper, WashMachineContext dbContext, IHttpContextAccessor httpContextAccessor)
         {
             _mapper = mapper;
@@ -232,6 +234,7 @@ namespace WashMachine.Business.Services
         public ShopSettingModel GetGeneralSetting()
         {
             SettingModel model = new SettingModel();
+            MachineCommadService machineCommadService = new MachineCommadService(_mapper, _dbContext, _httpContextAccessor);
 
             return new ShopSettingModel()
             {
@@ -241,7 +244,8 @@ namespace WashMachine.Business.Services
                 PaymeScanImgUrl = GetSetting(nameof(model.PaymeScanPath)),
                 AlipayPaymentImgUrl = GetSetting(nameof(model.AlipayPaymentnPath)),
                 OctopusPaymentImgUrl = GetSetting(nameof(model.OctopusPaymentPath)),
-                PaymePaymentImgUrl = GetSetting(nameof(model.PaymePaymentPath))
+                PaymePaymentImgUrl = GetSetting(nameof(model.PaymePaymentPath)),
+                MachineCommandConfig = machineCommadService.GetAll()
             };
         }
     }

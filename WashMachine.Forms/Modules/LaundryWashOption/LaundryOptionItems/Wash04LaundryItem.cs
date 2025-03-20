@@ -8,9 +8,8 @@ using WashMachine.Forms.Common.UI;
 using WashMachine.Forms.Database.Context;
 using WashMachine.Forms.Database.Tables.Machine;
 using WashMachine.Forms.Modules.Laundry;
-using WashMachine.Forms.Modules.LaundryWashOption.Machine;
-using WashMachine.Forms.Modules.LaundryWashOption.PaymentItems;
 using WashMachine.Forms.Modules.LaundryWashOption.TimeOptionItems;
+using WashMachine.Forms.Modules.Shop.Model;
 
 namespace WashMachine.Forms.Modules.LaundryWashOption.LaundryOptionItems
 {
@@ -18,15 +17,17 @@ namespace WashMachine.Forms.Modules.LaundryWashOption.LaundryOptionItems
     {
         public string Name => nameof(Wash04LaundryItem);
 
-        public string ImplementCommand => "04 06 01 27 00 01 F9 A8";
+        public string ImplementCommand { get; set; } = "04 06 01 27 00 01 F9 A8";
 
-        public Dictionary<string, string> ProgramCommands => new Dictionary<string, string>
+        public Dictionary<string, string> ProgramCommands { get; set; } = new Dictionary<string, string>
         {
             {$"{nameof(Minute15TimeOptionItem)}", "01 06 01 26 00 01 A8 68" },
             {$"{nameof(Minute30TimeOptionItem)}", "01 06 01 26 00 02 E8 69" },
             {$"{nameof(Minute40TimeOptionItem)}", "01 06 01 26 00 03 29 A9" },
             {$"{nameof(Minute45TimeOptionItem)}", "01 06 01 26 00 04 68 6B" },
         };
+        public string StopCommand { get; set; }
+        public string UnlockCommand { get; set; }
 
         Form mainForm;
 
@@ -36,6 +37,25 @@ namespace WashMachine.Forms.Modules.LaundryWashOption.LaundryOptionItems
         {
             mainForm = parent;
             machineService = new Machine.MachineService();
+            LoadConfig();
+        }
+
+        private void LoadConfig()
+        {
+            ShopConfigModel shopConfig = Program.ShopConfig;
+            MachineCommandModel command = shopConfig.ShopSetting.MachineCommandConfig;
+
+            ProgramCommands = new Dictionary<string, string>()
+            {
+                {$"{nameof(Minute15TimeOptionItem)}", command.Wash04LaundryItem_Minute15TimeOptionItem },
+                {$"{nameof(Minute30TimeOptionItem)}", command.Wash04LaundryItem_Minute30TimeOptionItem },
+                {$"{nameof(Minute40TimeOptionItem)}", command.Wash04LaundryItem_Minute40TimeOptionItem },
+                {$"{nameof(Minute45TimeOptionItem)}", command.Wash04LaundryItem_Minute45TimeOptionItem },
+            };
+
+            ImplementCommand = command.Wash04LaundryItem_ImplementCommand;
+            StopCommand = command.Wash04LaundryItem_StopCommand;
+            UnlockCommand = command.Wash04LaundryItem_UnlockCommand;
         }
 
         public void Click()
@@ -129,7 +149,7 @@ namespace WashMachine.Forms.Modules.LaundryWashOption.LaundryOptionItems
                 Logger.Log($"{nameof(Wash04LaundryItem)} Step 2 {JsonConvert.SerializeObject(appConfig)}");
                 bool isConnected = await machineService.ConnectAsync(appConfig.DollarCom, appConfig.DollarBaudRate, appConfig.DollarData, appConfig.DollarParity, appConfig.DollarStopBits);
 
-                if (isConnected || true)
+                if (isConnected)
                 {
                     Logger.Log($"{nameof(Wash04LaundryItem)} Step 3");
                     string programCommand = ProgramCommands[$"{form.TimeOptionItemSelected.Name}"];
@@ -145,6 +165,7 @@ namespace WashMachine.Forms.Modules.LaundryWashOption.LaundryOptionItems
                 }
                 else
                 {
+                    MessageBox.Show("Unable connect to device, please try agiain", "Warning!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     Logger.Log($"{nameof(Wash04LaundryItem)} Can not connect device.");
                 }
             });

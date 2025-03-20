@@ -35,7 +35,7 @@ namespace WashMachine.Forms.Modules.LaundryWashOption.PaymentItems
             }
         }
 
-        public void Click()
+        public async void Click()
         {
             try
             {
@@ -43,10 +43,20 @@ namespace WashMachine.Forms.Modules.LaundryWashOption.PaymentItems
                 if (form.LaundryOptionItemSelected != null && form.TimeOptionItemSelected != null)
                 {
                     paymentItem.SetAmount(form.TimeOptionItemSelected.Amount);
-
-                    PaidByForm paidByForm = new PaidByForm(followType, paymentItem);
-                    paidByForm.Show();
-                    paidByForm.FormClosed += PaidByForm_FormClosed;
+                    if (followType == FollowType.TestMachineWithoutPayment)
+                    {
+                        ProgressUI progressUI = new ProgressUI();
+                        progressUI.SetParent(form);
+                        progressUI.Show();
+                        await form.LaundryOptionItemSelected.Start();
+                        progressUI.Hide();
+                    }
+                    else
+                    {
+                        PaidByForm paidByForm = new PaidByForm(followType, paymentItem);
+                        paidByForm.Show();
+                        paidByForm.FormClosed += PaidByForm_FormClosed;
+                    }
                 }
             }
             catch (Exception ex)

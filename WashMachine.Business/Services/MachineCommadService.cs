@@ -23,29 +23,42 @@ namespace WashMachine.Business.Services
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public List<MachineCommandModel> GetAll(int id)
+        public MachineCommandModel GetAll()
         {
             List<MachineCommand> machineCommands = _dbContext.MachineCommand.ToList();
-            return _mapper.Map<List<MachineCommandModel>>(machineCommands);
+            MachineCommandModel commandModel = new MachineCommandModel();
+            foreach (var machineCommand in machineCommands)
+            {
+                var field = commandModel.GetType().GetProperty(machineCommand.Key, System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+                field.SetValue(commandModel, machineCommand.Value);
+            }
+            return commandModel;
         }
 
-        public Respondent SaveAll(List<MachineCommandModel> machineCommands)
+        public Respondent SaveAll(MachineCommandModel machineCommand)
         {
-            _dbContext.MachineCommand.RemoveRange();
-            foreach (MachineCommandModel machineCommand in machineCommands)
+            List<MachineCommand> machineCommands = _dbContext.MachineCommand.ToList();
+            if (machineCommands.Count > 0)
             {
-                _dbContext.MachineCommand.Add(new MachineCommand()
-                {
-                    Key = machineCommand.Key,
-                    Value = machineCommand.Value,
-                });
+                _dbContext.MachineCommand.RemoveRange(machineCommands);
+                _dbContext.SaveChanges();
             }
 
+            foreach (var propertyInfo in machineCommand.GetType().GetProperties())
+            {
+                var value = propertyInfo.GetValue(machineCommand, null)?.ToString();
+
+                _dbContext.MachineCommand.Add(new MachineCommand()
+                {
+                    Key = propertyInfo.Name,
+                    Value = value
+                });
+            }
             _dbContext.SaveChanges();
             return new Respondent
             {
                 Success = true,
-                Message = string.Format(Messages.SaveSuccess, "Shop")
+                Message = string.Format(Messages.SaveSuccess, "Machine Command")
             };
         }
     }

@@ -26,7 +26,10 @@ namespace WashMachine.Business.Services
         {
             var entity = _dbContext.User.FirstOrDefault(c => c.Email == email);
             var model = _mapper.Map<UserModel>(entity);
-            model.ShopOwner = _mapper.Map<ShopModel>(_dbContext.Shop.FirstOrDefault(f => f.ShopOwnerId == entity.Id));
+            if (model != null)
+            {
+                model.ShopOwner = _mapper.Map<ShopModel>(_dbContext.Shop.FirstOrDefault(f => f.ShopOwnerId == entity.Id));
+            }
             return model;
         }
 

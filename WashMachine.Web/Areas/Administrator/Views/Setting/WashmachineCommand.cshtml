@@ -2,6 +2,12 @@
 @{
     ViewData["Title"] = "Wash machine commands";
 }
+<script>
+    function resetDefault(){
+        $('#IsResetDefault').val('1');
+        $('#form').submit();
+    }
+</script>
 <div class="mannager-content">
     <div class="manager-list">
         <nav>
@@ -10,7 +16,17 @@
             </div>
         </nav>
         <div class="tab-content w-100" id="nav-tabContent" style="padding-top: 15px;">
-            <form class="body-content" action="/administrator/setting/OctopusSetting" name="form" enctype="multipart/form-data" method="post">
+            <form class="body-content" action="/administrator/setting/WashmachineCommand" id="form" name="form" enctype="multipart/form-data" method="post">
+                <input id="IsResetDefault" name="IsResetDefault" value="0" hidden />
+                <div class="row" style="padding-bottom: 15px;">
+                    <div class="col-md-12">
+                        <div class="form-button" style="float: right">
+                            <a class="btn btn-secondary" href="@Context.GetBaseUrl()">Back</a>
+                            <button type="button" onclick="resetDefault();" class="btn btn-success"><i class="fa fa-redo"></i> Reset Default</button>
+                            <button type="submit" class="btn btn-primary"><i class="far fa-save"></i> Save</button>
+                        </div>
+                    </div>
+               </div>
                 <div class="tab-pane box-15" id="octopus_job_tab" role="tabpanel" aria-labelledby="nav-home-tab">
                     <div class="wap-500">
                         <div class="form-area form-editor">
@@ -23,7 +39,7 @@
                                                 <thead>
                                                     <tr>
                                                         <th rowspan="2" style="text-align: center;vertical-align: middle;">Name</th>
-                                                        <th rowspan="2" style="text-align: center;vertical-align: middle;">Machine</th>
+                                                        <th rowspan="2" style="text-align: center;vertical-align: middle;">Action</th>
                                                         <th rowspan="2" style="text-align: center;vertical-align: middle;">Address</th>
                                                         <th colspan="4" style="text-align: center;">Command</th>
                                                     </tr>
@@ -38,58 +54,58 @@
                                                 <tbody>
                                                     <tr>
                                                         <td rowspan="4" style="vertical-align: middle;">Select Program</td>
-                                                        <td>Machine 1</td>
+                                                        <td>Program 1</td>
                                                         <td rowspan="4" style="vertical-align: middle;">0x126</td>
-                                                        <td><input name="@(nameof(Model.Wash01LaundryItem_Minute15TimeOptionItem))" value="@Model.Wash01LaundryItem_Minute15TimeOptionItem" /></td>
-                                                        <td><input name="@(nameof(Model.Wash02LaundryItem_Minute15TimeOptionItem))" value="@Model.Wash02LaundryItem_Minute15TimeOptionItem" /></td>
-                                                        <td><input name="@(nameof(Model.Wash03LaundryItem_Minute15TimeOptionItem))" value="@Model.Wash03LaundryItem_Minute15TimeOptionItem" /></td>
-                                                        <td><input name="@(nameof(Model.Wash04LaundryItem_Minute15TimeOptionItem))" value="@Model.Wash04LaundryItem_Minute15TimeOptionItem" /></td>
+                                                        <td><input class="form-control" name="@(nameof(Model.Wash01LaundryItem_Minute15TimeOptionItem))" value="@Model.Wash01LaundryItem_Minute15TimeOptionItem" /></td>
+                                                        <td><input class="form-control" name="@(nameof(Model.Wash02LaundryItem_Minute15TimeOptionItem))" value="@Model.Wash02LaundryItem_Minute15TimeOptionItem" /></td>
+                                                        <td><input class="form-control" name="@(nameof(Model.Wash03LaundryItem_Minute15TimeOptionItem))" value="@Model.Wash03LaundryItem_Minute15TimeOptionItem" /></td>
+                                                        <td><input class="form-control" name="@(nameof(Model.Wash04LaundryItem_Minute15TimeOptionItem))" value="@Model.Wash04LaundryItem_Minute15TimeOptionItem" /></td>
                                                     </tr>
                                                     <tr>
-                                                        <td>Machine 2</td>
-                                                        <td><input name="@(nameof(Model.Wash01LaundryItem_Minute30TimeOptionItem))" value="@Model.Wash01LaundryItem_Minute30TimeOptionItem" /></td>
-                                                        <td><input name="@(nameof(Model.Wash02LaundryItem_Minute30TimeOptionItem))" value="@Model.Wash02LaundryItem_Minute30TimeOptionItem" /></td>
-                                                        <td><input name="@(nameof(Model.Wash03LaundryItem_Minute30TimeOptionItem))" value="@Model.Wash03LaundryItem_Minute30TimeOptionItem" /></td>
-                                                        <td><input name="@(nameof(Model.Wash04LaundryItem_Minute30TimeOptionItem))" value="@Model.Wash04LaundryItem_Minute30TimeOptionItem" /></td>
+                                                        <td>Program 2</td>
+                                                        <td><input class="form-control" name="@(nameof(Model.Wash01LaundryItem_Minute30TimeOptionItem))" value="@Model.Wash01LaundryItem_Minute30TimeOptionItem" /></td>
+                                                        <td><input class="form-control" name="@(nameof(Model.Wash02LaundryItem_Minute30TimeOptionItem))" value="@Model.Wash02LaundryItem_Minute30TimeOptionItem" /></td>
+                                                        <td><input class="form-control" name="@(nameof(Model.Wash03LaundryItem_Minute30TimeOptionItem))" value="@Model.Wash03LaundryItem_Minute30TimeOptionItem" /></td>
+                                                        <td><input class="form-control" name="@(nameof(Model.Wash04LaundryItem_Minute30TimeOptionItem))" value="@Model.Wash04LaundryItem_Minute30TimeOptionItem" /></td>
                                                     </tr>
                                                     <tr>
-                                                        <td>Machine 3</td>
-                                                        <td><input name="@(nameof(Model.Wash01LaundryItem_Minute40TimeOptionItem))" value="@Model.Wash01LaundryItem_Minute40TimeOptionItem" /></td>
-                                                        <td><input name="@(nameof(Model.Wash02LaundryItem_Minute40TimeOptionItem))" value="@Model.Wash02LaundryItem_Minute40TimeOptionItem" /></td>
-                                                        <td><input name="@(nameof(Model.Wash03LaundryItem_Minute40TimeOptionItem))" value="@Model.Wash03LaundryItem_Minute40TimeOptionItem" /></td>
-                                                        <td><input name="@(nameof(Model.Wash04LaundryItem_Minute40TimeOptionItem))" value="@Model.Wash04LaundryItem_Minute40TimeOptionItem" /></td>
+                                                        <td>Program 3</td>
+                                                        <td><input class="form-control" name="@(nameof(Model.Wash01LaundryItem_Minute40TimeOptionItem))" value="@Model.Wash01LaundryItem_Minute40TimeOptionItem" /></td>
+                                                        <td><input class="form-control" name="@(nameof(Model.Wash02LaundryItem_Minute40TimeOptionItem))" value="@Model.Wash02LaundryItem_Minute40TimeOptionItem" /></td>
+                                                        <td><input class="form-control" name="@(nameof(Model.Wash03LaundryItem_Minute40TimeOptionItem))" value="@Model.Wash03LaundryItem_Minute40TimeOptionItem" /></td>
+                                                        <td><input class="form-control" name="@(nameof(Model.Wash04LaundryItem_Minute40TimeOptionItem))" value="@Model.Wash04LaundryItem_Minute40TimeOptionItem" /></td>
                                                     </tr>
                                                     <tr>
-                                                        <td>Machine 4</td>
-                                                        <td><input name="@(nameof(Model.Wash01LaundryItem_Minute45TimeOptionItem))" value="@Model.Wash01LaundryItem_Minute45TimeOptionItem" /></td>
-                                                        <td><input name="@(nameof(Model.Wash02LaundryItem_Minute45TimeOptionItem))" value="@Model.Wash02LaundryItem_Minute45TimeOptionItem" /></td>
-                                                        <td><input name="@(nameof(Model.Wash03LaundryItem_Minute45TimeOptionItem))" value="@Model.Wash03LaundryItem_Minute45TimeOptionItem" /></td>
-                                                        <td><input name="@(nameof(Model.Wash04LaundryItem_Minute45TimeOptionItem))" value="@Model.Wash04LaundryItem_Minute45TimeOptionItem" /></td>
+                                                        <td>Program 4</td>
+                                                        <td><input class="form-control" name="@(nameof(Model.Wash01LaundryItem_Minute45TimeOptionItem))" value="@Model.Wash01LaundryItem_Minute45TimeOptionItem" /></td>
+                                                        <td><input class="form-control" name="@(nameof(Model.Wash02LaundryItem_Minute45TimeOptionItem))" value="@Model.Wash02LaundryItem_Minute45TimeOptionItem" /></td>
+                                                        <td><input class="form-control" name="@(nameof(Model.Wash03LaundryItem_Minute45TimeOptionItem))" value="@Model.Wash03LaundryItem_Minute45TimeOptionItem" /></td>
+                                                        <td><input class="form-control" name="@(nameof(Model.Wash04LaundryItem_Minute45TimeOptionItem))" value="@Model.Wash04LaundryItem_Minute45TimeOptionItem" /></td>
                                                     </tr>
                                                     <tr>
                                                         <td>Implement</td>
                                                         <td></td>
                                                         <td>0x127</td>
-                                                        <td><input name="@(nameof(Model.Wash01LaundryItem_ImplementCommand))" value="@Model.Wash01LaundryItem_ImplementCommand" /></td>
-                                                        <td><input name="@(nameof(Model.Wash02LaundryItem_ImplementCommand))" value="@Model.Wash02LaundryItem_ImplementCommand" /></td>
-                                                        <td><input name="@(nameof(Model.Wash03LaundryItem_ImplementCommand))" value="@Model.Wash03LaundryItem_ImplementCommand" /></td>
-                                                        <td><input name="@(nameof(Model.Wash04LaundryItem_ImplementCommand))" value="@Model.Wash04LaundryItem_ImplementCommand" /></td>
+                                                        <td><input class="form-control" name="@(nameof(Model.Wash01LaundryItem_ImplementCommand))" value="@Model.Wash01LaundryItem_ImplementCommand" /></td>
+                                                        <td><input class="form-control" name="@(nameof(Model.Wash02LaundryItem_ImplementCommand))" value="@Model.Wash02LaundryItem_ImplementCommand" /></td>
+                                                        <td><input class="form-control" name="@(nameof(Model.Wash03LaundryItem_ImplementCommand))" value="@Model.Wash03LaundryItem_ImplementCommand" /></td>
+                                                        <td><input class="form-control" name="@(nameof(Model.Wash04LaundryItem_ImplementCommand))" value="@Model.Wash04LaundryItem_ImplementCommand" /></td>
                                                     </tr>
                                                     <tr>
                                                         <td rowspan="2" style="vertical-align: middle;">ukno</td>
                                                         <td>Stop</td>
                                                         <td rowspan="2" style="vertical-align: middle;">0x127</td>
-                                                        <td><input name="@(nameof(Model.Wash01LaundryItem_StopCommand))" value="@Model.Wash01LaundryItem_StopCommand" /></td>
-                                                        <td><input name="@(nameof(Model.Wash02LaundryItem_StopCommand))" value="@Model.Wash02LaundryItem_StopCommand" /></td>
-                                                        <td><input name="@(nameof(Model.Wash03LaundryItem_StopCommand))" value="@Model.Wash03LaundryItem_StopCommand" /></td>
-                                                        <td><input name="@(nameof(Model.Wash04LaundryItem_StopCommand))" value="@Model.Wash04LaundryItem_StopCommand" /></td>
+                                                        <td><input class="form-control" name="@(nameof(Model.Wash01LaundryItem_StopCommand))" value="@Model.Wash01LaundryItem_StopCommand" /></td>
+                                                        <td><input class="form-control" name="@(nameof(Model.Wash02LaundryItem_StopCommand))" value="@Model.Wash02LaundryItem_StopCommand" /></td>
+                                                        <td><input class="form-control" name="@(nameof(Model.Wash03LaundryItem_StopCommand))" value="@Model.Wash03LaundryItem_StopCommand" /></td>
+                                                        <td><input class="form-control" name="@(nameof(Model.Wash04LaundryItem_StopCommand))" value="@Model.Wash04LaundryItem_StopCommand" /></td>
                                                     </tr>
                                                     <tr>
                                                         <td>Unlock</td>
-                                                        <td><input name="@(nameof(Model.Wash01LaundryItem_UnlockCommand))" value="@Model.Wash01LaundryItem_UnlockCommand" /></td>
-                                                        <td><input name="@(nameof(Model.Wash02LaundryItem_UnlockCommand))" value="@Model.Wash02LaundryItem_UnlockCommand" /></td>
-                                                        <td><input name="@(nameof(Model.Wash03LaundryItem_UnlockCommand))" value="@Model.Wash03LaundryItem_UnlockCommand" /></td>
-                                                        <td><input name="@(nameof(Model.Wash04LaundryItem_UnlockCommand))" value="@Model.Wash04LaundryItem_UnlockCommand" /></td>
+                                                        <td><input class="form-control" name="@(nameof(Model.Wash01LaundryItem_UnlockCommand))" value="@Model.Wash01LaundryItem_UnlockCommand" /></td>
+                                                        <td><input class="form-control" name="@(nameof(Model.Wash02LaundryItem_UnlockCommand))" value="@Model.Wash02LaundryItem_UnlockCommand" /></td>
+                                                        <td><input class="form-control" name="@(nameof(Model.Wash03LaundryItem_UnlockCommand))" value="@Model.Wash03LaundryItem_UnlockCommand" /></td>
+                                                        <td><input class="form-control" name="@(nameof(Model.Wash04LaundryItem_UnlockCommand))" value="@Model.Wash04LaundryItem_UnlockCommand" /></td>
                                                     </tr>
                                                 </tbody>
                                             </table>
@@ -119,24 +135,74 @@
                                                         <td rowspan="3" style="vertical-align: middle;">Select the temperature</td>
                                                         <td>High</td>
                                                         <td rowspan="3" style="vertical-align: middle;">0x166</td>
-                                                        <td><input /></td>
-                                                        <td><input /></td>
-                                                        <td><input /></td>
-                                                        <td><input /></td>
+                                                        <td><input class="form-control" name="@(nameof(Model.Dryer01LaundryItem_HighTempOptionItem))" value="@Model.Dryer01LaundryItem_HighTempOptionItem" /></td>
+                                                        <td><input class="form-control" name="@(nameof(Model.Dryer02LaundryItem_HighTempOptionItem))" value="@Model.Dryer02LaundryItem_HighTempOptionItem" /></td>
+                                                        <td><input class="form-control" name="@(nameof(Model.Dryer03LaundryItem_HighTempOptionItem))" value="@Model.Dryer03LaundryItem_HighTempOptionItem" /></td>
+                                                        <td><input class="form-control" name="@(nameof(Model.Dryer04LaundryItem_HighTempOptionItem))" value="@Model.Dryer04LaundryItem_HighTempOptionItem" /></td>
                                                     </tr>
                                                     <tr>
                                                         <td>Medium</td>
-                                                        <td><input /></td>
-                                                        <td><input /></td>
-                                                        <td><input /></td>
-                                                        <td><input /></td>
+                                                        <td><input class="form-control" name="@(nameof(Model.Dryer01LaundryItem_MidTempOptionItem))" value="@Model.Dryer01LaundryItem_MidTempOptionItem" /></td>
+                                                        <td><input class="form-control" name="@(nameof(Model.Dryer02LaundryItem_MidTempOptionItem))" value="@Model.Dryer02LaundryItem_MidTempOptionItem" /></td>
+                                                        <td><input class="form-control" name="@(nameof(Model.Dryer03LaundryItem_MidTempOptionItem))" value="@Model.Dryer03LaundryItem_MidTempOptionItem" /></td>
+                                                        <td><input class="form-control" name="@(nameof(Model.Dryer04LaundryItem_MidTempOptionItem))" value="@Model.Dryer04LaundryItem_MidTempOptionItem" /></td>
                                                     </tr>
                                                     <tr>
                                                         <td>Low</td>
-                                                        <td><input /></td>
-                                                        <td><input /></td>
-                                                        <td><input /></td>
-                                                        <td><input /></td>
+                                                        <td><input class="form-control" name="@(nameof(Model.Dryer01LaundryItem_LowTempOptionItem))" value="@Model.Dryer01LaundryItem_LowTempOptionItem" /></td>
+                                                        <td><input class="form-control" name="@(nameof(Model.Dryer02LaundryItem_LowTempOptionItem))" value="@Model.Dryer02LaundryItem_LowTempOptionItem" /></td>
+                                                        <td><input class="form-control" name="@(nameof(Model.Dryer03LaundryItem_LowTempOptionItem))" value="@Model.Dryer03LaundryItem_LowTempOptionItem" /></td>
+                                                        <td><input class="form-control" name="@(nameof(Model.Dryer04LaundryItem_LowTempOptionItem))" value="@Model.Dryer04LaundryItem_LowTempOptionItem" /></td>
+                                                     
+                                                    </tr>
+                                                    <tr>
+                                                        <td rowspan="4" style="vertical-align: middle;">Time setting</td>
+                                                        <td>30 Mins</td>
+                                                        <td rowspan="4" style="vertical-align: middle;">0x167</td>
+                                                        <td><input class="form-control" name="@(nameof(Model.Dryer01LaundryItem_Minute30TimeOptionItem))" value="@Model.Dryer01LaundryItem_Minute30TimeOptionItem" /></td>
+                                                        <td><input class="form-control" name="@(nameof(Model.Dryer02LaundryItem_Minute30TimeOptionItem))" value="@Model.Dryer02LaundryItem_Minute30TimeOptionItem" /></td>
+                                                        <td><input class="form-control" name="@(nameof(Model.Dryer03LaundryItem_Minute30TimeOptionItem))" value="@Model.Dryer03LaundryItem_Minute30TimeOptionItem" /></td>
+                                                        <td><input class="form-control" name="@(nameof(Model.Dryer04LaundryItem_Minute30TimeOptionItem))" value="@Model.Dryer04LaundryItem_Minute30TimeOptionItem" /></td>
+                                                    
+                                                    </tr>
+                                                    <tr>
+                                                        <td>60 Mins</td>
+                                                        <td><input class="form-control" name="@(nameof(Model.Dryer01LaundryItem_Minute40TimeOptionItem))" value="@Model.Dryer01LaundryItem_Minute40TimeOptionItem" /></td>
+                                                        <td><input class="form-control" name="@(nameof(Model.Dryer02LaundryItem_Minute40TimeOptionItem))" value="@Model.Dryer02LaundryItem_Minute40TimeOptionItem" /></td>
+                                                        <td><input class="form-control" name="@(nameof(Model.Dryer03LaundryItem_Minute40TimeOptionItem))" value="@Model.Dryer03LaundryItem_Minute40TimeOptionItem" /></td>
+                                                        <td><input class="form-control" name="@(nameof(Model.Dryer04LaundryItem_Minute40TimeOptionItem))" value="@Model.Dryer04LaundryItem_Minute40TimeOptionItem" /></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>90 Mins</td>
+                                                        <td><input class="form-control" name="@(nameof(Model.Dryer01LaundryItem_Minute50TimeOptionItem))" value="@Model.Dryer01LaundryItem_Minute50TimeOptionItem" /></td>
+                                                        <td><input class="form-control" name="@(nameof(Model.Dryer02LaundryItem_Minute50TimeOptionItem))" value="@Model.Dryer02LaundryItem_Minute50TimeOptionItem" /></td>
+                                                        <td><input class="form-control" name="@(nameof(Model.Dryer03LaundryItem_Minute50TimeOptionItem))" value="@Model.Dryer03LaundryItem_Minute50TimeOptionItem" /></td>
+                                                        <td><input class="form-control" name="@(nameof(Model.Dryer04LaundryItem_Minute50TimeOptionItem))" value="@Model.Dryer04LaundryItem_Minute50TimeOptionItem" /></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>120 Mins</td>
+                                                        <td><input class="form-control" name="@(nameof(Model.Dryer01LaundryItem_Minute60TimeOptionItem))" value="@Model.Dryer01LaundryItem_Minute60TimeOptionItem" /></td>
+                                                        <td><input class="form-control" name="@(nameof(Model.Dryer02LaundryItem_Minute60TimeOptionItem))" value="@Model.Dryer02LaundryItem_Minute60TimeOptionItem" /></td>
+                                                        <td><input class="form-control" name="@(nameof(Model.Dryer03LaundryItem_Minute60TimeOptionItem))" value="@Model.Dryer03LaundryItem_Minute60TimeOptionItem" /></td>
+                                                        <td><input class="form-control" name="@(nameof(Model.Dryer04LaundryItem_Minute60TimeOptionItem))" value="@Model.Dryer04LaundryItem_Minute60TimeOptionItem" /></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="vertical-align: middle;">Implement</td>
+                                                        <td>Start</td>
+                                                        <td style="vertical-align: middle;">0x168</td>
+                                                        <td><input class="form-control" name="@(nameof(Model.Dryer01LaundryItem_ImplementCommand))" value="@Model.Dryer01LaundryItem_ImplementCommand" /></td>
+                                                        <td><input class="form-control" name="@(nameof(Model.Dryer02LaundryItem_ImplementCommand))" value="@Model.Dryer02LaundryItem_ImplementCommand" /></td>
+                                                        <td><input class="form-control" name="@(nameof(Model.Dryer03LaundryItem_ImplementCommand))" value="@Model.Dryer03LaundryItem_ImplementCommand" /></td>
+                                                        <td><input class="form-control" name="@(nameof(Model.Dryer04LaundryItem_ImplementCommand))" value="@Model.Dryer04LaundryItem_ImplementCommand" /></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="vertical-align: middle;">Stop</td>
+                                                        <td>Stop it</td>
+                                                        <td style="vertical-align: middle;">0x168</td>
+                                                        <td><input class="form-control" name="@(nameof(Model.Dryer01LaundryItem_StopCommand))" value="@Model.Dryer01LaundryItem_StopCommand" /></td>
+                                                        <td><input class="form-control" name="@(nameof(Model.Dryer02LaundryItem_StopCommand))" value="@Model.Dryer02LaundryItem_StopCommand" /></td>
+                                                        <td><input class="form-control" name="@(nameof(Model.Dryer03LaundryItem_StopCommand))" value="@Model.Dryer03LaundryItem_StopCommand" /></td>
+                                                        <td><input class="form-control" name="@(nameof(Model.Dryer04LaundryItem_StopCommand))" value="@Model.Dryer04LaundryItem_StopCommand" /></td>
                                                     </tr>
                                                 </tbody>
                                             </table>
@@ -149,6 +215,7 @@
                 </div>
                 <div class="form-button" style="float: right">
                     <a class="btn btn-secondary" href="@Context.GetBaseUrl()">Back</a>
+                    <button type="button" class="btn btn-success"><i class="fa fa-redo"></i> Reset Default</button>
                     <button type="submit" class="btn btn-primary"><i class="far fa-save"></i> Save</button>
                 </div>
             </form>

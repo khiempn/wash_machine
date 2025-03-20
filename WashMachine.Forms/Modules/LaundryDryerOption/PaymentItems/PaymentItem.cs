@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Drawing;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using WashMachine.Forms.Common.UI;
 using WashMachine.Forms.Modules.Login;
@@ -44,7 +45,7 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.PaymentItems
             }
         }
 
-        public void Click()
+        public async void Click()
         {
             try
             {
@@ -53,9 +54,20 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.PaymentItems
                 {
                     paymentItem.SetAmount(form.TimeOptionItemSelected.Amount);
 
-                    PaidByForm paidByForm = new PaidByForm(followType, paymentItem);
-                    paidByForm.Show();
-                    paidByForm.FormClosed += PaidByForm_FormClosed;
+                    if (followType == FollowType.TestMachineWithoutPayment)
+                    {
+                        ProgressUI progressUI = new ProgressUI();
+                        progressUI.SetParent(form);
+                        progressUI.Show();
+                        await form.LaundryOptionItemSelected.Start();
+                        progressUI.Hide();
+                    }
+                    else
+                    {
+                        PaidByForm paidByForm = new PaidByForm(followType, paymentItem);
+                        paidByForm.Show();
+                        paidByForm.FormClosed += PaidByForm_FormClosed;
+                    }
                 }
             }
             catch (Exception ex)

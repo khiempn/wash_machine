@@ -16,6 +16,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Serialization;
 using System;
+using WashMachine.Repositories.Entities;
 
 namespace WashMachine.Web
 {
@@ -64,7 +65,6 @@ namespace WashMachine.Web
                 options.IdleTimeout = TimeSpan.FromMinutes(20);
                 options.Cookie.IsEssential = true;
             });
-
 
             //Start Registering and Initializing AutoMapper
             //services.AddAutoMapper(typeof(MappingProfile));
@@ -146,6 +146,7 @@ namespace WashMachine.Web
             services.AddScoped<IBusiness, CouponService>();
             services.AddScoped<IBusiness, LogService>();
             services.AddScoped<IBusiness, EmailService>();
+            services.AddScoped<IBusiness, MachineCommadService>();
             services.AddTransient<ExportExcelService>();
         }
     }

@@ -2,7 +2,6 @@
 using System.IO;
 using System.Windows.Forms;
 using WashMachine.Forms.Modules.Login;
-using WashMachine.Forms.Modules.Shop;
 
 namespace WashMachine.Forms
 {

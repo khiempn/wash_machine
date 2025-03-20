@@ -16,6 +16,7 @@ namespace WashMachine.Web.AppCode
             CreateMap<Coupon, CouponModel>();
             CreateMap<ShopCom, ShopComModel>();
             CreateMap<Log, LogModel>();
+            CreateMap<MachineCommand, MachineCommandModel>();
         }
     }
 }

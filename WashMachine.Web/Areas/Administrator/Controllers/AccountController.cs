@@ -33,7 +33,7 @@ namespace WashMachine.Web.Areas.Administrator.Controllers
             {
                 ReturnUrl = returnUrl
             };
-            model.Username = "admin@boxcut.hk";
+            model.Username = "admin@washmachine.com";
             model.Password = "admin@123";
             return View(model);
         }

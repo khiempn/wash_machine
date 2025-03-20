@@ -12,6 +12,5 @@ namespace WashMachine.Forms
         public string Phone { get; set; }
         public string Email { get; set; }
         public ShopSettingModel ShopSetting { get; set; } = new ShopSettingModel();
-
     }
 }

@@ -76,7 +76,7 @@ namespace WashMachine.Forms.Modules.Login
             tblInputs.RowStyles.Add(new RowStyle() { Height = 1, SizeType = SizeType.Percent });
             tblInputs.ColumnStyles.Add(new ColumnStyle() { Width = 1, SizeType = SizeType.Percent });
             tblInputs.ColumnStyles.Add(new ColumnStyle() { Width = 2, SizeType = SizeType.Percent });
-            tbUserName = new TextBox() { Dock = DockStyle.Fill, Text = "admin@boxcut.hk", Multiline = true };
+            tbUserName = new TextBox() { Dock = DockStyle.Fill, Text = "admin@washmachine.com", Multiline = true };
             tbPassword = new TextBox() { Dock = DockStyle.Fill, Text = "admin@123", PasswordChar = '*', Multiline = true };
 
             tblInputs.Controls.Add(new Label() { Text = "USER ID:", Dock = DockStyle.Fill, TextAlign = ContentAlignment.MiddleLeft }, 0, 0);

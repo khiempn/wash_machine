@@ -10,5 +10,7 @@
         public string OctopusPaymentImgUrl { get; set; }
         public string PaymePaymentImgUrl { get; set; }
         public string AlipayPaymentImgUrl { get; set; }
+
+        public MachineCommandModel MachineCommandConfig { get; set; }
     }
 }

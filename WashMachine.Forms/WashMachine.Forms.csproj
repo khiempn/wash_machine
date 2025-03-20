@@ -235,6 +235,7 @@
     <Compile Include="Modules\Payment\CardItemProperty.cs" />
     <Compile Include="Modules\Payment\IPaymentItem.cs" />
     <Compile Include="Modules\Payment\PaymentItems\HkdPaymentItem.cs" />
+    <Compile Include="Modules\Shop\Model\MachineCommandModel.cs" />
     <Compile Include="Modules\Shop\Model\ShopModel.cs" />
     <Compile Include="Modules\Shop\Model\ShopSettingModel.cs" />
     <Compile Include="Modules\Shop\Service\IShopService.cs" />

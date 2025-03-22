@@ -201,15 +201,14 @@ namespace WashMachine.Forms.Modules.Login
                             await Program.ShopConfig.ShopSetting.LoadImages();
                             InitialOctopusAsync();
                             Program.octopusService.SetUserIsUsingApp(true);
-                            Refresh();
                         }
-                        Cursor = Cursors.Default;
-                        tlpLoginForm.Enabled = true;
-                        progressUI.Hide();
                     }
                     finally
                     {
-
+                        Cursor = Cursors.Default;
+                        tlpLoginForm.Enabled = true;
+                        progressUI.Hide();
+                        Refresh();
                     }
                 });
             });

@@ -31,10 +31,10 @@ namespace WashMachine.Business.Services
             if (entity != null)
             {
                 entity.ShopComs = _dbContext.ShopCom.Where(c => c.ShopId == id).ToList();
-                var dollarCom = entity.ShopComs.FirstOrDefault(w => w.ComType == "DollarCom");
-                if (dollarCom != null)
+                var WashMachineCom = entity.ShopComs.FirstOrDefault(w => w.ComType == "WashMachineCom");
+                if (WashMachineCom != null)
                 {
-                    model.DollarCom = _mapper.Map<ShopComModel>(dollarCom);
+                    model.WashMachineCom = _mapper.Map<ShopComModel>(WashMachineCom);
                 }
             }
             return model;
@@ -83,13 +83,13 @@ namespace WashMachine.Business.Services
 
             _dbContext.ShopCom.Add(new ShopCom()
             {
-                ComType = model.DollarCom.ComType,
-                BaudRate = model.DollarCom.BaudRate,
-                ComName = model.DollarCom.ComName,
-                Data = model.DollarCom.Data,
-                Parity = model.DollarCom.Parity,
+                ComType = model.WashMachineCom.ComType,
+                BaudRate = model.WashMachineCom.BaudRate,
+                ComName = model.WashMachineCom.ComName,
+                Data = model.WashMachineCom.Data,
+                Parity = model.WashMachineCom.Parity,
                 ShopId = model.Id,
-                StopBits = model.DollarCom.StopBits
+                StopBits = model.WashMachineCom.StopBits
             });
 
             _dbContext.SaveChanges();

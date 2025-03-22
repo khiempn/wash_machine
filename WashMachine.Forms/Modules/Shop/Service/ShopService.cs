@@ -3,6 +3,7 @@ using WashMachine.Forms.Modules.Shop.Model;
 using Newtonsoft.Json;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System;
 
 namespace WashMachine.Forms.Modules.Shop.Service
 {
@@ -17,9 +18,16 @@ namespace WashMachine.Forms.Modules.Shop.Service
 
         public async Task<byte[]> DownloadImageAsByteArrayAsync(string url)
         {
-            using (HttpClient client = new HttpClient())
+            try
             {
-                return await client.GetByteArrayAsync(url);
+                using (HttpClient client = new HttpClient())
+                {
+                    return await client.GetByteArrayAsync(url);
+                }
+            }
+            catch (Exception ex)
+            {
+                return null;
             }
         }
 

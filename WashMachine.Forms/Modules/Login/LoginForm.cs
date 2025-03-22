@@ -1,6 +1,8 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Drawing;
 using System.IO;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -59,8 +61,7 @@ namespace WashMachine.Forms.Modules.Login
 
             ButtonRoundedUI btnLogin = new ButtonRoundedUI()
             {
-                Height = 50,
-                Width = Width,
+                Dock = DockStyle.Fill,
                 Text = "Normal Operate 正常操作",
                 ShapeBackgroudColor = ColorTranslator.FromHtml("#a5a5a5"),
                 ShapeBorderColor = Color.Black
@@ -90,7 +91,6 @@ namespace WashMachine.Forms.Modules.Login
             ButtonRoundedUI btnPayment = new ButtonRoundedUI()
             {
                 Dock = DockStyle.Fill,
-                Width = Width,
                 Text = "Test Payment Only",
                 ShapeBackgroudColor = ColorTranslator.FromHtml("#a5a5a5"),
                 ShapeBorderColor = Color.Black
@@ -101,7 +101,6 @@ namespace WashMachine.Forms.Modules.Login
             ButtonRoundedUI btnMachineWithoutPayment = new ButtonRoundedUI()
             {
                 Dock = DockStyle.Fill,
-                Width = Width,
                 Text = "Test Machine without Payment",
                 ShapeBackgroudColor = ColorTranslator.FromHtml("#a5a5a5"),
                 ShapeBorderColor = Color.Black
@@ -112,7 +111,6 @@ namespace WashMachine.Forms.Modules.Login
             ButtonRoundedUI btnLogout = new ButtonRoundedUI()
             {
                 Dock = DockStyle.Fill,
-                Width = Width,
                 Text = "Logout",
                 ShapeBackgroudColor = ColorTranslator.FromHtml("#a5a5a5"),
                 ShapeBorderColor = Color.Black
@@ -135,7 +133,7 @@ namespace WashMachine.Forms.Modules.Login
 
         private void BtnLogout_Click(object sender, EventArgs e)
         {
-            Program.AppConfig.ShopConfigPath = Path.Combine(Directory.GetCurrentDirectory(), "shop.config");
+            Program.AppConfig.ShopConfigPath = Path.Combine(Directory.GetCurrentDirectory(), Program.ShopConfigFile);
             if (File.Exists(Program.AppConfig.ShopConfigPath))
             {
                 File.Delete(Program.AppConfig.ShopConfigPath);
@@ -161,7 +159,7 @@ namespace WashMachine.Forms.Modules.Login
 
         private void SignInShopForm_FormClosed(object sender, FormClosedEventArgs e)
         {
-            Program.AppConfig.ShopConfigPath = Path.Combine(Directory.GetCurrentDirectory(), "shop.config");
+            Program.AppConfig.ShopConfigPath = Path.Combine(Directory.GetCurrentDirectory(), Program.ShopConfigFile);
             if (!File.Exists(Program.AppConfig.ShopConfigPath))
             {
                 Application.Exit();
@@ -188,27 +186,68 @@ namespace WashMachine.Forms.Modules.Login
             tlpLoginForm.Enabled = false;
             progressUI.Show();
 
-            Task.Run(async () =>
+            Task.Run(() =>
             {
                 Thread.Sleep(5000);
+                BeginInvoke((MethodInvoker)async delegate
+                {
+                    try
+                    {
+                        Program.ShopConfig = Program.AppConfig.GetShopConfig();
+                        bool isLogin = await ReSignIn(Program.ShopConfig.Code);
+                        if (isLogin)
+                        {
+                            Program.ShopConfig = Program.AppConfig.GetShopConfig();
+                            await Program.ShopConfig.ShopSetting.LoadImages();
+                            InitialOctopusAsync();
+                            Program.octopusService.SetUserIsUsingApp(true);
+                            Cursor = Cursors.Default;
+                            tlpLoginForm.Enabled = true;
+                            progressUI.Hide();
+                            Refresh();
+                        }
+                    }
+                    finally
+                    {
+
+                    }
+                });
+            });
+        }
+
+        private async Task<bool> ReSignIn(string code)
+        {
+            Shop.Model.ShopModel shopModel = await new Modules.Shop.Service.ShopService().SignIn(code);
+            if (shopModel == null)
+            {
+                MessageBox.Show("The shop code is not available, please try again.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return false;
+            }
+            else
+            {
                 try
                 {
-                    Program.ShopConfig = Program.AppConfig.GetShopConfig();
-                    await Program.ShopConfig.ShopSetting.LoadImages();
-                }
-                finally
-                {
-                    BeginInvoke((MethodInvoker)delegate
+                    Program.AppConfig.ShopConfigPath = Path.Combine(Directory.GetCurrentDirectory(), Program.ShopConfigFile);
+                    if (!File.Exists(Program.AppConfig.ShopConfigPath))
                     {
-                        InitialOctopusAsync();
-                        Program.octopusService.SetUserIsUsingApp(true);
-                        Cursor = Cursors.Default;
-                        tlpLoginForm.Enabled = true;
-                        progressUI.Hide();
-                        Refresh();
-                    });
+                        Application.Exit();
+                    }
+
+                    using (FileStream fileStream = new FileStream(Program.AppConfig.ShopConfigPath, FileMode.OpenOrCreate))
+                    {
+                        string dataasstring = JsonConvert.SerializeObject(shopModel);
+                        byte[] info = new UTF8Encoding(true).GetBytes(dataasstring);
+                        fileStream.Write(info, 0, info.Length);
+                    }
+                    return true;
                 }
-            });
+                catch (Exception ex)
+                {
+                    Logger.Log(ex);
+                    MessageBox.Show("The shop code is not available, please try again.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+                return false;
+            }
         }
 
         private async void BtnMachine_Click(object sender, EventArgs e)

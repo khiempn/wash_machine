@@ -18,14 +18,14 @@ namespace WashMachine.Forms
                 var name = propertyInfo.Name;
                 var value = appSettings[name] ?? "";
 
-                if (name.Equals("DollarParity", System.StringComparison.OrdinalIgnoreCase)
+                if (name.Equals("WashMachineParity", System.StringComparison.OrdinalIgnoreCase)
                     || name.Equals("CouponParity", System.StringComparison.OrdinalIgnoreCase)
                     )
                 {
                     Parity parity = (Parity)Enum.Parse(typeof(Parity), value, true);
                     propertyInfo.SetValue(obj, parity);
                 }
-                else if (name.Equals("DollarStopBits", System.StringComparison.OrdinalIgnoreCase)
+                else if (name.Equals("WashMachineStopBits", System.StringComparison.OrdinalIgnoreCase)
                     || name.Equals("CouponStopBits", System.StringComparison.OrdinalIgnoreCase)
                     )
                 {
@@ -50,16 +50,18 @@ namespace WashMachine.Forms
             return obj;
         }
         public string AppHost { get; set; }
-        public string DollarCom { get; set; }
-        public int DollarBaudRate { get; set; }
-        public Parity DollarParity { get; set; }
-        public int DollarData { get; set; }
-        public StopBits DollarStopBits { get; set; }
-        public string CouponCom { get; set; }
-        public int CouponBaudRate { get; set; }
-        public Parity CouponParity { get; set; }
-        public int CouponData { get; set; }
-        public StopBits CouponStopBits { get; set; }
+        public string WashMachineCom { get; set; }
+        public int WashMachineBaudRate { get; set; }
+        public Parity WashMachineParity { get; set; }
+        public int WashMachineData { get; set; }
+        public StopBits WashMachineStopBits { get; set; }
+
+        public string DryerMachineCom { get; set; }
+        public int DryerMachineBaudRate { get; set; }
+        public Parity DryerMachineParity { get; set; }
+        public int DryerMachineData { get; set; }
+        public StopBits DryerMachineStopBits { get; set; }
+
         public int XorMethod { get; set; } = 0;
         public int HexTrimMethod { get; set; } = 0;
         public string EftTilNumber { get; set; }
@@ -77,14 +79,9 @@ namespace WashMachine.Forms
         public int ScanTimeout { get; set; }
         public int DelayDeduct { get; set; }
 
-        public string WashMachineCom { get; set; }
-        public int WashMachineBaudRate { get; set; }
-        public Parity WashMachineParity { get; set; }
-        public int WashMachineData { get; set; }
-        public StopBits WashMachineStopBits { get; set; }
         public ShopConfigModel GetShopConfig()
         {
-            string shopConfigPath = Path.Combine(Directory.GetCurrentDirectory(), "shop.config");
+            string shopConfigPath = Path.Combine(Directory.GetCurrentDirectory(), Program.ShopConfigFile);
             if (File.Exists(shopConfigPath))
             {
                 string shopConfigText = File.ReadAllText(shopConfigPath);

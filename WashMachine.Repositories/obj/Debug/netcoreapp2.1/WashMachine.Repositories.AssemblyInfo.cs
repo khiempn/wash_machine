@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("WashMachine.Repositories")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+db2221dd0576c55c328cd7ac4e262380d8fe7d43")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+06406fbdae78e90bc4e1960a2c4e6560c191ee9b")]
 [assembly: System.Reflection.AssemblyProductAttribute("WashMachine.Repositories")]
 [assembly: System.Reflection.AssemblyTitleAttribute("WashMachine.Repositories")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

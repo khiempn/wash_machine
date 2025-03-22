@@ -77,16 +77,7 @@ namespace WashMachine.Forms.Modules.PaidBy.Service
         {
             try
             {
-                AppConfigModel appConfig = Program.AppConfig;
-                bool isConnected = await machineService.ConnectAsync(appConfig.CouponCom, appConfig.CouponBaudRate, appConfig.CouponData, appConfig.CouponParity, appConfig.CouponStopBits);
-                if (isConnected)
-                {
-                    aliPaytimer.Start();
-                }
-                else
-                {
-                    MessageBox.Show($"Can not connect device.! \n CONFIG: {JsonConvert.SerializeObject(appConfig)}", "Information", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                }
+                aliPaytimer.Start();
             }
             catch (Exception ex)
             {

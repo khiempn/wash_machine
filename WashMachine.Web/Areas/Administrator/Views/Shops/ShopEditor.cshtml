@@ -146,13 +146,13 @@
                         <div class="card">
                             <div class="card-body">
                                 <h5 class="card-title">Machine COM</h5>
-                                <input hidden name="DollarCom.ComType" value="DollarCom" />
+                                <input hidden name="WashMachineCom.ComType" value="WashMachineCom" />
                                 <div class="row">
                                     <div class="col-md-4">
                                         <div class="form-group row">
                                             <label class="col-sm-4 col-form-label">COM Name</label>
                                             <div class="col-sm-8 form-item">
-                                                @Html.TextBoxFor(model => model.DollarCom.ComName, new { @class = "form-control", autocomplete = "off", placeholder = "COM Name" })
+                                                @Html.TextBoxFor(model => model.WashMachineCom.ComName, new { @class = "form-control", autocomplete = "off", placeholder = "COM Name" })
                                             </div>
                                         </div>
                                     </div>
@@ -160,7 +160,7 @@
                                         <div class="form-group row">
                                             <label class="col-sm-4 col-form-label">Baud Rate</label>
                                             <div class="col-sm-8 form-item">
-                                                @Html.TextBoxFor(model => model.DollarCom.BaudRate, new { @class = "form-control", autocomplete = "off", placeholder = "Baud Rate" })
+                                                @Html.TextBoxFor(model => model.WashMachineCom.BaudRate, new { @class = "form-control", autocomplete = "off", placeholder = "Baud Rate" })
                                             </div>
                                         </div>
                                     </div>
@@ -168,14 +168,14 @@
                                         <div class="form-group row">
                                             <label class="col-sm-4 col-form-label">Parity</label>
                                             <div class="col-sm-8 form-item">
-                                                @Html.DropDownList("DollarCom.Parity", new List<SelectListItem> {
-                                                new SelectListItem { Value = "None", Text = "None", Selected = (Model.DollarCom.Parity == "None") },
-                                                new SelectListItem { Value = "Odd", Text = "Odd", Selected = (Model.DollarCom.Parity == "Odd") },
-                                                new SelectListItem { Value = "Even", Text = "Even", Selected = (Model.DollarCom.Parity == "Even") },
-                                                new SelectListItem { Value = "Mark", Text = "Mark", Selected = (Model.DollarCom.Parity == "Mark") },
-                                                new SelectListItem { Value = "Space", Text = "Space", Selected = (Model.DollarCom.Parity == "Space") }
+                                                @Html.DropDownList("WashMachineCom.Parity", new List<SelectListItem> {
+                                                new SelectListItem { Value = "None", Text = "None", Selected = (Model.WashMachineCom.Parity == "None") },
+                                                new SelectListItem { Value = "Odd", Text = "Odd", Selected = (Model.WashMachineCom.Parity == "Odd") },
+                                                new SelectListItem { Value = "Even", Text = "Even", Selected = (Model.WashMachineCom.Parity == "Even") },
+                                                new SelectListItem { Value = "Mark", Text = "Mark", Selected = (Model.WashMachineCom.Parity == "Mark") },
+                                                new SelectListItem { Value = "Space", Text = "Space", Selected = (Model.WashMachineCom.Parity == "Space") }
                                                 }, "---Select an option---", new { @class = "form-control" })
-                                                @Html.ValidationMessageFor(model => model.DollarCom.Parity)
+                                                @Html.ValidationMessageFor(model => model.WashMachineCom.Parity)
                                             </div>
                                         </div>
                                     </div>
@@ -185,7 +185,7 @@
                                         <div class="form-group row">
                                             <label class="col-sm-4 col-form-label">Data</label>
                                             <div class="col-sm-8 form-item">
-                                                @Html.TextBoxFor(model => model.DollarCom.Data, new { @class = "form-control", autocomplete = "off", placeholder = "Data" })
+                                                @Html.TextBoxFor(model => model.WashMachineCom.Data, new { @class = "form-control", autocomplete = "off", placeholder = "Data" })
                                             </div>
                                         </div>
                                     </div>
@@ -193,13 +193,13 @@
                                         <div class="form-group row">
                                             <label class="col-sm-4 col-form-label">StopBits</label>
                                             <div class="col-sm-8 form-item">
-                                                @Html.DropDownList("DollarCom.StopBits", new List<SelectListItem> {
-                                                new SelectListItem { Value = "None", Text = "None", Selected = (Model.DollarCom.StopBits == "None") },
-                                                new SelectListItem { Value = "One", Text = "One", Selected = (Model.DollarCom.StopBits == "One") },
-                                                new SelectListItem { Value = "Two", Text = "Two", Selected = (Model.DollarCom.StopBits == "Two") },
-                                                new SelectListItem { Value = "OnePointFive", Text = "OnePointFive", Selected = (Model.DollarCom.StopBits == "OnePointFive") }
+                                                @Html.DropDownList("WashMachineCom.StopBits", new List<SelectListItem> {
+                                                new SelectListItem { Value = "None", Text = "None", Selected = (Model.WashMachineCom.StopBits == "None") },
+                                                new SelectListItem { Value = "One", Text = "One", Selected = (Model.WashMachineCom.StopBits == "One") },
+                                                new SelectListItem { Value = "Two", Text = "Two", Selected = (Model.WashMachineCom.StopBits == "Two") },
+                                                new SelectListItem { Value = "OnePointFive", Text = "OnePointFive", Selected = (Model.WashMachineCom.StopBits == "OnePointFive") }
                                                 }, "---Select an option---", new { @class = "form-control" })
-                                                @Html.ValidationMessageFor(model => model.DollarCom.StopBits)
+                                                @Html.ValidationMessageFor(model => model.WashMachineCom.StopBits)
                                             </div>
                                         </div>
                                     </div>

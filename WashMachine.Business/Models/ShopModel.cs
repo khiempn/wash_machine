@@ -32,6 +32,6 @@ namespace WashMachine.Business.Models
         public string MachineCode { get; set; }
         public string BackLink { get; set; }
 
-        public ShopComModel DollarCom { get; set; } = new ShopComModel();
+        public ShopComModel WashMachineCom { get; set; } = new ShopComModel();
     }
 }

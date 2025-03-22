@@ -148,7 +148,7 @@ namespace WashMachine.Forms.Modules.LaundryWashOption.LaundryOptionItems
 
                 AppConfigModel appConfig = Program.AppConfig;
                 Logger.Log($"{nameof(Wash03LaundryItem)} Step 2 {JsonConvert.SerializeObject(appConfig)}");
-                bool isConnected = await machineService.ConnectAsync(appConfig.DollarCom, appConfig.DollarBaudRate, appConfig.DollarData, appConfig.DollarParity, appConfig.DollarStopBits);
+                bool isConnected = await machineService.ConnectAsync(appConfig.WashMachineCom, appConfig.WashMachineBaudRate, appConfig.WashMachineData, appConfig.WashMachineParity, appConfig.WashMachineStopBits);
 
                 if (isConnected)
                 {

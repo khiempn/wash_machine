@@ -32,7 +32,7 @@ namespace WashMachine.Forms.Modules.LaundryWashOption
             WindowState = FormWindowState.Maximized;
             StartPosition = FormStartPosition.CenterParent;
             BackColor = Color.White;
-            Font = new Font(Font.FontFamily, 14f, FontStyle.Regular);
+            Font = new Font(Font.FontFamily, 12f, FontStyle.Regular);
 
             tblLaundryForm = new TableLayoutPanel()
             {

@@ -49,7 +49,7 @@ namespace WashMachine.Forms.Modules.Login
                 Name = "MainLayout"
             };
 
-            Font = new Font(Font.FontFamily, 14f, FontStyle.Regular);
+            Font = new Font(Font.FontFamily, 12f, FontStyle.Regular);
             tlpLoginForm.Paint += TlpLoginForm_Paint;
             tlpLoginForm.RowStyles.Add(new RowStyle() { Height = 1, SizeType = SizeType.Percent });
             tlpLoginForm.RowStyles.Add(new RowStyle() { Height = 2, SizeType = SizeType.Percent });
@@ -172,7 +172,7 @@ namespace WashMachine.Forms.Modules.Login
         {
             try
             {
-                Program.octopusService.Disconect();
+                Program.octopusService?.Disconect();
             }
             catch (Exception ex)
             {
@@ -201,11 +201,11 @@ namespace WashMachine.Forms.Modules.Login
                             await Program.ShopConfig.ShopSetting.LoadImages();
                             InitialOctopusAsync();
                             Program.octopusService.SetUserIsUsingApp(true);
-                            Cursor = Cursors.Default;
-                            tlpLoginForm.Enabled = true;
-                            progressUI.Hide();
                             Refresh();
                         }
+                        Cursor = Cursors.Default;
+                        tlpLoginForm.Enabled = true;
+                        progressUI.Hide();
                     }
                     finally
                     {

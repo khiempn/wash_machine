@@ -39,12 +39,12 @@ namespace WashMachine.Forms.Common.Utils
             Size formSize = mainForm.Size;
             control.Size = new Size((int)(formSize.Width * widthPer), (int)(formSize.Height * heightPer));
 
-            List<string> ignoreFonts = new List<string>() { nameof(LowTempOptionItem), nameof(MidTempOptionItem), nameof(HighTempOptionItem) };
-            if(!ignoreFonts.Contains(control.Name))
-            {
-                float fontSize = Math.Min(mainForm.Width, mainForm.Height) * fontSizePer;
-                control.Font = new Font(mainForm.Font.FontFamily, fontSize);
-            }
+            //List<string> ignoreFonts = new List<string>() { nameof(LowTempOptionItem), nameof(MidTempOptionItem), nameof(HighTempOptionItem) };
+            //if(!ignoreFonts.Contains(control.Name))
+            //{
+            //    float fontSize = Math.Min(mainForm.Width, mainForm.Height) * fontSizePer;
+            //    control.Font = new Font(mainForm.Font.FontFamily, fontSize);
+            //}
             if (control.Padding.All > 0)
             {
                 control.Padding = new Padding((int)paddingSize);

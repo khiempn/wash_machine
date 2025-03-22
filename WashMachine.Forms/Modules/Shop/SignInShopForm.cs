@@ -29,7 +29,7 @@ namespace WashMachine.Forms.Modules.Shop
 
             FormBorderStyle = FormBorderStyle.FixedSingle;
             shopService = new ShopService();
-            Font = new Font(Font.FontFamily, 14f, FontStyle.Regular);
+            Font = new Font(Font.FontFamily, 12f, FontStyle.Regular);
 
             tlpSignInShopForm = new TableLayoutPanel()
             {

@@ -38,8 +38,8 @@ namespace WashMachine.Business.Models
         public string Wash04LaundryItem_UnlockCommand { get; set; } = "04 06 01 27 00 10 39 A4";
 
         public string Dryer01LaundryItem_HighTempOptionItem { get; set; } = "01 06 01 66 00 01 A9 E9";
-        public string Dryer01LaundryItem_MidTempOptionItem { get; set; } = "01 06 01 66 00 01 E9 E8";
-        public string Dryer01LaundryItem_LowTempOptionItem { get; set; } = "01 06 01 66 00 01 28 28";
+        public string Dryer01LaundryItem_MidTempOptionItem { get; set; } = "01 06 01 66 00 02 E9 E8";
+        public string Dryer01LaundryItem_LowTempOptionItem { get; set; } = "01 06 01 66 00 03 28 28";
         public string Dryer01LaundryItem_Minute30TimeOptionItem { get; set; } = "01 06 01 67 00 1E B9 E1";
         public string Dryer01LaundryItem_Minute40TimeOptionItem { get; set; } = "01 06 01 67 00 3C 39 F8";
         public string Dryer01LaundryItem_Minute50TimeOptionItem { get; set; } = "01 06 01 67 00 5A B9 D2";
@@ -48,8 +48,8 @@ namespace WashMachine.Business.Models
         public string Dryer01LaundryItem_StopCommand { get; set; } = "01 06 01 68 00 02 88 2B";
 
         public string Dryer02LaundryItem_HighTempOptionItem { get; set; } = "02 06 01 66 00 01 A9 DA";
-        public string Dryer02LaundryItem_MidTempOptionItem { get; set; } = "02 06 01 66 00 01 E9 DB";
-        public string Dryer02LaundryItem_LowTempOptionItem { get; set; } = "02 06 01 66 00 01 28 1B";
+        public string Dryer02LaundryItem_MidTempOptionItem { get; set; } = "02 06 01 66 00 02 E9 DB";
+        public string Dryer02LaundryItem_LowTempOptionItem { get; set; } = "02 06 01 66 00 03 28 1B";
         public string Dryer02LaundryItem_Minute30TimeOptionItem { get; set; } = "02 06 01 67 00 1E B9 D2";
         public string Dryer02LaundryItem_Minute40TimeOptionItem { get; set; } = "02 06 01 67 00 3C 39 CB";
         public string Dryer02LaundryItem_Minute50TimeOptionItem { get; set; } = "02 06 01 67 00 5A B9 E1";
@@ -58,8 +58,8 @@ namespace WashMachine.Business.Models
         public string Dryer02LaundryItem_StopCommand { get; set; } = "02 06 01 68 00 02 88 18";
 
         public string Dryer03LaundryItem_HighTempOptionItem { get; set; } = "03 06 01 66 00 01 A8 0B";
-        public string Dryer03LaundryItem_MidTempOptionItem { get; set; } = "03 06 01 66 00 01 E8 0A";
-        public string Dryer03LaundryItem_LowTempOptionItem { get; set; } = "03 06 01 66 00 01 29 CA";
+        public string Dryer03LaundryItem_MidTempOptionItem { get; set; } = "03 06 01 66 00 02 E8 0A";
+        public string Dryer03LaundryItem_LowTempOptionItem { get; set; } = "03 06 01 66 00 03 29 CA";
         public string Dryer03LaundryItem_Minute30TimeOptionItem { get; set; } = "03 06 01 67 00 1E B8 03";
         public string Dryer03LaundryItem_Minute40TimeOptionItem { get; set; } = "03 06 01 67 00 3C 38 1A";
         public string Dryer03LaundryItem_Minute50TimeOptionItem { get; set; } = "03 06 01 67 00 5A B8 30";
@@ -68,8 +68,8 @@ namespace WashMachine.Business.Models
         public string Dryer03LaundryItem_StopCommand { get; set; } = "03 06 01 68 00 02 89 C9";
 
         public string Dryer04LaundryItem_HighTempOptionItem { get; set; } = "04 06 01 66 00 01 A9 BC";
-        public string Dryer04LaundryItem_MidTempOptionItem { get; set; } = "04 06 01 66 00 01 E9 BD";
-        public string Dryer04LaundryItem_LowTempOptionItem { get; set; } = "04 06 01 66 00 01 28 7D";
+        public string Dryer04LaundryItem_MidTempOptionItem { get; set; } = "04 06 01 66 00 02 E9 BD";
+        public string Dryer04LaundryItem_LowTempOptionItem { get; set; } = "04 06 01 66 00 03 28 7D";
         public string Dryer04LaundryItem_Minute30TimeOptionItem { get; set; } = "04 06 01 67 00 1E B9 B4";
         public string Dryer04LaundryItem_Minute40TimeOptionItem { get; set; } = "04 06 01 67 00 3C 39 AD";
         public string Dryer04LaundryItem_Minute50TimeOptionItem { get; set; } = "04 06 01 67 00 5A B9 87";

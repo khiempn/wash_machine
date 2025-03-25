@@ -21,8 +21,8 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.LaundryOptionItems
         public Dictionary<string, string> TemperatureCommands { get; set; } = new Dictionary<string, string>()
         {
             { nameof(HighTempOptionItem), "04 06 01 66 00 01 A9 BC" },
-            { nameof(MidTempOptionItem), "04 06 01 66 00 01 E9 BD" },
-            { nameof(LowTempOptionItem), "04 06 01 66 00 01 28 7D" },
+            { nameof(MidTempOptionItem), "04 06 01 66 00 02 E9 BD" },
+            { nameof(LowTempOptionItem), "04 06 01 66 00 03 28 7D" },
         };
 
         public Dictionary<string, string> TimeCommands { get; set; } = new Dictionary<string, string>()

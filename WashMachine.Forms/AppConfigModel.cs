@@ -19,14 +19,14 @@ namespace WashMachine.Forms
                 var value = appSettings[name] ?? "";
 
                 if (name.Equals("WashMachineParity", System.StringComparison.OrdinalIgnoreCase)
-                    || name.Equals("CouponParity", System.StringComparison.OrdinalIgnoreCase)
+                    || name.Equals("DryerMachineParity", System.StringComparison.OrdinalIgnoreCase)
                     )
                 {
                     Parity parity = (Parity)Enum.Parse(typeof(Parity), value, true);
                     propertyInfo.SetValue(obj, parity);
                 }
                 else if (name.Equals("WashMachineStopBits", System.StringComparison.OrdinalIgnoreCase)
-                    || name.Equals("CouponStopBits", System.StringComparison.OrdinalIgnoreCase)
+                    || name.Equals("DryerMachineStopBits", System.StringComparison.OrdinalIgnoreCase)
                     )
                 {
                     StopBits parity = (StopBits)Enum.Parse(typeof(StopBits), value, true);

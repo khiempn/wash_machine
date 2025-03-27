@@ -188,7 +188,7 @@ namespace WashMachine.Forms.Modules.Login
 
             Task.Run(() =>
             {
-                Thread.Sleep(5000);
+                Thread.Sleep(3000);
                 BeginInvoke((MethodInvoker)async delegate
                 {
                     try
@@ -198,7 +198,7 @@ namespace WashMachine.Forms.Modules.Login
                         if (isLogin)
                         {
                             Program.ShopConfig = Program.AppConfig.GetShopConfig();
-                            await Program.ShopConfig.ShopSetting.LoadImages();
+                            //await Program.ShopConfig.ShopSetting.LoadImages();
                             InitialOctopusAsync();
                             Program.octopusService.SetUserIsUsingApp(true);
                         }

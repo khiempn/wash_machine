@@ -157,6 +157,12 @@
     <Compile Include="Modules\LaundryWashOption\TimeOptionItems\Minute30TimeOptionItem.cs" />
     <Compile Include="Modules\LaundryWashOption\TimeOptionItems\Minute15TimeOptionItem.cs" />
     <Compile Include="Modules\Laundry\CardItemProperty.cs" />
+    <Compile Include="Modules\Laundry\Dialog\RunningDetailUI.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Modules\Laundry\Dialog\RunningDetailUI.Designer.cs">
+      <DependentUpon>RunningDetailUI.cs</DependentUpon>
+    </Compile>
     <Compile Include="Modules\Laundry\LaundryItems\Dryer04LaundryItem.cs" />
     <Compile Include="Modules\Laundry\LaundryItems\Dryer03LaundryItem.cs" />
     <Compile Include="Modules\Laundry\LaundryItems\Dryer02LaundryItem.cs" />
@@ -265,6 +271,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Modules\LaundryWashOption\LaundryWashOptionForm.resx">
       <DependentUpon>LaundryWashOptionForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Modules\Laundry\Dialog\RunningDetailUI.resx">
+      <DependentUpon>RunningDetailUI.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Modules\Laundry\LaundryForm.resx">
       <DependentUpon>LaundryForm.cs</DependentUpon>

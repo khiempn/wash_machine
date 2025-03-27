@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using WashMachine.Forms.Common.UI;
 using WashMachine.Forms.Database.Context;
 using WashMachine.Forms.Database.Tables.Machine;
+using WashMachine.Forms.Modules.Laundry.Dialog;
 using WashMachine.Forms.Modules.LaundryDryerOption;
 using WashMachine.Forms.Modules.Login;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Menu;
@@ -28,10 +29,19 @@ namespace WashMachine.Forms.Modules.Laundry.LaundryItems
 
         public void Click()
         {
-            LaundryDryerOptionForm laundryDryerOptionForm = new LaundryDryerOptionForm(this, followType);
-            laundryDryerOptionForm.Show();
-            laundryDryerOptionForm.FormClosed += LaundryDryerOptionForm_FormClosed;
-            mainForm.Hide();
+            //LaundryDryerOptionForm laundryDryerOptionForm = new LaundryDryerOptionForm(this, followType);
+            //laundryDryerOptionForm.Show();
+            //laundryDryerOptionForm.FormClosed += LaundryDryerOptionForm_FormClosed;
+            //mainForm.Hide();
+            MachineModel machine = new MachineModel();
+
+            machine.StartAt = DateTime.Now.Ticks.ToString();
+            machine.EndAt = DateTime.Now.AddMinutes(30).Ticks.ToString();
+            machine.Time = 30;
+            machine.Temp = 1;
+
+            RunningDetailUI runningDetailUI = new RunningDetailUI(machine);
+            runningDetailUI.ShowDialog();
         }
 
         private void LaundryDryerOptionForm_FormClosed(object sender, FormClosedEventArgs e)

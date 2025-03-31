@@ -1007,11 +1007,18 @@ namespace WashMachine.Forms.Modules.PaidBy.Machine.Octopus
         {
             get
             {
-                string info = CustomerInfo + string.Empty;
-                string[] items = info.Split('-');
-                if (items.Length > 0)
+                try
                 {
-                    return int.Parse(items[0]);
+                    string info = CustomerInfo + string.Empty;
+                    string[] items = info.Split('-');
+                    if (items.Length > 0)
+                    {
+                        return int.Parse(items[0]);
+                    }
+                }
+                catch
+                {
+                    return -1;
                 }
                 return -1;
             }

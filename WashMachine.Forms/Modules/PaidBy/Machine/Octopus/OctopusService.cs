@@ -154,9 +154,13 @@ namespace WashMachine.Forms.Modules.PaidBy.Machine.Octopus
                     PaymentId = paymentInfo.Id,
                     PaymentTypeId = paymentInfo.PaymentTypeId,
                     PaymentTypeName = paymentInfo.PaymentTypeName,
+                    CustomerInfo = "0-10-2-3-4"
                 };
                 cardInfo.CardJson = JsonConvert.SerializeObject(cardInfo);
                 CreateOrderIncompleteHandler?.Invoke(sender, cardInfo);
+
+                cardPollFirstly = null;
+                pollTimer.Stop();
 
                 PaymentProgressHandler?.Invoke(true, new OctopusPaymentResponseModel()
                 {
@@ -167,6 +171,7 @@ namespace WashMachine.Forms.Modules.PaidBy.Machine.Octopus
                     MessageCodes = new List<int>() { (int)OctopusPaymentStatus.SUCCESS },
                     IsStop = true
                 });
+
                 return;
             }
             else

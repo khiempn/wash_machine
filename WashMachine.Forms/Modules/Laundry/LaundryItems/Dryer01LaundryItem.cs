@@ -9,7 +9,6 @@ using WashMachine.Forms.Database.Tables.Machine;
 using WashMachine.Forms.Modules.Laundry.Dialog;
 using WashMachine.Forms.Modules.LaundryDryerOption;
 using WashMachine.Forms.Modules.Login;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.Menu;
 
 namespace WashMachine.Forms.Modules.Laundry.LaundryItems
 {
@@ -29,19 +28,35 @@ namespace WashMachine.Forms.Modules.Laundry.LaundryItems
 
         public void Click()
         {
-            //LaundryDryerOptionForm laundryDryerOptionForm = new LaundryDryerOptionForm(this, followType);
-            //laundryDryerOptionForm.Show();
-            //laundryDryerOptionForm.FormClosed += LaundryDryerOptionForm_FormClosed;
-            //mainForm.Hide();
-            MachineModel machine = new MachineModel();
+            if (AppDbContext.Machine.Get(nameof(Dryer01LaundryItem)).IsRunning == 0)
+            {
+                LaundryDryerOptionForm laundryDryerOptionForm = new LaundryDryerOptionForm(this, followType);
+                laundryDryerOptionForm.Show();
+                laundryDryerOptionForm.FormClosed += LaundryDryerOptionForm_FormClosed;
+                mainForm.Hide();
+            }
+            else
+            {
+                MachineModel machine = timer.Tag as MachineModel;
+                if (MachineService.IsRunCompleted(machine) == false)
+                {
+                    RunningDetailUI runningDetailUI = new RunningDetailUI(machine);
+                    runningDetailUI.FormClosed += RunningDetailUI_FormClosed;
+                    runningDetailUI.ShowDialog();
+                }
+                else
+                {
+                    LaundryDryerOptionForm laundryDryerOptionForm = new LaundryDryerOptionForm(this, followType);
+                    laundryDryerOptionForm.Show();
+                    laundryDryerOptionForm.FormClosed += LaundryDryerOptionForm_FormClosed;
+                    mainForm.Hide();
+                }
+            }
+        }
 
-            machine.StartAt = DateTime.Now.Ticks.ToString();
-            machine.EndAt = DateTime.Now.AddMinutes(30).Ticks.ToString();
-            machine.Time = 30;
-            machine.Temp = 1;
-
-            RunningDetailUI runningDetailUI = new RunningDetailUI(machine);
-            runningDetailUI.ShowDialog();
+        private void RunningDetailUI_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            mainForm.Refresh();
         }
 
         private void LaundryDryerOptionForm_FormClosed(object sender, FormClosedEventArgs e)
@@ -66,6 +81,7 @@ namespace WashMachine.Forms.Modules.Laundry.LaundryItems
                 ShapeBorderColor = Color.Black,
                 CornerRadius = 50,
                 Margin = new Padding(0, 0, 10, 0),
+                Name = $"CardButtonRoundedUI_{nameof(Dryer01LaundryItem)}"
             };
             cardButton.Click += CardItem_Click;
 
@@ -92,7 +108,8 @@ namespace WashMachine.Forms.Modules.Laundry.LaundryItems
                 TextAlign = ContentAlignment.TopCenter,
                 Enabled = false,
                 Dock = DockStyle.Fill,
-                ForeColor = ColorTranslator.FromHtml("#ffffff")
+                ForeColor = ColorTranslator.FromHtml("#ffffff"),
+                Name = $"Title_{nameof(Dryer01LaundryItem)}"
             };
 
             lbTitle.Paint += LbTitle_Paint;
@@ -153,8 +170,17 @@ namespace WashMachine.Forms.Modules.Laundry.LaundryItems
                     AppDbContext.Machine.ResetMachine(machine);
                     if (mainForm.Controls.Find(lbInforName, true).Any())
                     {
+                        CardButtonRoundedUI cardButtonRounded = mainForm.Controls.Find($"CardButtonRoundedUI_{nameof(Dryer01LaundryItem)}", true).First() as CardButtonRoundedUI;
+                        cardButtonRounded.IsDisabled = false;
+                        cardButtonRounded.Refresh();
+
+                        Label lbTitle = mainForm.Controls.Find($"Title_{nameof(Dryer01LaundryItem)}", true).First() as Label;
+                        lbTitle.ForeColor = ColorTranslator.FromHtml("#ffffff");
+
                         Label lbInfor = mainForm.Controls.Find(lbInforName, true).First() as Label;
-                        mainForm.Controls.Remove(lbInfor);
+                        mainForm.Controls.RemoveByKey(lbInforName);
+                        lbInfor.Dispose();
+                        mainForm.Refresh();
                     }
                 }
                 else

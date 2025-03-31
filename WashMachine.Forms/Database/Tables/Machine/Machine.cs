@@ -306,5 +306,40 @@ namespace WashMachine.Forms.Database.Tables.Machine
             model.IsRunning = 0;
             Update(model);
         }
+
+        public MachineModel Get(string name)
+        {
+            var machine = new MachineModel();
+
+            using (var con = CreateConnection())
+            {
+                var command = con.CreateCommand();
+                command.CommandText = $@"SELECT Id, Name, Description, Type, StartAt, EndAt, Time, Temp, IsRunning FROM machine
+                    WHERE Name = '{name}'
+                ";
+                command.CommandType = System.Data.CommandType.Text;
+                using (SQLiteDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        machine = new MachineModel()
+                        {
+                            Id = reader.GetInt32(0),
+                            Name = reader.GetString(1),
+                            Description = reader.GetString(2),
+                            Type = reader.GetInt32(3),
+                            StartAt = reader.GetString(4),
+                            EndAt = reader.GetString(5),
+                            Time = reader.GetInt32(6),
+                            Temp = reader.GetInt32(7),
+                            IsRunning = reader.GetInt32(8)
+                        };
+                        return machine;
+                    }
+                }
+            }
+
+            return machine;
+        }
     }
 }

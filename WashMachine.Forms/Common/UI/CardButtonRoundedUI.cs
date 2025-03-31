@@ -57,10 +57,7 @@ namespace WashMachine.Forms.Common.UI
 
                 TextRenderer.DrawText(e.Graphics, Text, Font, ClientRectangle, ForeColor);
 
-                if (IsDisabled)
-                {
-                    SetBackgroundControl(Controls, bgColor);
-                }
+                SetBackgroundControl(Controls, bgColor);
             }
         }
 

@@ -351,7 +351,7 @@ namespace WashMachine.Forms.Modules.PaidBy.PaidByItems
             {
                 Dock = DockStyle.Fill,
                 Padding = new Padding(10),
-                ShapeBackgroudColor = ColorTranslator.FromHtml(cardItem.BackgroundColor),
+                ShapeBackgroudColor = Color.Transparent,
                 ShapeBorderColor = Color.Black,
                 CornerRadius = 50,
 

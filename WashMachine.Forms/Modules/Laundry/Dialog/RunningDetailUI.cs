@@ -96,6 +96,7 @@ namespace WashMachine.Forms.Modules.Laundry.Dialog
         {
             progressUI.Show();
             AppDbContext.Machine.ResetMachine(_machineModel);
+            Close();
         }
 
         private void Timer_Tick(object sender, System.EventArgs e)

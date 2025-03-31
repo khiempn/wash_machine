@@ -162,7 +162,7 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.LaundryOptionItems
                 Logger.Log($"{nameof(Dryer02LaundryItem)} Step 2 {JsonConvert.SerializeObject(appConfig)}");
                 bool isConnected = await machineService.ConnectAsync(appConfig.DryerMachineCom, appConfig.DryerMachineBaudRate, appConfig.DryerMachineData, appConfig.DryerMachineParity, appConfig.DryerMachineStopBits);
 
-                if (isConnected)
+                if (isConnected || Program.AppConfig.AutoRunning == 1)
                 {
                     Logger.Log($"{nameof(Dryer02LaundryItem)} Step 3");
                     string tempCommand = TemperatureCommands[$"{form.TempOptionItemSelected.Name}"];

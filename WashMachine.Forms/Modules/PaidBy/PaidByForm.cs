@@ -148,6 +148,7 @@ namespace WashMachine.Forms.Modules.PaidBy
         private void CardReturnUI_Click(object sender, EventArgs e)
         {
             Close();
+            Dispose();
         }
 
         private void CardItem_MouseLeave(object sender, EventArgs e)

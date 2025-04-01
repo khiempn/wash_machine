@@ -56,6 +56,7 @@ namespace WashMachine.Forms.Modules.Laundry.LaundryItems
         private void RunningDetailUI_FormClosed(object sender, FormClosedEventArgs e)
         {
             mainForm.Refresh();
+            ResetTemplate();
         }
 
         private void LaundryDryerOptionForm_FormClosed(object sender, FormClosedEventArgs e)
@@ -164,22 +165,7 @@ namespace WashMachine.Forms.Modules.Laundry.LaundryItems
                 MachineModel machine = timer.Tag as MachineModel;
                 if (MachineService.IsRunCompleted(machine))
                 {
-                    timer.Stop();
-                    AppDbContext.Machine.ResetMachine(machine);
-                    if (mainForm.Controls.Find(lbInforName, true).Any())
-                    {
-                        CardButtonRoundedUI cardButtonRounded = mainForm.Controls.Find($"CardButtonRoundedUI_{nameof(Dryer04LaundryItem)}", true).First() as CardButtonRoundedUI;
-                        cardButtonRounded.IsDisabled = false;
-                        cardButtonRounded.Refresh();
-
-                        Label lbTitle = mainForm.Controls.Find($"Title_{nameof(Dryer04LaundryItem)}", true).First() as Label;
-                        lbTitle.ForeColor = ColorTranslator.FromHtml("#ffffff");
-
-                        Label lbInfor = mainForm.Controls.Find(lbInforName, true).First() as Label;
-                        mainForm.Controls.RemoveByKey(lbInforName);
-                        lbInfor.Dispose();
-                        mainForm.Refresh();
-                    }
+                    ResetTemplate();
                 }
                 else
                 {
@@ -212,5 +198,29 @@ namespace WashMachine.Forms.Modules.Laundry.LaundryItems
         {
             Click();
         }
+        private void ResetTemplate()
+        {
+            MachineModel machine = timer.Tag as MachineModel;
+            if (MachineService.IsRunCompleted(machine))
+            {
+                timer.Stop();
+                AppDbContext.Machine.ResetMachine(machine);
+                if (mainForm.Controls.Find(lbInforName, true).Any())
+                {
+                    CardButtonRoundedUI cardButtonRounded = mainForm.Controls.Find($"CardButtonRoundedUI_{nameof(Dryer04LaundryItem)}", true).First() as CardButtonRoundedUI;
+                    cardButtonRounded.IsDisabled = false;
+                    cardButtonRounded.Refresh();
+
+                    Label lbTitle = mainForm.Controls.Find($"Title_{nameof(Dryer04LaundryItem)}", true).First() as Label;
+                    lbTitle.ForeColor = ColorTranslator.FromHtml("#ffffff");
+
+                    Label lbInfor = mainForm.Controls.Find(lbInforName, true).First() as Label;
+                    mainForm.Controls.RemoveByKey(lbInforName);
+                    lbInfor.Dispose();
+                    mainForm.Refresh();
+                }
+            }
+        }
+
     }
 }

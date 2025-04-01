@@ -1,4 +1,8 @@
-﻿using EFTSolutions;
+﻿using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Threading.Tasks;
+using System.Windows.Forms;
 using WashMachine.Forms.Common.Http;
 using WashMachine.Forms.Common.UI;
 using WashMachine.Forms.Modules.PaidBy.Dialog;
@@ -8,13 +12,6 @@ using WashMachine.Forms.Modules.PaidBy.Service;
 using WashMachine.Forms.Modules.PaidBy.Service.Eft;
 using WashMachine.Forms.Modules.PaidBy.Service.Model;
 using WashMachine.Forms.Modules.Payment;
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace WashMachine.Forms.Modules.PaidBy.PaidByItems
 {
@@ -22,9 +19,9 @@ namespace WashMachine.Forms.Modules.PaidBy.PaidByItems
     {
         ScanWaitingUI waitingUI;
         HttpService httpService;
-        IPaymentItem paymentItem;
+        IPaymentItem _paymentItem;
         Form mainForm;
-        Service.OctopusService octopusService;
+        static Service.OctopusService octopusService;
         ShopService shopService;
         ShopConfigModel shopConfig;
         PaymentModel _payment;
@@ -32,10 +29,18 @@ namespace WashMachine.Forms.Modules.PaidBy.PaidByItems
 
         public OctopusPaidByItem(Form parent, IPaymentItem paymentItem)
         {
-            octopusService = new Service.OctopusService();
+            if (octopusService == null)
+            {
+                octopusService = new Service.OctopusService();
+            }
+
+            octopusService.PaymentProgressHandler -= OctopusService_PaymentProgressHandler;
+            octopusService.PaymentLoopingHandler -= OctopusService_PaymentLoopingHandler;
+            octopusService.CreateOrderIncompleteHandler -= OctopusService_CreateOrderIncompleteHandler;
             octopusService.PaymentProgressHandler += OctopusService_PaymentProgressHandler;
             octopusService.PaymentLoopingHandler += OctopusService_PaymentLoopingHandler;
             octopusService.CreateOrderIncompleteHandler += OctopusService_CreateOrderIncompleteHandler;
+
             shopService = new ShopService();
             shopConfig = Program.AppConfig.GetShopConfig();
 
@@ -45,9 +50,10 @@ namespace WashMachine.Forms.Modules.PaidBy.PaidByItems
             waitingUI.CancelHandler += WaitingUI_CancelHandlerAsync;
             waitingUI.HomeHandler += WaitingUI_HomeHandler;
 
-            this.paymentItem = paymentItem;
+            _paymentItem = paymentItem;
             mainForm = parent;
         }
+
 
         private async void OctopusService_CreateOrderIncompleteHandler(object sender, CardInfo cardInfo)
         {
@@ -205,7 +211,7 @@ namespace WashMachine.Forms.Modules.PaidBy.PaidByItems
                             Message = "Payment successfully!"
                         });
 
-                        paymentItem.PaymentCompletedCallBack.Invoke(mainForm, () =>
+                        _paymentItem.PaymentCompletedCallBack.Invoke(mainForm, () =>
                         {
                             progressUI.Hide();
                             mainForm.Controls.Remove(progressUI);
@@ -399,7 +405,7 @@ namespace WashMachine.Forms.Modules.PaidBy.PaidByItems
             try
             {
                 Program.octopusService.SetUserIsUsingAppWithScanning();
-                waitingUI = new ScanWaitingUI(PaymentType.Octopus, paymentItem.PaymentAmount);
+                waitingUI = new ScanWaitingUI(PaymentType.Octopus, _paymentItem.PaymentAmount);
                 waitingUI.SetParent(mainForm);
                 waitingUI.CancelHandler += WaitingUI_CancelHandlerAsync;
                 waitingUI.HomeHandler += WaitingUI_HomeHandler;
@@ -408,15 +414,15 @@ namespace WashMachine.Forms.Modules.PaidBy.PaidByItems
                 waitingUI.Show();
                 mainForm.Refresh();
 
-                if (Program.octopusService.IsInitialSuccessfully == false || Program.octopusService.IsConnected() == false)
-                {
-                    waitingUI.SetSuccessMessage("Connecting to Octopus, please wait…");
-                    Program.octopusService.Initial();
-                    if (Program.octopusService.IsInitialSuccessfully)
-                    {
-                        waitingUI.SetSuccessMessage(string.Empty);
-                    }
-                }
+                //if (Program.octopusService.IsInitialSuccessfully == false || Program.octopusService.IsConnected() == false)
+                //{
+                //    waitingUI.SetSuccessMessage("Connecting to Octopus, please wait…");
+                //    Program.octopusService.Initial();
+                //    if (Program.octopusService.IsInitialSuccessfully)
+                //    {
+                //        waitingUI.SetSuccessMessage(string.Empty);
+                //    }
+                //}
                 _payment = null;
                 IsCancelPayment = false;
                 PaymentModel payment = await shopService.CreateNewPayment(new PaymentModel()
@@ -426,7 +432,7 @@ namespace WashMachine.Forms.Modules.PaidBy.PaidByItems
                     PaymentStatus = 1,
                     PaymentTypeName = nameof(PaymentType.Octopus),
                     PaymentTypeId = (int)PaymentType.Octopus,
-                    Amount = paymentItem.PaymentAmount
+                    Amount = _paymentItem.PaymentAmount
                 });
                 _payment = payment;
 

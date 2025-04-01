@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using WashMachine.Forms.Common.UI;
 using WashMachine.Forms.Database.Context;
 using WashMachine.Forms.Database.Tables.Machine;
+using WashMachine.Forms.Modules.Laundry.Dialog;
 using WashMachine.Forms.Modules.LaundryWashOption;
 using WashMachine.Forms.Modules.Login;
 
@@ -28,10 +29,36 @@ namespace WashMachine.Forms.Modules.Laundry.LaundryItems
 
         public void Click()
         {
-            LaundryWashOptionForm laundryWashOptionForm = new LaundryWashOptionForm(this, followType);
-            laundryWashOptionForm.Show();
-            laundryWashOptionForm.FormClosed += LaundryWashOptionForm_FormClosed;
-            mainForm.Hide();
+            if (AppDbContext.Machine.Get(nameof(Wash02LaundryItem)).IsRunning == 0)
+            {
+                LaundryWashOptionForm laundryWashOptionForm = new LaundryWashOptionForm(this, followType);
+                laundryWashOptionForm.Show();
+                laundryWashOptionForm.FormClosed += LaundryWashOptionForm_FormClosed;
+                mainForm.Hide();
+            }
+            else
+            {
+                MachineModel machine = timer.Tag as MachineModel;
+                if (MachineService.IsRunCompleted(machine) == false)
+                {
+                    RunningDetailUI runningDetailUI = new RunningDetailUI(machine);
+                    runningDetailUI.FormClosed += RunningDetailUI_FormClosed;
+                    runningDetailUI.ShowDialog();
+                }
+                else
+                {
+                    LaundryWashOptionForm laundryWashOptionForm = new LaundryWashOptionForm(this, followType);
+                    laundryWashOptionForm.Show();
+                    laundryWashOptionForm.FormClosed += LaundryWashOptionForm_FormClosed;
+                    mainForm.Hide();
+                }
+            }
+        }
+
+        private void RunningDetailUI_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            mainForm.Refresh();
+            ResetTemplate();
         }
 
         private void LaundryWashOptionForm_FormClosed(object sender, FormClosedEventArgs e)
@@ -56,6 +83,7 @@ namespace WashMachine.Forms.Modules.Laundry.LaundryItems
                 ShapeBorderColor = Color.Black,
                 CornerRadius = 50,
                 Margin = new Padding(0, 0, 10, 0),
+                Name = $"CardButtonRoundedUI_{nameof(Wash02LaundryItem)}"
             };
             cardButton.Click += CardItem_Click;
 
@@ -82,7 +110,8 @@ namespace WashMachine.Forms.Modules.Laundry.LaundryItems
                 TextAlign = ContentAlignment.TopCenter,
                 Enabled = false,
                 Dock = DockStyle.Fill,
-                ForeColor = ColorTranslator.FromHtml("#ffffff")
+                ForeColor = ColorTranslator.FromHtml("#ffffff"),
+                Name = $"Title_{nameof(Wash02LaundryItem)}"
             };
 
             MachineModel machine = AppDbContext.Machine.Get(new MachineModel() { Name = Name });
@@ -139,13 +168,7 @@ namespace WashMachine.Forms.Modules.Laundry.LaundryItems
                 MachineModel machine = timer.Tag as MachineModel;
                 if (MachineService.IsRunCompleted(machine))
                 {
-                    timer.Stop();
-                    AppDbContext.Machine.ResetMachine(machine);
-                    if (mainForm.Controls.Find(lbInforName, true).Any())
-                    {
-                        Label lbInfor = mainForm.Controls.Find(lbInforName, true).First() as Label;
-                        mainForm.Controls.Remove(lbInfor);
-                    }
+                    ResetTemplate();
                 }
                 else
                 {
@@ -178,6 +201,30 @@ namespace WashMachine.Forms.Modules.Laundry.LaundryItems
         private void CardItem_Click(object sender, EventArgs e)
         {
             Click();
+        }
+
+        private void ResetTemplate()
+        {
+            MachineModel machine = timer.Tag as MachineModel;
+            if (MachineService.IsRunCompleted(machine))
+            {
+                timer.Stop();
+                AppDbContext.Machine.ResetMachine(machine);
+                if (mainForm.Controls.Find(lbInforName, true).Any())
+                {
+                    CardButtonRoundedUI cardButtonRounded = mainForm.Controls.Find($"CardButtonRoundedUI_{nameof(Wash02LaundryItem)}", true).First() as CardButtonRoundedUI;
+                    cardButtonRounded.IsDisabled = false;
+                    cardButtonRounded.Refresh();
+
+                    Label lbTitle = mainForm.Controls.Find($"Title_{nameof(Wash02LaundryItem)}", true).First() as Label;
+                    lbTitle.ForeColor = ColorTranslator.FromHtml("#ffffff");
+
+                    Label lbInfor = mainForm.Controls.Find(lbInforName, true).First() as Label;
+                    mainForm.Controls.RemoveByKey(lbInforName);
+                    lbInfor.Dispose();
+                    mainForm.Refresh();
+                }
+            }
         }
     }
 }

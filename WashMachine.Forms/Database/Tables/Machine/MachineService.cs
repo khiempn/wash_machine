@@ -30,6 +30,17 @@ namespace WashMachine.Forms.Database.Tables.Machine
             return string.Empty;
         }
 
+        public static string GetEndAtFormat(MachineModel model)
+        {
+            if (!string.IsNullOrWhiteSpace(model.EndAt))
+            {
+                DateTime startAt = new DateTime(long.Parse(model.EndAt));
+                return startAt.ToString(@"hh\:mm tt");
+            }
+
+            return string.Empty;
+        }
+
         public static bool IsRunCompleted(MachineModel model)
         {
             DateTime endAt = new DateTime(long.Parse(model.EndAt));

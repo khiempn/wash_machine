@@ -1,14 +1,12 @@
-﻿using WashMachine.Forms.Modules.PaidBy.Machine;
-using WashMachine.Forms.Modules.PaidBy.Machine.Octopus;
-using WashMachine.Forms.Modules.PaidBy.Service.Model;
-using WashMachine.Forms.Modules.PaidBy.Service.Octopus;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Printing;
 using System.Threading.Tasks;
+using WashMachine.Forms.Modules.PaidBy.Machine;
+using WashMachine.Forms.Modules.PaidBy.Machine.Octopus;
+using WashMachine.Forms.Modules.PaidBy.Service.Model;
 
 namespace WashMachine.Forms.Modules.PaidBy.Service
 {

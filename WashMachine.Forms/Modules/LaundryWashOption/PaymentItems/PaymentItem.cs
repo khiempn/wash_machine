@@ -18,20 +18,32 @@ namespace WashMachine.Forms.Modules.LaundryWashOption.PaymentItems
             mainForm = form;
             this.followType = followType;
             paymentItem = new Payment.PaymentItems.HkdPaymentItem();
-            paymentItem.PaymentCompletedCallBack = PaymentItem_PaymentCompleted;
+            paymentItem.PaymentCompletedCallBack += PaymentItem_PaymentCompleted;
+        }
+
+        ~PaymentItem()
+        {
+            paymentItem.PaymentCompletedCallBack -= PaymentItem_PaymentCompleted;
         }
 
         private async void PaymentItem_PaymentCompleted(Form form, Action done)
         {
-            LaundryWashOptionForm laundryWashOptionForm = (LaundryWashOptionForm)mainForm;
-            if (laundryWashOptionForm.LaundryOptionItemSelected != null)
+            try
             {
-                ProgressUI progressUI = new ProgressUI();
-                progressUI.SetParent(form);
-                progressUI.Show();
-                await laundryWashOptionForm.LaundryOptionItemSelected.Start();
-                progressUI.Hide();
-                done.Invoke();
+                LaundryWashOptionForm laundryWashOptionForm = (LaundryWashOptionForm)mainForm;
+                if (laundryWashOptionForm.LaundryOptionItemSelected != null)
+                {
+                    ProgressUI progressUI = new ProgressUI();
+                    progressUI.SetParent(form);
+                    progressUI.Show();
+                    await laundryWashOptionForm.LaundryOptionItemSelected.Start();
+                    progressUI.Hide();
+                    done.Invoke();
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex);
             }
         }
 
@@ -68,6 +80,7 @@ namespace WashMachine.Forms.Modules.LaundryWashOption.PaymentItems
         private void PaidByForm_FormClosed(object sender, FormClosedEventArgs e)
         {
             mainForm.Close();
+            mainForm.Dispose();
         }
 
         public Control GetTemplate()

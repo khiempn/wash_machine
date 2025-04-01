@@ -150,7 +150,7 @@ namespace WashMachine.Forms.Modules.LaundryWashOption.LaundryOptionItems
                 Logger.Log($"{nameof(Wash03LaundryItem)} Step 2 {JsonConvert.SerializeObject(appConfig)}");
                 bool isConnected = await machineService.ConnectAsync(appConfig.WashMachineCom, appConfig.WashMachineBaudRate, appConfig.WashMachineData, appConfig.WashMachineParity, appConfig.WashMachineStopBits);
 
-                if (isConnected)
+                if (isConnected || Program.AppConfig.AutoRunning == 1)
                 {
                     Logger.Log($"{nameof(Wash03LaundryItem)} Step 3");
                     string programCommand = ProgramCommands[$"{form.TimeOptionItemSelected.Name}"];

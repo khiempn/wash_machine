@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Drawing;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using WashMachine.Forms.Common.UI;
 using WashMachine.Forms.Modules.Login;
@@ -22,6 +21,11 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.PaymentItems
             this.followType = followType;
             paymentItem = new Payment.PaymentItems.HkdPaymentItem();
             paymentItem.PaymentCompletedCallBack += PaymentItem_PaymentCompleted;
+        }
+
+        ~PaymentItem()
+        {
+            paymentItem.PaymentCompletedCallBack -= PaymentItem_PaymentCompleted;
         }
 
         private async void PaymentItem_PaymentCompleted(Form form, Action done)
@@ -79,6 +83,7 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.PaymentItems
         private void PaidByForm_FormClosed(object sender, FormClosedEventArgs e)
         {
             mainForm.Close();
+            mainForm.Dispose();
         }
 
         public Control GetTemplate()

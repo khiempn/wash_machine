@@ -29,14 +29,7 @@ namespace WashMachine.Forms.Modules.PaidBy.PaidByItems
 
         public OctopusPaidByItem(Form parent, IPaymentItem paymentItem)
         {
-            if (octopusService == null)
-            {
-                octopusService = new Service.OctopusService();
-            }
-
-            octopusService.PaymentProgressHandler -= OctopusService_PaymentProgressHandler;
-            octopusService.PaymentLoopingHandler -= OctopusService_PaymentLoopingHandler;
-            octopusService.CreateOrderIncompleteHandler -= OctopusService_CreateOrderIncompleteHandler;
+            octopusService = new Service.OctopusService();
             octopusService.PaymentProgressHandler += OctopusService_PaymentProgressHandler;
             octopusService.PaymentLoopingHandler += OctopusService_PaymentLoopingHandler;
             octopusService.CreateOrderIncompleteHandler += OctopusService_CreateOrderIncompleteHandler;
@@ -52,8 +45,32 @@ namespace WashMachine.Forms.Modules.PaidBy.PaidByItems
 
             _paymentItem = paymentItem;
             mainForm = parent;
+            mainForm.FormClosing += MainForm_FormClosing;
         }
 
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            RemoveRegisterEvents();
+        }
+
+        private void RemoveRegisterEvents()
+        {
+            try
+            {
+                octopusService.PaymentProgressHandler -= OctopusService_PaymentProgressHandler;
+                octopusService.PaymentLoopingHandler -= OctopusService_PaymentLoopingHandler;
+                octopusService.CreateOrderIncompleteHandler -= OctopusService_CreateOrderIncompleteHandler;
+                octopusService.RemoveRegisterEvents();
+
+                mainForm.FormClosing -= MainForm_FormClosing;
+                waitingUI.CancelHandler -= WaitingUI_CancelHandlerAsync;
+                waitingUI.HomeHandler -= WaitingUI_HomeHandler;
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex);
+            }
+        }
 
         private async void OctopusService_CreateOrderIncompleteHandler(object sender, CardInfo cardInfo)
         {

@@ -37,7 +37,7 @@ namespace WashMachine.Forms.Modules.PaidBy.Service
 
         private void MachineService_PaymentLoopingHandler(object sender, bool e)
         {
-            
+
         }
 
         private void Timer_Tick(object sender, EventArgs e)
@@ -149,11 +149,12 @@ namespace WashMachine.Forms.Modules.PaidBy.Service
             catch (Exception ex)
             {
                 Logger.Log(ex);
-                return new EftPayResponseModel() { 
+                return new EftPayResponseModel()
+                {
                     IsSuccess = false,
-                    Message = $"{ex.Message}", 
-                    ReturnId = 0, 
-                    TransactionRecord = null 
+                    Message = $"{ex.Message}",
+                    ReturnId = 0,
+                    TransactionRecord = null
                 };
             }
         }
@@ -196,6 +197,20 @@ namespace WashMachine.Forms.Modules.PaidBy.Service
         {
             if (value == null) return "0";
             return value.Value.ToString("n" + n);
+        }
+
+        public void RemoveRegisterEvents()
+        {
+            try
+            {
+                machineService.CodeRecived -= MachineService_CodeRecived;
+                machineService.PaymentLoopingHandler -= MachineService_PaymentLoopingHandler;
+                machineService.RemoveRegisterEvents();
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex);
+            }
         }
     }
 }

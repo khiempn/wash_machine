@@ -165,5 +165,21 @@ namespace WashMachine.Forms.Modules.PaidBy.Service
 
             //previewDialog.ShowDialog();
         }
+
+        public void RemoveRegisterEvents()
+        {
+            try
+            {
+                machineService.PaymentProgressHandler -= MachineService_PaymentProgressHandler;
+                machineService.PaymentLoopingHandler -= MachineService_PaymentLoopingHandler;
+                machineService.CreateOrderIncompleteHandler -= MachineService_CreateOrderIncompleteHandler;
+
+                machineService.RemoveRegisterEvents();
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex);
+            }
+        }
     }
 }

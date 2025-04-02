@@ -21,7 +21,7 @@ namespace WashMachine.Forms.Modules.LaundryWashOption.PaymentItems
             paymentItem.PaymentCompletedCallBack += PaymentItem_PaymentCompleted;
         }
 
-        ~PaymentItem()
+        private void RemoveRegisterEvents()
         {
             paymentItem.PaymentCompletedCallBack -= PaymentItem_PaymentCompleted;
         }
@@ -30,6 +30,7 @@ namespace WashMachine.Forms.Modules.LaundryWashOption.PaymentItems
         {
             try
             {
+                RemoveRegisterEvents();
                 LaundryWashOptionForm laundryWashOptionForm = (LaundryWashOptionForm)mainForm;
                 if (laundryWashOptionForm.LaundryOptionItemSelected != null)
                 {

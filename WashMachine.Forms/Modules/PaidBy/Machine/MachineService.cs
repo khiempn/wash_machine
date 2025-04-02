@@ -189,5 +189,19 @@ namespace WashMachine.Forms.Modules.PaidBy.Machine
             }
             return Task.FromResult(false);
         }
+
+        public void RemoveRegisterEvents()
+        {
+            try
+            {
+                octopusService.PaymentProgressHandler -= OctopusService_PaymentProgressHandler;
+                octopusService.PaymentLoopingHandler -= OctopusService_PaymentLoopingHandler;
+                octopusService.CreateOrderIncompleteHandler -= OctopusService_CreateOrderIncompleteHandler;
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex);
+            }
+        }
     }
 }

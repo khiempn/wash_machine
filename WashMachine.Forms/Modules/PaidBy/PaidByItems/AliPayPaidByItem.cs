@@ -46,6 +46,30 @@ namespace WashMachine.Forms.Modules.PaidBy.PaidByItems
 
             this.paymentItem = paymentItem;
             mainForm = parent;
+            mainForm.FormClosing += MainForm_FormClosing;
+        }
+
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            RemoveRegisterEvents();
+        }
+
+        private void RemoveRegisterEvents()
+        {
+            try
+            {
+                alipayService.CodeRecivedHandler += AlipayService_CodeRecivedHandlerAsync;
+                alipayService.PaymentLoopingHandler += AlipayService_PaymentLoopingHandler;
+                alipayService.RemoveRegisterEvents();
+
+                mainForm.FormClosing -= MainForm_FormClosing;
+                waitingUI.CancelHandler -= WaitingUI_CancelHandlerAsync;
+                waitingUI.HomeHandler -= WaitingUI_HomeHandler;
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex);
+            }
         }
 
         private void AlipayService_PaymentLoopingHandler(object sender, bool e)

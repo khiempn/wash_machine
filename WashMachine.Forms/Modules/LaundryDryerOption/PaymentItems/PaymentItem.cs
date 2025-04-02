@@ -23,7 +23,7 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.PaymentItems
             paymentItem.PaymentCompletedCallBack += PaymentItem_PaymentCompleted;
         }
 
-        ~PaymentItem()
+        private void RemoveRegisterEvents()
         {
             paymentItem.PaymentCompletedCallBack -= PaymentItem_PaymentCompleted;
         }
@@ -32,6 +32,7 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.PaymentItems
         {
             try
             {
+                RemoveRegisterEvents();
                 LaundryDryerOptionForm laundryDryerOptionForm = (LaundryDryerOptionForm)mainForm;
                 if (laundryDryerOptionForm.LaundryOptionItemSelected != null && laundryDryerOptionForm.TimeOptionItemSelected != null && laundryDryerOptionForm.TempOptionItemSelected != null)
                 {

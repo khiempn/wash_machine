@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO.Ports;
 using System.Linq;
 using System.Threading.Tasks;
+using WashMachine.Forms.Services.Machine;
 
 namespace WashMachine.Forms.Modules.LaundryWashOption.Machine
 {
@@ -27,7 +28,7 @@ namespace WashMachine.Forms.Modules.LaundryWashOption.Machine
                 Logger.Log($"CONNECT BEGIN: portName {portName} baudRate {baudRate} parity {parity} StopBits {step}");
                 if (_serialPort == null)
                 {
-                    _serialPort = new SerialPort(portName, baudRate, parity, data, step);
+                    _serialPort = MachineManager.TryGetMachine(portName, baudRate, data, parity, step);
                 }
 
                 if (_serialPort.IsOpen == false)

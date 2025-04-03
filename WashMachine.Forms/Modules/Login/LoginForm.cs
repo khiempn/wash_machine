@@ -15,6 +15,7 @@ using WashMachine.Forms.Modules.PaidBy;
 using WashMachine.Forms.Modules.PaidBy.Machine.Octopus;
 using WashMachine.Forms.Modules.Payment.PaymentItems;
 using WashMachine.Forms.Modules.Shop;
+using WashMachine.Forms.Services.Machine;
 
 namespace WashMachine.Forms.Modules.Login
 {
@@ -120,7 +121,7 @@ namespace WashMachine.Forms.Modules.Login
 
             Controls.Add(tlpLoginForm);
             FormClosed += LoginForm_FormClosed;
-
+            FormClosing += LoginForm_FormClosing;
             InitialData();
 
             if (!File.Exists(Program.AppConfig.ShopConfigPath))
@@ -129,6 +130,13 @@ namespace WashMachine.Forms.Modules.Login
                 signInShopForm.ShowDialog();
                 signInShopForm.FormClosed += SignInShopForm_FormClosed;
             }
+        }
+
+        private void LoginForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            progressUI.Show();
+            MachineManager.TryDisconnectAll();
+            progressUI.Hide();
         }
 
         private void BtnLogout_Click(object sender, EventArgs e)

@@ -178,7 +178,6 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.LaundryOptionItems
                     // Run implement as START
                     machineService.ExecHexCommand(ImplementCommand);
                     System.Threading.Thread.Sleep(2000);
-                    machineService.Disconect();
                     SetIsRunning();
                     Logger.Log($"{nameof(Dryer03LaundryItem)} Step 4 END");
                 }

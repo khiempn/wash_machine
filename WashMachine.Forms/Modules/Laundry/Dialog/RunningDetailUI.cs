@@ -104,6 +104,11 @@ namespace WashMachine.Forms.Modules.Laundry.Dialog
             Close();
         }
 
+        private void StopMachine()
+        {
+
+        }
+
         private void Timer_Tick(object sender, System.EventArgs e)
         {
             try
@@ -124,6 +129,7 @@ namespace WashMachine.Forms.Modules.Laundry.Dialog
             }
             catch (Exception ex)
             {
+                Logger.Log(ex);
                 timer.Stop();
             }
         }

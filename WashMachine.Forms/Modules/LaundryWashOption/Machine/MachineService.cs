@@ -16,7 +16,7 @@ namespace WashMachine.Forms.Modules.LaundryWashOption.Machine
 
         }
 
-        public async Task<bool> ConnectAsync(string portName, int baudRate, int data, Parity parity = Parity.None, StopBits step = StopBits.One)
+        public Task<bool> ConnectAsync(string portName, int baudRate, int data, Parity parity = Parity.None, StopBits step = StopBits.One)
         {
             if (string.IsNullOrWhiteSpace(portName))
             {
@@ -29,14 +29,28 @@ namespace WashMachine.Forms.Modules.LaundryWashOption.Machine
                 if (_serialPort == null)
                 {
                     _serialPort = MachineManager.TryGetMachine(portName, baudRate, data, parity, step);
+                    if (_serialPort != null && _serialPort.IsOpen == false)
+                    {
+                        _serialPort.Open();
+                        Logger.Log($"CONNECT END: SUCCESSFULLY");
+                        return Task.FromResult(true);
+                    }
                 }
-
-                if (_serialPort.IsOpen == false)
+            }
+            catch (UnauthorizedAccessException)
+            {
+                Logger.Log($"CONNECT END: FAILED");
+                Disconect();
+                if (Program.AppConfig.ForceAdminResetMachine == 1)
                 {
-                    _serialPort.Open();
+                    MachineManager.Reset(portName);
+                    _serialPort = MachineManager.TryGetMachine(portName, baudRate, data, parity, step);
+                    if (_serialPort != null && _serialPort.IsOpen == false)
+                    {
+                        _serialPort.Open();
+                        return Task.FromResult(true);
+                    }
                 }
-                Logger.Log($"CONNECT END: SUCCESSFULLY");
-                return true;
             }
             catch (Exception ex)
             {
@@ -44,22 +58,12 @@ namespace WashMachine.Forms.Modules.LaundryWashOption.Machine
                 Logger.Log(ex);
             }
 
-            return false;
+            return Task.FromResult(false);
         }
 
         public void Disconect()
         {
-            try
-            {
-                if (_serialPort != null && _serialPort.IsOpen)
-                {
-                    _serialPort.Close();
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.Log(ex);
-            }
+            MachineManager.Disconnect(Program.AppConfig.WashMachineCom, Program.AppConfig.WashMachineBaudRate);
         }
 
         public void ExecCommand(string command)

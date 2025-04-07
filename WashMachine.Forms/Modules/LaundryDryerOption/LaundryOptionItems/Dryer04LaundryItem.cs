@@ -35,6 +35,8 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.LaundryOptionItems
 
         public string ImplementCommand { get; set; } = "04 06 01 68 00 01 C8 7F";
         public string StopCommand { get; set; }
+        public string HealthCheckCommand { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public Action<object> HealthCheckCompleted { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         Form mainForm;
 
@@ -234,6 +236,11 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.LaundryOptionItems
                     Logger.Log($"{nameof(Dryer04LaundryItem)} Can not connect device.");
                 }
             });
+        }
+
+        public Task HealthCheck()
+        {
+            throw new NotImplementedException();
         }
     }
 }

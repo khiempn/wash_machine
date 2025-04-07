@@ -10,6 +10,7 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.Machine
     public class MachineService : IMachineService
     {
         SerialPort _serialPort;
+        public event EventHandler<EventArgs> DataReceived;
 
         public MachineService()
         {
@@ -29,6 +30,7 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.Machine
                 if (_serialPort == null)
                 {
                     _serialPort = MachineManager.TryGetMachine(portName, baudRate, data, parity, step);
+                    _serialPort.DataReceived += SerialPort_DataReceived;
                     if (_serialPort != null && _serialPort.IsOpen == false)
                     {
                         _serialPort.Open();
@@ -59,6 +61,14 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.Machine
             }
 
             return Task.FromResult(false);
+        }
+
+        private void SerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
+        {
+            SerialPort sp = (SerialPort)sender;
+            string data = sp.ReadExisting();
+            DataReceived?.Invoke(data, e);
+            //Console.WriteLine($"Data Received: {data}");
         }
 
         public void Disconect()
@@ -253,6 +263,14 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.Machine
             string last = hexValue.Substring(2, 2);
 
             return new string[] { last, first };
+        }
+
+        public void RemoveRegisterEvents()
+        {
+            if (_serialPort != null)
+            {
+                _serialPort.DataReceived -= SerialPort_DataReceived;
+            }
         }
     }
 }

@@ -130,6 +130,24 @@ namespace WashMachine.Forms.Modules.Login
                 signInShopForm.ShowDialog();
                 signInShopForm.FormClosed += SignInShopForm_FormClosed;
             }
+            // Modbus RTU frame (excluding CRC bytes at the end)
+            byte[] frame = {
+                0x01, 0x03, 0x14,
+                0x00, 0x02, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00
+            };
+
+            ushort computedCRC = CalculateCRC(frame);
+            Console.WriteLine($"Computed CRC: {computedCRC:X4}");
+            // Provided CRC in little-endian format
+            byte[] providedCRC = { 0x48, 0xCE }; // Interpreted as CE48
+
+            // Compare computed CRC to the provided CRC
+            ushort providedCRCValue = BitConverter.ToUInt16(providedCRC, 0); // Convert little-endian bytes to ushort
+            Console.WriteLine($"Computed CRC: {computedCRC:X4}");
+            Console.WriteLine($"Provided CRC: {providedCRCValue:X4}");
+            Console.WriteLine(computedCRC == providedCRCValue ? "CRC matches. Frame is valid!" : "CRC mismatch. Frame is invalid!");
         }
 
         private void LoginForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -328,6 +346,30 @@ namespace WashMachine.Forms.Modules.Login
             ScaleUtil.ScaleAll(Controls, this);
             tlpLoginForm.Location = new Point((Width - tlpLoginForm.Width) / 2, (Height - tlpLoginForm.Height) / 2);
             Refresh();
+        }
+
+        ushort CalculateCRC(byte[] data)
+        {
+            ushort crc = 0xFFFF; // Start with all bits set
+            for (int i = 0; i < data.Length; i++)
+            {
+                crc ^= data[i]; // XOR byte into least significant byte of CRC
+
+                for (int j = 0; j < 8; j++) // Process each bit
+                {
+                    if ((crc & 0x0001) != 0) // If the least significant bit is set
+                    {
+                        crc >>= 1;           // Shift right
+                        crc ^= 0xA001;       // XOR with polynomial 0xA001
+                    }
+                    else
+                    {
+                        crc >>= 1;           // Just shift right
+                    }
+                }
+            }
+
+            return crc; // Final CRC value
         }
     }
 }

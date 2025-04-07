@@ -26,14 +26,19 @@ namespace WashMachine.Forms.Modules.Laundry.LaundryItems
             followType = _followType;
         }
 
-        public void Click()
+        public async void Click()
         {
             if (AppDbContext.Machine.Get(nameof(Dryer01LaundryItem)).IsRunning == 0)
             {
-                LaundryDryerOptionForm laundryDryerOptionForm = new LaundryDryerOptionForm(this, followType);
-                laundryDryerOptionForm.Show();
-                laundryDryerOptionForm.FormClosed += LaundryDryerOptionForm_FormClosed;
-                mainForm.Hide();
+                LaundryDryerOption.LaundryOptionItems.Dryer01LaundryItem laundryItem = new LaundryDryerOption.LaundryOptionItems.Dryer01LaundryItem(null, mainForm);
+                laundryItem.HealthCheckCompleted += (obj) =>
+                {
+                    LaundryDryerOptionForm laundryDryerOptionForm = new LaundryDryerOptionForm(this, followType);
+                    laundryDryerOptionForm.Show();
+                    laundryDryerOptionForm.FormClosed += LaundryDryerOptionForm_FormClosed;
+                    mainForm.Hide();
+                };
+                await laundryItem.HealthCheck();
             }
             else
             {
@@ -135,7 +140,7 @@ namespace WashMachine.Forms.Modules.Laundry.LaundryItems
                         ForeColor = ColorTranslator.FromHtml("#ffffff"),
                         Name = lbInforName
                     };
-                    
+
                     timer?.Stop();
 
                     timer = new Timer

@@ -204,6 +204,7 @@ namespace WashMachine.Forms.Modules.Laundry.LaundryItems
         private void ResetTemplate()
         {
             MachineModel machine = timer.Tag as MachineModel;
+            machine = AppDbContext.Machine.Get(machine);
             if (MachineService.IsRunCompleted(machine))
             {
                 timer.Stop();

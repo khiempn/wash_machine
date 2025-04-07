@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Drawing;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using WashMachine.Forms.Common.UI;
-using WashMachine.Forms.Database.Context;
 using WashMachine.Forms.Database.Tables.Machine;
+using WashMachine.Forms.Modules.LaundryDryerOption.LaundryOptionItems;
+using WashMachine.Forms.Modules.LaundryWashOption.LaundryOptionItems;
 
 namespace WashMachine.Forms.Modules.Laundry.Dialog
 {
@@ -29,12 +31,13 @@ namespace WashMachine.Forms.Modules.Laundry.Dialog
 
             BackColor = Color.White;
             Font = new Font(Font.FontFamily, 12f, FontStyle.Regular);
-            
+
             Width = 500;
             Height = 350;
             TableLayoutPanel tblDetailForm = new TableLayoutPanel()
             {
-                Dock = DockStyle.Fill
+                Dock = DockStyle.Fill,
+                Name = "MainLayout",
             };
             tblDetailForm.RowStyles.Add(new RowStyle() { Height = 3, SizeType = SizeType.Percent });
             tblDetailForm.RowStyles.Add(new RowStyle() { Height = 1, SizeType = SizeType.Percent });
@@ -97,16 +100,72 @@ namespace WashMachine.Forms.Modules.Laundry.Dialog
             Refresh();
         }
 
-        private void BtnStop_Click(object sender, System.EventArgs e)
+        private async void BtnStop_Click(object sender, System.EventArgs e)
         {
             progressUI.Show();
-            AppDbContext.Machine.ResetMachine(_machineModel);
+            timer.Stop();
+            timer.Dispose();
+            await StopMachine();
             Close();
         }
 
-        private void StopMachine()
+        private async Task StopMachine()
         {
+            if (_machineModel.Name.Equals(nameof(Dryer01LaundryItem), StringComparison.OrdinalIgnoreCase))
+            {
+                Dryer01LaundryItem dryerLaundryItem = new Dryer01LaundryItem(null, ParentForm);
+                await dryerLaundryItem.Stop();
+                return;
+            }
 
+            if (_machineModel.Name.Equals(nameof(Dryer02LaundryItem), StringComparison.OrdinalIgnoreCase))
+            {
+                Dryer02LaundryItem dryerLaundryItem = new Dryer02LaundryItem(null, ParentForm);
+                await dryerLaundryItem.Stop();
+                return;
+            }
+
+            if (_machineModel.Name.Equals(nameof(Dryer03LaundryItem), StringComparison.OrdinalIgnoreCase))
+            {
+                Dryer03LaundryItem dryerLaundryItem = new Dryer03LaundryItem(null, ParentForm);
+                await dryerLaundryItem.Stop();
+                return;
+            }
+
+            if (_machineModel.Name.Equals(nameof(Dryer04LaundryItem), StringComparison.OrdinalIgnoreCase))
+            {
+                Dryer04LaundryItem dryerLaundryItem = new Dryer04LaundryItem(null, ParentForm);
+                await dryerLaundryItem.Stop();
+                return;
+            }
+
+            if (_machineModel.Name.Equals(nameof(Wash01LaundryItem), StringComparison.OrdinalIgnoreCase))
+            {
+                Wash01LaundryItem washLaundryItem = new Wash01LaundryItem(null, ParentForm);
+                await washLaundryItem.Stop();
+                return;
+            }
+
+            if (_machineModel.Name.Equals(nameof(Wash02LaundryItem), StringComparison.OrdinalIgnoreCase))
+            {
+                Wash02LaundryItem washLaundryItem = new Wash02LaundryItem(null, ParentForm);
+                await washLaundryItem.Stop();
+                return;
+            }
+
+            if (_machineModel.Name.Equals(nameof(Wash03LaundryItem), StringComparison.OrdinalIgnoreCase))
+            {
+                Wash03LaundryItem washLaundryItem = new Wash03LaundryItem(null, ParentForm);
+                await washLaundryItem.Stop();
+                return;
+            }
+
+            if (_machineModel.Name.Equals(nameof(Wash04LaundryItem), StringComparison.OrdinalIgnoreCase))
+            {
+                Wash04LaundryItem washLaundryItem = new Wash04LaundryItem(null, ParentForm);
+                await washLaundryItem.Stop();
+                return;
+            }
         }
 
         private void Timer_Tick(object sender, System.EventArgs e)
@@ -116,10 +175,7 @@ namespace WashMachine.Forms.Modules.Laundry.Dialog
                 MachineModel machine = timer.Tag as MachineModel;
                 if (MachineService.IsRunCompleted(machine))
                 {
-                    timer.Stop();
-                    progressUI.Show();
-                    AppDbContext.Machine.ResetMachine(_machineModel);
-                    Close();
+                    BtnStop_Click(sender, e);
                 }
                 else
                 {
@@ -131,11 +187,14 @@ namespace WashMachine.Forms.Modules.Laundry.Dialog
             {
                 Logger.Log(ex);
                 timer.Stop();
+                timer.Dispose();
             }
         }
 
         private void BtnClose_Click(object sender, System.EventArgs e)
         {
+            timer.Stop();
+            timer.Dispose();
             Close();
         }
     }

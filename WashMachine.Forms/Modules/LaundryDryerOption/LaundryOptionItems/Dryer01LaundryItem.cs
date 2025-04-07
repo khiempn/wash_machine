@@ -203,8 +203,7 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.LaundryOptionItems
         public void SetIsStop()
         {
             MachineModel machine = AppDbContext.Machine.Get(new MachineModel() { Name = Name });
-            machine.IsRunning = 0;
-            AppDbContext.Machine.Update(machine);
+            AppDbContext.Machine.ResetMachine(machine);
         }
 
         public async Task Stop()

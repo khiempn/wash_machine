@@ -8,6 +8,7 @@ using WashMachine.Forms.Common.UI;
 using WashMachine.Forms.Database.Context;
 using WashMachine.Forms.Database.Tables.Machine;
 using WashMachine.Forms.Modules.Laundry;
+using WashMachine.Forms.Modules.LaundryDryerOption;
 using WashMachine.Forms.Modules.LaundryWashOption.TimeOptionItems;
 using WashMachine.Forms.Modules.Shop.Model;
 
@@ -181,6 +182,40 @@ namespace WashMachine.Forms.Modules.LaundryWashOption.LaundryOptionItems
             machine.Time = form.TimeOptionItemSelected.TimeNumber;
             machine.IsRunning = 1;
             AppDbContext.Machine.Update(machine);
+        }
+
+        public void SetIsStop()
+        {
+            MachineModel machine = AppDbContext.Machine.Get(new MachineModel() { Name = Name });
+            AppDbContext.Machine.ResetMachine(machine);
+        }
+
+        public async Task Stop()
+        {
+            await Task.Run(async () =>
+            {
+                Logger.Log($"{nameof(Wash01LaundryItem)} Step 1 STOP");
+                LaundryWashOptionForm form = (LaundryWashOptionForm)mainForm;
+
+                AppConfigModel appConfig = Program.AppConfig;
+                Logger.Log($"{nameof(Wash01LaundryItem)} Step 2 {JsonConvert.SerializeObject(appConfig)}");
+                bool isConnected = await machineService.ConnectAsync(appConfig.WashMachineCom, appConfig.WashMachineBaudRate, appConfig.WashMachineData, appConfig.WashMachineParity, appConfig.WashMachineStopBits);
+
+                if (isConnected || Program.AppConfig.AutoRunning == 1)
+                {
+                    Logger.Log($"{nameof(Wash01LaundryItem)} Step 3");
+                    //Run stop program
+                    machineService.ExecHexCommand(StopCommand);
+                    System.Threading.Thread.Sleep(2000);
+                    SetIsStop();
+                    Logger.Log($"{nameof(Wash01LaundryItem)} Step 4 END");
+                }
+                else
+                {
+                    MessageBox.Show("Unable connect to device, please try agiain", "Warning!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    Logger.Log($"{nameof(Wash01LaundryItem)} Can not connect device.");
+                }
+            });
         }
     }
 }

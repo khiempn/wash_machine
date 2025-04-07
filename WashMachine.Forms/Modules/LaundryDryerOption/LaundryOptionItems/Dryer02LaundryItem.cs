@@ -4,12 +4,14 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Xml.Linq;
 using WashMachine.Forms.Common.UI;
 using WashMachine.Forms.Database.Context;
 using WashMachine.Forms.Database.Tables.Machine;
 using WashMachine.Forms.Modules.Laundry;
 using WashMachine.Forms.Modules.LaundryDryerOption.TempOptionItems;
 using WashMachine.Forms.Modules.LaundryDryerOption.TimeOptionItems;
+using WashMachine.Forms.Modules.Main;
 using WashMachine.Forms.Modules.Shop.Model;
 
 namespace WashMachine.Forms.Modules.LaundryDryerOption.LaundryOptionItems
@@ -198,6 +200,40 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.LaundryOptionItems
             machine.Temp = form.TempOptionItemSelected.TypeId;
             machine.IsRunning = 1;
             AppDbContext.Machine.Update(machine);
+        }
+
+        public void SetIsStop()
+        {
+            MachineModel machine = AppDbContext.Machine.Get(new MachineModel() { Name = Name });
+            AppDbContext.Machine.ResetMachine(machine);
+        }
+
+        public async Task Stop()
+        {
+            await Task.Run(async () =>
+            {
+                Logger.Log($"{nameof(Dryer02LaundryItem)} Step 1 STOP");
+                LaundryDryerOptionForm form = (LaundryDryerOptionForm)mainForm;
+
+                AppConfigModel appConfig = Program.AppConfig;
+                Logger.Log($"{nameof(Dryer02LaundryItem)} Step 2 {JsonConvert.SerializeObject(appConfig)}");
+                bool isConnected = await machineService.ConnectAsync(appConfig.DryerMachineCom, appConfig.DryerMachineBaudRate, appConfig.DryerMachineData, appConfig.DryerMachineParity, appConfig.DryerMachineStopBits);
+
+                if (isConnected || Program.AppConfig.AutoRunning == 1)
+                {
+                    Logger.Log($"{nameof(Dryer02LaundryItem)} Step 3");
+                    //Run stop program
+                    machineService.ExecHexCommand(StopCommand);
+                    System.Threading.Thread.Sleep(2000);
+                    SetIsStop();
+                    Logger.Log($"{nameof(Dryer02LaundryItem)} Step 4 END");
+                }
+                else
+                {
+                    MessageBox.Show("Unable connect to device, please try agiain", "Warning!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    Logger.Log($"{nameof(Dryer02LaundryItem)} Can not connect device.");
+                }
+            });
         }
     }
 }

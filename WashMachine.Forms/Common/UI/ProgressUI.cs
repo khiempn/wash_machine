@@ -13,7 +13,7 @@ namespace WashMachine.Forms.Common.UI
         {
             TableLayoutPanel tblLayoutPanel = new TableLayoutPanel()
             {
-                Dock = DockStyle.Fill
+                Dock = DockStyle.Fill,
             };
 
             Font = new Font(tblLayoutPanel.Font.FontFamily, 14f, FontStyle.Regular);

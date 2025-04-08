@@ -80,6 +80,7 @@ namespace WashMachine.Forms
         public int DelayDeduct { get; set; }
         public int AutoRunning { get; set; }
         public int ForceAdminResetMachine { get; set; }
+        public int IsHealthCheckTesting { get; set; }
 
         public ShopConfigModel GetShopConfig()
         {

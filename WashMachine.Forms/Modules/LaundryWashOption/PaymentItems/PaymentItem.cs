@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.Windows.Forms;
 using WashMachine.Forms.Common.UI;
+using WashMachine.Forms.Modules.LaundryDryerOption;
 using WashMachine.Forms.Modules.Login;
 using WashMachine.Forms.Modules.PaidBy;
 
@@ -53,27 +54,40 @@ namespace WashMachine.Forms.Modules.LaundryWashOption.PaymentItems
             try
             {
                 LaundryWashOptionForm form = (LaundryWashOptionForm)mainForm;
-                if (form.LaundryOptionItemSelected != null && form.TimeOptionItemSelected != null)
+                ProgressUI progressUI = new ProgressUI();
+                progressUI.SetParent(form);
+                progressUI.Show();
+                form.LaundryOptionItemSelected.HealthCheckCompleted += (isHealthCheck) =>
                 {
-                    paymentItem.SetAmount(form.TimeOptionItemSelected.Amount);
-                    if (followType == FollowType.TestMachineWithoutPayment)
+                    mainForm.BeginInvoke((MethodInvoker)async delegate
                     {
-                        ProgressUI progressUI = new ProgressUI();
-                        progressUI.SetParent(form);
-                        progressUI.Show();
-                        await form.LaundryOptionItemSelected.Start();
                         progressUI.Hide();
-                    }
-                    else
-                    {
-                        PaidByForm paidByForm = new PaidByForm(followType, paymentItem);
-                        paidByForm.Show();
-                        paidByForm.FormClosed += PaidByForm_FormClosed;
-                    }
-                }
+                        if ((bool)isHealthCheck)
+                        {
+                            paymentItem.SetAmount(form.TimeOptionItemSelected.Amount);
+                            if (followType == FollowType.TestMachineWithoutPayment)
+                            {
+                                await form.LaundryOptionItemSelected.Start();
+                            }
+                            else
+                            {
+                                PaidByForm paidByForm = new PaidByForm(followType, paymentItem);
+                                paidByForm.Show();
+                                paidByForm.FormClosed += PaidByForm_FormClosed;
+                            }
+                        }
+                        else
+                        {
+                            MessageBox.Show("The machine is not available right now. Please try again later.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        }
+                    });
+                };
+
+                await form.LaundryOptionItemSelected.HealthCheck();
             }
             catch (Exception ex)
             {
+                MessageBox.Show("Apologies for the inconvenience. This feature may not be working properly at the moment. Please try again later. Thank you for your patience!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 Logger.Log(ex);
             }
         }

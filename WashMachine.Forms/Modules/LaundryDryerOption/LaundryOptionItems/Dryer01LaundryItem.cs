@@ -64,7 +64,17 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.LaundryOptionItems
 
         private void MachineService_DataReceived(object sender, EventArgs e)
         {
-            HealthCheckCompleted?.Invoke(sender);
+            Logger.Log($"{nameof(Dryer01LaundryItem)} MachineService_DataReceived {sender as string}");
+
+            if (sender != null)
+            {
+                bool isValidateCrc = machineService.ValidateCRCCommand(sender.ToString());
+                HealthCheckCompleted?.Invoke(isValidateCrc);
+            }
+            else
+            {
+                HealthCheckCompleted?.Invoke(false);
+            }
         }
 
         private void LoadConfig()
@@ -258,16 +268,29 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.LaundryOptionItems
         {
             await Task.Run(async () =>
             {
-                Logger.Log($"{nameof(Dryer01LaundryItem)} Step 1 START");
+                Logger.Log($"{nameof(Dryer01LaundryItem)} Step 1 HealthCheck");
                 AppConfigModel appConfig = Program.AppConfig;
                 Logger.Log($"{nameof(Dryer01LaundryItem)} Step 2 {JsonConvert.SerializeObject(appConfig)}");
                 bool isConnected = await machineService.ConnectAsync(appConfig.DryerMachineCom, appConfig.DryerMachineBaudRate, appConfig.DryerMachineData, appConfig.DryerMachineParity, appConfig.DryerMachineStopBits);
 
-                if (isConnected)
+                if (isConnected || Program.AppConfig.AutoRunning == 1)
                 {
                     // Run health check command
-                    machineService.ExecHexCommand(HealthCheckCommand);
+                    machineService.ExecHexCommand(HealthCheckCommand, (dtRecived) =>
+                    {
+                        Logger.Log($"{nameof(Dryer01LaundryItem)} MachineService_DataReceived {dtRecived}");
+                        if (!string.IsNullOrWhiteSpace(dtRecived))
+                        {
+                            bool isValidateCrc = machineService.ValidateCRCCommand(dtRecived);
+                            HealthCheckCompleted?.Invoke(isValidateCrc);
+                        }
+                        else
+                        {
+                            HealthCheckCompleted?.Invoke(false);
+                        }
+                    });
                     System.Threading.Thread.Sleep(2000);
+                    machineService.FakeInvokeDataReceived();
                     Logger.Log($"{nameof(Dryer01LaundryItem)} Step 4 END");
                 }
                 else

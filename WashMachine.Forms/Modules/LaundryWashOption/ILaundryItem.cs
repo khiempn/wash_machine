@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -10,10 +11,13 @@ namespace WashMachine.Forms.Modules.LaundryWashOption
         string ImplementCommand { get; set; }
         string StopCommand { get; set; }
         string UnlockCommand { get; set; }
+        string HealthCheckCommand { get; set; }
+        Action<object> HealthCheckCompleted { get; set; }
         Dictionary<string, string> ProgramCommands { get; set; }
         void Click();
         Control GetTemplate();
         void DisableItem(Control control);
         Task Start();
+        Task HealthCheck();
     }
 }

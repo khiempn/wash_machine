@@ -28,7 +28,8 @@ namespace WashMachine.Forms.Modules.LaundryWashOption.LaundryOptionItems
         };
         public string StopCommand { get; set; }
         public string UnlockCommand { get; set; }
-
+        public string HealthCheckCommand { get; set; } = "03 03 01 1D 00 09 15 D4";
+        public Action<object> HealthCheckCompleted { get; set; }
         Form mainForm;
 
         Machine.MachineService machineService;
@@ -37,7 +38,35 @@ namespace WashMachine.Forms.Modules.LaundryWashOption.LaundryOptionItems
         {
             mainForm = parent;
             machineService = new Machine.MachineService();
+            machineService.DataReceived += MachineService_DataReceived;
+            mainForm.FormClosing += MainForm_FormClosing;
             LoadConfig();
+        }
+
+        private void MachineService_DataReceived(object sender, EventArgs e)
+        {
+            Logger.Log($"{nameof(Wash03LaundryItem)} MachineService_DataReceived {sender as string}");
+
+            if (sender != null)
+            {
+                bool isValidateCrc = machineService.ValidateCRCCommand(sender.ToString());
+                HealthCheckCompleted?.Invoke(isValidateCrc);
+            }
+            else
+            {
+                HealthCheckCompleted?.Invoke(false);
+            }
+        }
+
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            RemoveRegisterEvents();
+        }
+
+        private void RemoveRegisterEvents()
+        {
+            machineService.DataReceived -= MachineService_DataReceived;
+            machineService.RemoveRegisterEvents();
         }
 
         private void LoadConfig()
@@ -207,6 +236,31 @@ namespace WashMachine.Forms.Modules.LaundryWashOption.LaundryOptionItems
                     machineService.ExecHexCommand(StopCommand);
                     System.Threading.Thread.Sleep(2000);
                     SetIsStop();
+                    Logger.Log($"{nameof(Wash03LaundryItem)} Step 4 END");
+                }
+                else
+                {
+                    MessageBox.Show("Unable connect to device, please try agiain", "Warning!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    Logger.Log($"{nameof(Wash03LaundryItem)} Can not connect device.");
+                }
+            });
+        }
+
+        public async Task HealthCheck()
+        {
+            await Task.Run(async () =>
+            {
+                Logger.Log($"{nameof(Wash03LaundryItem)} Step 1 HealthCheck");
+                AppConfigModel appConfig = Program.AppConfig;
+                Logger.Log($"{nameof(Wash03LaundryItem)} Step 2 {JsonConvert.SerializeObject(appConfig)}");
+                bool isConnected = await machineService.ConnectAsync(appConfig.DryerMachineCom, appConfig.DryerMachineBaudRate, appConfig.DryerMachineData, appConfig.DryerMachineParity, appConfig.DryerMachineStopBits);
+
+                if (isConnected || Program.AppConfig.AutoRunning == 1)
+                {
+                    // Run health check command
+                    machineService.ExecHexCommand(HealthCheckCommand);
+                    System.Threading.Thread.Sleep(2000);
+                    machineService.FakeInvokeDataReceived();
                     Logger.Log($"{nameof(Wash03LaundryItem)} Step 4 END");
                 }
                 else

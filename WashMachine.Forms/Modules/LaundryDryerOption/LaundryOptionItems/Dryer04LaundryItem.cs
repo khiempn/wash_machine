@@ -35,8 +35,8 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.LaundryOptionItems
 
         public string ImplementCommand { get; set; } = "04 06 01 68 00 01 C8 7F";
         public string StopCommand { get; set; }
-        public string HealthCheckCommand { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public Action<object> HealthCheckCompleted { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public string HealthCheckCommand { get; set; } = "04 03 01 5C 00 0A 04 76";
+        public Action<object> HealthCheckCompleted { get; set; }
 
         Form mainForm;
 
@@ -46,7 +46,23 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.LaundryOptionItems
         {
             mainForm = parent;
             machineService = new Machine.MachineService();
+            machineService.DataReceived += MachineService_DataReceived;
             LoadConfig();
+        }
+
+        private void MachineService_DataReceived(object sender, EventArgs e)
+        {
+            Logger.Log($"{nameof(Dryer03LaundryItem)} MachineService_DataReceived {sender as string}");
+
+            if (sender != null)
+            {
+                bool isValidateCrc = machineService.ValidateCRCCommand(sender.ToString());
+                HealthCheckCompleted?.Invoke(isValidateCrc);
+            }
+            else
+            {
+                HealthCheckCompleted?.Invoke(false);
+            }
         }
 
         private void LoadConfig()
@@ -72,7 +88,6 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.LaundryOptionItems
             ImplementCommand = command.Dryer04LaundryItem_ImplementCommand;
             StopCommand = command.Dryer04LaundryItem_StopCommand;
         }
-
 
         public void Click()
         {
@@ -238,9 +253,29 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.LaundryOptionItems
             });
         }
 
-        public Task HealthCheck()
+        public async Task HealthCheck()
         {
-            throw new NotImplementedException();
+            await Task.Run(async () =>
+            {
+                Logger.Log($"{nameof(Dryer04LaundryItem)} Step 1 HealthCheck");
+                AppConfigModel appConfig = Program.AppConfig;
+                Logger.Log($"{nameof(Dryer04LaundryItem)} Step 2 {JsonConvert.SerializeObject(appConfig)}");
+                bool isConnected = await machineService.ConnectAsync(appConfig.DryerMachineCom, appConfig.DryerMachineBaudRate, appConfig.DryerMachineData, appConfig.DryerMachineParity, appConfig.DryerMachineStopBits);
+
+                if (isConnected || Program.AppConfig.AutoRunning == 1)
+                {
+                    // Run health check command
+                    machineService.ExecHexCommand(HealthCheckCommand);
+                    System.Threading.Thread.Sleep(2000);
+                    machineService.FakeInvokeDataReceived();
+                    Logger.Log($"{nameof(Dryer04LaundryItem)} Step 4 END");
+                }
+                else
+                {
+                    MessageBox.Show("Unable connect to device, please try agiain", "Warning!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    Logger.Log($"{nameof(Dryer04LaundryItem)} Can not connect device.");
+                }
+            });
         }
     }
 }

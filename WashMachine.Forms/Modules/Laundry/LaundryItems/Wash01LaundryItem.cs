@@ -7,6 +7,7 @@ using WashMachine.Forms.Common.UI;
 using WashMachine.Forms.Database.Context;
 using WashMachine.Forms.Database.Tables.Machine;
 using WashMachine.Forms.Modules.Laundry.Dialog;
+using WashMachine.Forms.Modules.LaundryDryerOption;
 using WashMachine.Forms.Modules.LaundryWashOption;
 using WashMachine.Forms.Modules.Login;
 
@@ -26,14 +27,33 @@ namespace WashMachine.Forms.Modules.Laundry.LaundryItems
             followType = _followType;
         }
 
-        public void Click()
+        public async void Click()
         {
             if (AppDbContext.Machine.Get(nameof(Wash01LaundryItem)).IsRunning == 0)
             {
-                LaundryWashOptionForm laundryWashOptionForm = new LaundryWashOptionForm(this, followType);
-                laundryWashOptionForm.Show();
-                laundryWashOptionForm.FormClosed += LaundryWashOptionForm_FormClosed;
-                mainForm.Hide();
+                ProgressUI progressUI = new ProgressUI();
+                progressUI.SetParent(mainForm);
+                progressUI.Show();
+                LaundryWashOption.LaundryOptionItems.Wash01LaundryItem laundryItem = new LaundryWashOption.LaundryOptionItems.Wash01LaundryItem(null, mainForm);
+                laundryItem.HealthCheckCompleted += (isHealthCheck) =>
+                {
+                    mainForm.BeginInvoke((MethodInvoker)delegate
+                    {
+                        progressUI.Hide();
+                        if ((bool)isHealthCheck)
+                        {
+                            LaundryWashOptionForm laundryWashOptionForm = new LaundryWashOptionForm(this, followType);
+                            laundryWashOptionForm.Show();
+                            laundryWashOptionForm.FormClosed += LaundryWashOptionForm_FormClosed;
+                            mainForm.Hide();
+                        }
+                        else
+                        {
+                            MessageBox.Show("The machine is not available right now. Please try again later.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        }
+                    });
+                };
+                await laundryItem.HealthCheck();
             }
             else
             {

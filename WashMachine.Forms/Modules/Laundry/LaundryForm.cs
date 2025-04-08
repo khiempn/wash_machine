@@ -30,7 +30,8 @@ namespace WashMachine.Forms.Modules.Laundry
             tblLaundryForm = new TableLayoutPanel()
             {
                 Width = 250,
-                Height = 550
+                Height = 550,
+                Name = "MainLayout"
             };
             tblLaundryForm.RowStyles.Add(new RowStyle() { Height = 4, SizeType = SizeType.Percent });
             tblLaundryForm.RowStyles.Add(new RowStyle() { Height = 1, SizeType = SizeType.Percent });

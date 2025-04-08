@@ -40,5 +40,13 @@ namespace WashMachine.Forms.Modules.LaundryWashOption.Machine
         /// <param name="hexCommands"></param>
         /// <returns></returns>
         List<int> XorHexCommand(List<string> hexCommands);
+
+        /// <summary>
+        /// Command sample "01 03 14 00 02 00 01 00 01 00 01 00 00 00 00 00 00 00 00 00 00 00 00 48 CF"
+        /// </summary>
+        /// <param name="hexCommand"></param>
+        /// <returns></returns>
+        bool ValidateCRCCommand(string hexCommand);
+
     }
 }

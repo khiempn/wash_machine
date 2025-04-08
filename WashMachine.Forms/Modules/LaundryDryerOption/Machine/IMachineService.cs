@@ -40,5 +40,23 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.Machine
         /// <param name="hexCommands"></param>
         /// <returns></returns>
         List<int> XorHexCommand(List<string> hexCommands);
+
+        /// <summary>
+        /// Input "01 03 14 00 02 00 01 00 01 00 01 00 00 00 00 00 00 00 00 00 00 00 00 48 CE"
+        /// Expected "01 03 14 00 02 00 01 00 01 00 01 00 00 00 00 00 00 00 00 00 00 00 00 48 CE" 
+        /// Using Cyclic Redundancy Check (CRC) to validate last two bytes [48 CE]
+        /// </summary>
+        /// <param name="hexCommand"></param>
+        /// <returns></returns>
+        bool ValidateCRCCommand(string hexCommand);
+
+        /// <summary>
+        /// Input 01 06 01 68 00 01 C8 2A
+        /// Expected 01 06 01 68 00 01 C8 2A
+        /// </summary>
+        /// <param name="hexSended"></param>
+        /// <param name="hexRecived"></param>
+        /// <returns></returns>
+        bool ValidateCommand(string hexSended, string hexRecived);
     }
 }

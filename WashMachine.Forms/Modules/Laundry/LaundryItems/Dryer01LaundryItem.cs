@@ -30,13 +30,27 @@ namespace WashMachine.Forms.Modules.Laundry.LaundryItems
         {
             if (AppDbContext.Machine.Get(nameof(Dryer01LaundryItem)).IsRunning == 0)
             {
+                ProgressUI progressUI = new ProgressUI();
+                progressUI.SetParent(mainForm);
+                progressUI.Show();
                 LaundryDryerOption.LaundryOptionItems.Dryer01LaundryItem laundryItem = new LaundryDryerOption.LaundryOptionItems.Dryer01LaundryItem(null, mainForm);
-                laundryItem.HealthCheckCompleted += (obj) =>
+                laundryItem.HealthCheckCompleted += (isHealthCheck) =>
                 {
-                    LaundryDryerOptionForm laundryDryerOptionForm = new LaundryDryerOptionForm(this, followType);
-                    laundryDryerOptionForm.Show();
-                    laundryDryerOptionForm.FormClosed += LaundryDryerOptionForm_FormClosed;
-                    mainForm.Hide();
+                    mainForm.BeginInvoke((MethodInvoker)delegate
+                    {
+                        progressUI.Hide();
+                        if ((bool)isHealthCheck)
+                        {
+                            LaundryDryerOptionForm laundryDryerOptionForm = new LaundryDryerOptionForm(this, followType);
+                            laundryDryerOptionForm.Show();
+                            laundryDryerOptionForm.FormClosed += LaundryDryerOptionForm_FormClosed;
+                            mainForm.Hide();
+                        }
+                        else
+                        {
+                            MessageBox.Show("The machine is not available right now. Please try again later.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        }
+                    });
                 };
                 await laundryItem.HealthCheck();
             }

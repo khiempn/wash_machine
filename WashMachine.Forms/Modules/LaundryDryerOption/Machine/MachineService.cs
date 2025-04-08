@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO.Ports;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using WashMachine.Forms.Services.Machine;
 
@@ -10,7 +11,7 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.Machine
     public class MachineService : IMachineService
     {
         SerialPort _serialPort;
-        public event EventHandler<EventArgs> DataReceived;
+        public Action<string> OnDataReceived;
 
         public MachineService()
         {
@@ -30,11 +31,14 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.Machine
                 if (_serialPort == null)
                 {
                     _serialPort = MachineManager.TryGetMachine(portName, baudRate, data, parity, step);
-                    _serialPort.DataReceived += SerialPort_DataReceived;
-                    if (_serialPort != null && _serialPort.IsOpen == false)
+                    if (_serialPort != null)
                     {
-                        _serialPort.Open();
-                        Logger.Log($"CONNECT END: SUCCESSFULLY");
+                        _serialPort.DataReceived += SerialPort_DataReceived;
+                        if (_serialPort.IsOpen == false)
+                        {
+                            _serialPort.Open();
+                            Logger.Log($"CONNECT END: SUCCESSFULLY");
+                        }
                         return Task.FromResult(true);
                     }
                 }
@@ -45,11 +49,17 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.Machine
                 Disconect();
                 if (Program.AppConfig.ForceAdminResetMachine == 1)
                 {
+                    Logger.Log($"UnauthorizedAccessException RECONNECT END: FAILED");
                     MachineManager.Reset(portName);
                     _serialPort = MachineManager.TryGetMachine(portName, baudRate, data, parity, step);
-                    if (_serialPort != null && _serialPort.IsOpen == false)
+                    if (_serialPort != null)
                     {
-                        _serialPort.Open();
+                        _serialPort.DataReceived += SerialPort_DataReceived;
+                        if (_serialPort.IsOpen == false)
+                        {
+                            _serialPort.Open();
+                            Logger.Log($"CONNECT END: SUCCESSFULLY");
+                        }
                         return Task.FromResult(true);
                     }
                 }
@@ -65,10 +75,17 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.Machine
 
         private void SerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
-            SerialPort sp = (SerialPort)sender;
-            string data = sp.ReadExisting();
-            DataReceived?.Invoke(data, e);
-            //Console.WriteLine($"Data Received: {data}");
+            if (Program.AppConfig.IsHealthCheckTesting == 1)
+            {
+                OnDataReceived?.Invoke("01 03 14 00 02 00 01 00 01 00 01 00 00 00 00 00 00 00 00 00 00 00 00 48 CE");
+            }
+            else
+            {
+                SerialPort sp = (SerialPort)sender;
+                string data = sp.ReadExisting();
+                OnDataReceived?.Invoke(data);
+                Console.WriteLine($"Data Received: {data}");
+            }
         }
 
         public void Disconect()
@@ -111,11 +128,38 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.Machine
                     throw new ArgumentNullException(nameof(hexCommand));
                 }
 
-                if (Program.AppConfig.HexTrimMethod == 1)
+                hexCommand = hexCommand.Replace(" ", string.Empty);
+
+                if (_serialPort != null && _serialPort.IsOpen || true)
                 {
-                    hexCommand = hexCommand.Replace(" ", string.Empty);
+                    byte[] buffer = HexStringToByteArray(hexCommand);
+                    Logger.Log("USING ExecHexCommand: " + hexCommand);
+                    _serialPort.Write(buffer, 0, buffer.Length);
+                    Logger.Log("_serialPort.Write ExecHexCommand: DONE");
+                }
+                else
+                {
+                    throw new Exception($"_serialPort is null or closed");
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex);
+            }
+        }
+
+        public void ExecHexCommand(string hexCommand, Action<string> onRecevied)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(hexCommand))
+                {
+                    throw new ArgumentNullException(nameof(hexCommand));
                 }
 
+                OnDataReceived = onRecevied;
+
+                hexCommand = hexCommand.Replace(" ", string.Empty);
                 if (_serialPort != null && _serialPort.IsOpen || true)
                 {
                     byte[] buffer = HexStringToByteArray(hexCommand);
@@ -271,6 +315,88 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.Machine
             {
                 _serialPort.DataReceived -= SerialPort_DataReceived;
             }
+        }
+
+        public bool ValidateCRCCommand(string hexCommand)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(hexCommand))
+                {
+                    throw new ArgumentNullException(nameof(hexCommand));
+                }
+
+                if (Program.AppConfig.HexTrimMethod == 1)
+                {
+                    hexCommand = hexCommand.Replace(" ", string.Empty);
+                }
+
+                byte[] buffer = HexStringToByteArray(hexCommand);
+
+                // Modbus RTU frame (excluding CRC bytes at the end)
+                // Remove two last buffer
+                byte[] frame = buffer.Skip(0).Take(buffer.Length - 2).ToArray();
+
+                ushort computedCRC = CalculateCRC(frame);
+                Console.WriteLine($"Computed CRC: {computedCRC:X4}");
+                // Provided CRC in little-endian format
+                byte[] providedCRC = { buffer.ElementAt(buffer.Length - 2), buffer.Last() }; // Interpreted as CE48
+
+                // Compare computed CRC to the provided CRC
+                ushort providedCRCValue = BitConverter.ToUInt16(providedCRC, 0); // Convert little-endian bytes to ushort
+                Console.WriteLine($"Computed CRC: {computedCRC:X4}");
+                Console.WriteLine($"Provided CRC: {providedCRCValue:X4}");
+                Console.WriteLine(computedCRC == providedCRCValue ? "CRC matches. Frame is valid!" : "CRC mismatch. Frame is invalid!");
+
+                return computedCRC == providedCRCValue;
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex);
+            }
+            return false;
+        }
+
+        private ushort CalculateCRC(byte[] data)
+        {
+            ushort crc = 0xFFFF; // Start with all bits set
+            for (int i = 0; i < data.Length; i++)
+            {
+                crc ^= data[i]; // XOR byte into least significant byte of CRC
+
+                for (int j = 0; j < 8; j++) // Process each bit
+                {
+                    if ((crc & 0x0001) != 0) // If the least significant bit is set
+                    {
+                        crc >>= 1;           // Shift right
+                        crc ^= 0xA001;       // XOR with polynomial 0xA001
+                    }
+                    else
+                    {
+                        crc >>= 1;           // Just shift right
+                    }
+                }
+            }
+
+            return crc; // Final CRC value
+        }
+
+        public void FakeInvokeDataReceived(string data = null)
+        {
+            Task.Run(() =>
+            {
+                Thread.Sleep(5000);
+                SerialPort_DataReceived(_serialPort, null);
+            });
+        }
+
+        public bool ValidateCommand(string hexSended, string hexRecived)
+        {
+            if (!string.IsNullOrWhiteSpace(hexSended))
+            {
+                return hexSended.Equals(hexRecived);
+            }
+            return false;
         }
     }
 }

@@ -27,14 +27,33 @@ namespace WashMachine.Forms.Modules.Laundry.LaundryItems
             followType = _followType;
         }
 
-        public void Click()
+        public async void Click()
         {
             if (AppDbContext.Machine.Get(nameof(Wash03LaundryItem)).IsRunning == 0)
             {
-                LaundryWashOptionForm laundryWashOptionForm = new LaundryWashOptionForm(this, followType);
-                laundryWashOptionForm.Show();
-                laundryWashOptionForm.FormClosed += LaundryWashOptionForm_FormClosed;
-                mainForm.Hide();
+                ProgressUI progressUI = new ProgressUI();
+                progressUI.SetParent(mainForm);
+                progressUI.Show();
+                LaundryWashOption.LaundryOptionItems.Wash03LaundryItem laundryItem = new LaundryWashOption.LaundryOptionItems.Wash03LaundryItem(null, mainForm);
+                laundryItem.HealthCheckCompleted += (isHealthCheck) =>
+                {
+                    mainForm.BeginInvoke((MethodInvoker)delegate
+                    {
+                        progressUI.Hide();
+                        if ((bool)isHealthCheck)
+                        {
+                            LaundryWashOptionForm laundryWashOptionForm = new LaundryWashOptionForm(this, followType);
+                            laundryWashOptionForm.Show();
+                            laundryWashOptionForm.FormClosed += LaundryWashOptionForm_FormClosed;
+                            mainForm.Hide();
+                        }
+                        else
+                        {
+                            MessageBox.Show("The machine is not available right now. Please try again later.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        }
+                    });
+                };
+                await laundryItem.HealthCheck();
             }
             else
             {

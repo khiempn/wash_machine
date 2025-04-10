@@ -38,37 +38,9 @@ namespace WashMachine.Forms.Modules.LaundryWashOption.LaundryOptionItems
         public Wash01LaundryItem(ILaundryItem laundryItem, Form parent)
         {
             mainForm = parent;
-            machineService = new Machine.MachineService();
-            machineService.DataReceived += MachineService_DataReceived;
-            mainForm.FormClosing += MainForm_FormClosing;
+            machineService = new Machine.MachineService(); 
             LoadConfig();
-        }
-
-        private void MachineService_DataReceived(object sender, EventArgs e)
-        {
-            Logger.Log($"{nameof(Wash01LaundryItem)} MachineService_DataReceived {sender as string}");
-
-            if (sender != null)
-            {
-                bool isValidateCrc = machineService.ValidateCRCCommand(sender.ToString());
-                HealthCheckCompleted?.Invoke(isValidateCrc);
-            }
-            else
-            {
-                HealthCheckCompleted?.Invoke(false);
-            }
-        }
-
-        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            RemoveRegisterEvents();
-        }
-
-        private void RemoveRegisterEvents()
-        {
-            machineService.DataReceived -= MachineService_DataReceived;
-            machineService.RemoveRegisterEvents();
-        }
+        } 
 
         private void LoadConfig()
         {
@@ -180,7 +152,7 @@ namespace WashMachine.Forms.Modules.LaundryWashOption.LaundryOptionItems
                 Logger.Log($"{nameof(Wash01LaundryItem)} Step 2 {JsonConvert.SerializeObject(appConfig)}");
                 bool isConnected = await machineService.ConnectAsync(appConfig.WashMachineCom, appConfig.WashMachineBaudRate, appConfig.WashMachineData, appConfig.WashMachineParity, appConfig.WashMachineStopBits);
 
-                if (isConnected || Program.AppConfig.AutoRunning == 1)
+                if (isConnected)
                 {
                     Logger.Log($"{nameof(Wash01LaundryItem)} Step 3");
                     string programCommand = ProgramCommands[$"{form.TimeOptionItemSelected.Name}"];
@@ -230,7 +202,7 @@ namespace WashMachine.Forms.Modules.LaundryWashOption.LaundryOptionItems
                 Logger.Log($"{nameof(Wash01LaundryItem)} Step 2 {JsonConvert.SerializeObject(appConfig)}");
                 bool isConnected = await machineService.ConnectAsync(appConfig.WashMachineCom, appConfig.WashMachineBaudRate, appConfig.WashMachineData, appConfig.WashMachineParity, appConfig.WashMachineStopBits);
 
-                if (isConnected || Program.AppConfig.AutoRunning == 1)
+                if (isConnected)
                 {
                     Logger.Log($"{nameof(Wash01LaundryItem)} Step 3");
                     //Run stop program
@@ -256,12 +228,28 @@ namespace WashMachine.Forms.Modules.LaundryWashOption.LaundryOptionItems
                 Logger.Log($"{nameof(Wash01LaundryItem)} Step 2 {JsonConvert.SerializeObject(appConfig)}");
                 bool isConnected = await machineService.ConnectAsync(appConfig.DryerMachineCom, appConfig.DryerMachineBaudRate, appConfig.DryerMachineData, appConfig.DryerMachineParity, appConfig.DryerMachineStopBits);
 
-                if (isConnected || Program.AppConfig.AutoRunning == 1)
+                if (isConnected)
                 {
                     // Run health check command
-                    machineService.ExecHexCommand(HealthCheckCommand);
-                    System.Threading.Thread.Sleep(2000);
-                    machineService.FakeInvokeDataReceived();
+                    machineService.ExecHexCommand(HealthCheckCommand, (dtRecived) =>
+                    {
+                        Logger.Log($"{nameof(Wash01LaundryItem)} MachineService_DataReceived {dtRecived}");
+                        if (!string.IsNullOrWhiteSpace(dtRecived))
+                        {
+                            bool isValidateCrc = machineService.ValidateCRCCommand(dtRecived);
+                            HealthCheckCompleted?.Invoke(isValidateCrc);
+                        }
+                        else
+                        {
+                            HealthCheckCompleted?.Invoke(false);
+                        }
+                    });
+
+                    if (Program.AppConfig.ByPassHealthCheckMachine == 1)
+                    {
+                        machineService.FakeInvokeDataReceived();
+                    }
+
                     Logger.Log($"{nameof(Wash01LaundryItem)} Step 4 END");
                 }
                 else

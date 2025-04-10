@@ -20,6 +20,11 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.Machine
 
         public Task<bool> ConnectAsync(string portName, int baudRate, int data, Parity parity = Parity.None, StopBits step = StopBits.One)
         {
+            if (Program.AppConfig.ByPassConnectMachine == 1)
+            {
+                return Task.FromResult(true);
+            }
+
             if (string.IsNullOrWhiteSpace(portName))
             {
                 throw new ArgumentNullException(nameof(portName));
@@ -75,7 +80,7 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.Machine
 
         private void SerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
-            if (Program.AppConfig.IsHealthCheckTesting == 1)
+            if (Program.AppConfig.ByPassHealthCheckMachine == 1)
             {
                 OnDataReceived?.Invoke("01 03 14 00 02 00 01 00 01 00 01 00 00 00 00 00 00 00 00 00 00 00 00 48 CE");
             }
@@ -130,7 +135,7 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.Machine
 
                 hexCommand = hexCommand.Replace(" ", string.Empty);
 
-                if (_serialPort != null && _serialPort.IsOpen || true)
+                if (_serialPort != null && _serialPort.IsOpen)
                 {
                     byte[] buffer = HexStringToByteArray(hexCommand);
                     Logger.Log("USING ExecHexCommand: " + hexCommand);
@@ -160,7 +165,7 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.Machine
                 OnDataReceived = onRecevied;
 
                 hexCommand = hexCommand.Replace(" ", string.Empty);
-                if (_serialPort != null && _serialPort.IsOpen || true)
+                if (_serialPort != null && _serialPort.IsOpen)
                 {
                     byte[] buffer = HexStringToByteArray(hexCommand);
                     Logger.Log("USING ExecHexCommand: " + hexCommand);
@@ -307,14 +312,6 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.Machine
             string last = hexValue.Substring(2, 2);
 
             return new string[] { last, first };
-        }
-
-        public void RemoveRegisterEvents()
-        {
-            if (_serialPort != null)
-            {
-                _serialPort.DataReceived -= SerialPort_DataReceived;
-            }
         }
 
         public bool ValidateCRCCommand(string hexCommand)

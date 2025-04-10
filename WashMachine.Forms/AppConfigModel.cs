@@ -78,9 +78,9 @@ namespace WashMachine.Forms
         public string ShopConfigPath { get; set; }
         public int ScanTimeout { get; set; }
         public int DelayDeduct { get; set; }
-        public int AutoRunning { get; set; }
+        public int ByPassConnectMachine { get; set; }
         public int ForceAdminResetMachine { get; set; }
-        public int IsHealthCheckTesting { get; set; }
+        public int ByPassHealthCheckMachine { get; set; }
 
         public ShopConfigModel GetShopConfig()
         {

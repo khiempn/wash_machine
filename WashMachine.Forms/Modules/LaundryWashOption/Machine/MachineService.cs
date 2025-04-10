@@ -11,7 +11,7 @@ namespace WashMachine.Forms.Modules.LaundryWashOption.Machine
     public class MachineService : IMachineService
     {
         SerialPort _serialPort;
-        public event EventHandler<EventArgs> DataReceived;
+        public Action<string> OnDataReceived;
 
         public MachineService()
         {
@@ -20,6 +20,11 @@ namespace WashMachine.Forms.Modules.LaundryWashOption.Machine
 
         public Task<bool> ConnectAsync(string portName, int baudRate, int data, Parity parity = Parity.None, StopBits step = StopBits.One)
         {
+            if (Program.AppConfig.ByPassConnectMachine == 1)
+            {
+                return Task.FromResult(true);
+            }
+
             if (string.IsNullOrWhiteSpace(portName))
             {
                 throw new ArgumentNullException(nameof(portName));
@@ -75,10 +80,17 @@ namespace WashMachine.Forms.Modules.LaundryWashOption.Machine
 
         private void SerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
-            SerialPort sp = (SerialPort)sender;
-            string data = sp.ReadExisting();
-            DataReceived?.Invoke(data, e);
-            Console.WriteLine($"Data Received: {data}");
+            if (Program.AppConfig.ByPassHealthCheckMachine == 1)
+            {
+                OnDataReceived?.Invoke("01 03 14 00 02 00 01 00 01 00 01 00 00 00 00 00 00 00 00 00 00 00 00 48 CE");
+            }
+            else
+            {
+                SerialPort sp = (SerialPort)sender;
+                string data = sp.ReadExisting();
+                OnDataReceived?.Invoke(data);
+                Console.WriteLine($"Data Received: {data}");
+            }
         }
 
         public void Disconect()
@@ -121,12 +133,39 @@ namespace WashMachine.Forms.Modules.LaundryWashOption.Machine
                     throw new ArgumentNullException(nameof(hexCommand));
                 }
 
-                if (Program.AppConfig.HexTrimMethod == 1)
+                hexCommand = hexCommand.Replace(" ", string.Empty);
+
+                if (_serialPort != null && _serialPort.IsOpen)
                 {
-                    hexCommand = hexCommand.Replace(" ", string.Empty);
+                    byte[] buffer = HexStringToByteArray(hexCommand);
+                    Logger.Log("USING ExecHexCommand: " + hexCommand);
+                    _serialPort.Write(buffer, 0, buffer.Length);
+                    Logger.Log("_serialPort.Write ExecHexCommand: DONE");
+                }
+                else
+                {
+                    throw new Exception($"_serialPort is null or closed");
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex);
+            }
+        }
+
+        public void ExecHexCommand(string hexCommand, Action<string> onRecevied)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(hexCommand))
+                {
+                    throw new ArgumentNullException(nameof(hexCommand));
                 }
 
-                if (_serialPort != null && _serialPort.IsOpen || true)
+                OnDataReceived = onRecevied;
+
+                hexCommand = hexCommand.Replace(" ", string.Empty);
+                if (_serialPort != null && _serialPort.IsOpen)
                 {
                     byte[] buffer = HexStringToByteArray(hexCommand);
                     Logger.Log("USING ExecHexCommand: " + hexCommand);
@@ -275,14 +314,6 @@ namespace WashMachine.Forms.Modules.LaundryWashOption.Machine
             return new string[] { last, first };
         }
 
-        public void RemoveRegisterEvents()
-        {
-            if (_serialPort != null)
-            {
-                _serialPort.DataReceived -= SerialPort_DataReceived;
-            }
-        }
-
         public bool ValidateCRCCommand(string hexCommand)
         {
             try
@@ -352,15 +383,17 @@ namespace WashMachine.Forms.Modules.LaundryWashOption.Machine
             Task.Run(() =>
             {
                 Thread.Sleep(5000);
-                if (!string.IsNullOrWhiteSpace(data))
-                {
-                    DataReceived?.Invoke(data, null);
-                }
-                else
-                {
-                    DataReceived?.Invoke("01 03 14 00 02 00 01 00 01 00 01 00 00 00 00 00 00 00 00 00 00 00 00 48 CE", null);
-                }
+                SerialPort_DataReceived(_serialPort, null);
             });
+        }
+
+        public bool ValidateCommand(string hexSended, string hexRecived)
+        {
+            if (!string.IsNullOrWhiteSpace(hexSended))
+            {
+                return hexSended.Equals(hexRecived);
+            }
+            return false;
         }
     }
 }

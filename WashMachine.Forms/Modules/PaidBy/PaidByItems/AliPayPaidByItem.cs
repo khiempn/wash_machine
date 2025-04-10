@@ -229,7 +229,7 @@ namespace WashMachine.Forms.Modules.PaidBy.PaidByItems
                                     Message = "Payment successfully!"
                                 });
 
-                                paymentItem.PaymentCompletedCallBack.Invoke(mainForm, () =>
+                                paymentItem.OnPaymentCompleted.Invoke(mainForm, () =>
                                 {
                                     progressUI.Hide();
                                     mainForm.Controls.Remove(progressUI);
@@ -241,7 +241,7 @@ namespace WashMachine.Forms.Modules.PaidBy.PaidByItems
                                     paymentAlertUI.PrinterClick += PaymentAlertUI_PrinterClick;
                                     paymentAlertUI.SetAlipayInvoice(orderRequest);
                                     paymentAlertUI.Show();
-                                });
+                                }, orderRequest);
                             }
                             else
                             {

@@ -157,12 +157,11 @@ namespace WashMachine.Forms.Modules.LaundryWashOption.Machine
         {
             try
             {
+                OnDataReceived = onRecevied;
                 if (string.IsNullOrWhiteSpace(hexCommand))
                 {
-                    throw new ArgumentNullException(nameof(hexCommand));
+                    OnDataReceived?.Invoke(string.Empty);
                 }
-
-                OnDataReceived = onRecevied;
 
                 hexCommand = hexCommand.Replace(" ", string.Empty);
                 if (_serialPort != null && _serialPort.IsOpen)
@@ -174,11 +173,13 @@ namespace WashMachine.Forms.Modules.LaundryWashOption.Machine
                 }
                 else
                 {
-                    throw new Exception($"_serialPort is null or closed");
+                    OnDataReceived?.Invoke(string.Empty);
+                    Logger.Log($"_serialPort is null or closed");
                 }
             }
             catch (Exception ex)
             {
+                OnDataReceived?.Invoke(string.Empty);
                 Logger.Log(ex);
             }
         }
@@ -387,9 +388,9 @@ namespace WashMachine.Forms.Modules.LaundryWashOption.Machine
             });
         }
 
-        public bool ValidateCommand(string hexSended, string hexRecived)
+        public bool ValidateProgramCommand(string hexSended, string hexRecived)
         {
-            if (!string.IsNullOrWhiteSpace(hexSended))
+            if (!string.IsNullOrWhiteSpace(hexSended) && !string.IsNullOrWhiteSpace(hexRecived))
             {
                 return hexSended.Equals(hexRecived);
             }

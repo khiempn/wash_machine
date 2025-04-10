@@ -8,8 +8,11 @@ using WashMachine.Forms.Common.UI;
 using WashMachine.Forms.Database.Context;
 using WashMachine.Forms.Database.Tables.Machine;
 using WashMachine.Forms.Modules.Laundry;
+using WashMachine.Forms.Modules.LaundryDryerOption.Email;
 using WashMachine.Forms.Modules.LaundryDryerOption.TempOptionItems;
 using WashMachine.Forms.Modules.LaundryDryerOption.TimeOptionItems;
+using WashMachine.Forms.Modules.LaundryWashOption.Api;
+using WashMachine.Forms.Modules.PaidBy.Service.Model;
 using WashMachine.Forms.Modules.Shop.Model;
 
 namespace WashMachine.Forms.Modules.LaundryDryerOption.LaundryOptionItems
@@ -17,14 +20,12 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.LaundryOptionItems
     public class Dryer01LaundryItem : ILaundryOptionItem
     {
         public string Name => nameof(Dryer01LaundryItem);
-
         public Dictionary<string, string> TemperatureCommands { get; set; } = new Dictionary<string, string>()
         {
             { nameof(HighTempOptionItem), "01 06 01 66 00 01 A9 E9" },
             { nameof(MidTempOptionItem), "01 06 01 66 00 02 E9 E8" },
             { nameof(LowTempOptionItem), "01 06 01 66 00 03 28 28" },
         };
-
         public Dictionary<string, string> TimeCommands { get; set; } = new Dictionary<string, string>()
         {
             { nameof(Minute30TimeOptionItem), "01 06 01 67 00 1E B9 E1" },
@@ -32,20 +33,21 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.LaundryOptionItems
             { nameof(Minute50TimeOptionItem), "01 06 01 67 00 5A B9 D2" },
             { nameof(Minute60TimeOptionItem), "01 06 01 67 00 78 39 CB" }
         };
-
         public string ImplementCommand { get; set; } = "01 06 01 68 00 01 C8 2A";
         public string StopCommand { get; set; }
         public string HealthCheckCommand { get; set; } = "01 03 01 5C 00 0A 04 23";
         public Action<object> HealthCheckCompleted { get; set; }
-
         Form mainForm;
-
         Machine.MachineService machineService;
+        EmailService emailService;
+        DryerApiService dryerApiService;
 
         public Dryer01LaundryItem(ILaundryItem laundryItem, Form parent)
         {
             mainForm = parent;
             machineService = new Machine.MachineService();
+            emailService = new EmailService();
+            dryerApiService = new DryerApiService();
             LoadConfig();
         }
 
@@ -153,40 +155,76 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.LaundryOptionItems
             (control as CardButtonRoundedUI).IsDisabled = true;
         }
 
-        public async Task Start()
+        public async Task Start(OrderModel order)
         {
             await Task.Run(async () =>
             {
-                Logger.Log($"{nameof(Dryer01LaundryItem)} Step 1 START");
+                Logger.Log($"{Name} Step 1 START");
                 LaundryDryerOptionForm form = (LaundryDryerOptionForm)mainForm;
 
                 AppConfigModel appConfig = Program.AppConfig;
-                Logger.Log($"{nameof(Dryer01LaundryItem)} Step 2 {JsonConvert.SerializeObject(appConfig)}");
+                Logger.Log($"{Name} Step 2 {JsonConvert.SerializeObject(appConfig)}");
                 bool isConnected = await machineService.ConnectAsync(appConfig.DryerMachineCom, appConfig.DryerMachineBaudRate, appConfig.DryerMachineData, appConfig.DryerMachineParity, appConfig.DryerMachineStopBits);
 
                 if (isConnected)
                 {
-                    Logger.Log($"{nameof(Dryer01LaundryItem)} Step 3");
-                    string tempCommand = TemperatureCommands[$"{form.TempOptionItemSelected.Name}"];
+                    Logger.Log($"{Name} Step 3");
+
                     //Run temp program
-                    machineService.ExecHexCommand(tempCommand);
-                    System.Threading.Thread.Sleep(2000);
-                    string timeCommand = TimeCommands[$"{form.TimeOptionItemSelected.Name}"];
-                    //Run temp program
-                    machineService.ExecHexCommand(timeCommand);
-                    System.Threading.Thread.Sleep(2000);
-                    // Run implement as START
-                    machineService.ExecHexCommand(ImplementCommand);
-                    System.Threading.Thread.Sleep(2000);
-                    SetIsRunning();
-                    Logger.Log($"{nameof(Dryer01LaundryItem)} Step 4 END");
+                    string tempCommand = TemperatureCommands[form.TempOptionItemSelected.Name];
+                    machineService.ExecHexCommand(tempCommand, (tempCommandRecived) =>
+                    {
+                        bool isValidate = machineService.ValidateProgramCommand(tempCommand, tempCommandRecived);
+
+                        if (isValidate == false)
+                        {
+                            OnStartError(order, tempCommand);
+                            return;
+                        }
+
+                        //Run temp program
+                        string timeCommand = TimeCommands[form.TimeOptionItemSelected.Name];
+                        machineService.ExecHexCommand(timeCommand, (timeCommandRecived) =>
+                        {
+                            isValidate = machineService.ValidateProgramCommand(timeCommand, timeCommandRecived);
+
+                            if (isValidate == false)
+                            {
+                                OnStartError(order, timeCommand);
+                                return;
+                            }
+
+                            // Run implement as START
+                            machineService.ExecHexCommand(ImplementCommand, (implementCommandRecived) =>
+                            {
+                                isValidate = machineService.ValidateProgramCommand(ImplementCommand, implementCommandRecived);
+
+                                if (isValidate == false)
+                                {
+                                    OnStartError(order, ImplementCommand);
+                                    return;
+                                }
+
+                                SetIsRunning();
+                            });
+
+                        });
+                    });
+
+                    Logger.Log($"{Name} Step 4 END");
                 }
                 else
                 {
                     MessageBox.Show("Unable connect to device, please try agiain", "Warning!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    Logger.Log($"{nameof(Dryer01LaundryItem)} Can not connect device.");
+                    Logger.Log($"{Name} Can not connect device.");
                 }
             });
+        }
+
+        private void OnStartError(OrderModel order, string command)
+        {
+            emailService.SendEmailStartError(order, Name, command);
+            dryerApiService.TrackingMachineError(order, Name, command);
         }
 
         public void SetIsRunning()
@@ -200,38 +238,44 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.LaundryOptionItems
             machine.Temp = form.TempOptionItemSelected.TypeId;
             machine.IsRunning = 1;
             AppDbContext.Machine.Update(machine);
+
+            machine = AppDbContext.Machine.Get(new MachineModel() { Name = Name });
+            dryerApiService.UpdateMachineInfo(machine);
         }
 
         public void SetIsStop()
         {
             MachineModel machine = AppDbContext.Machine.Get(new MachineModel() { Name = Name });
             AppDbContext.Machine.ResetMachine(machine);
+
+            machine = AppDbContext.Machine.Get(new MachineModel() { Name = Name });
+            dryerApiService.UpdateMachineInfo(machine);
         }
 
         public async Task Stop()
         {
             await Task.Run(async () =>
             {
-                Logger.Log($"{nameof(Dryer01LaundryItem)} Step 1 STOP");
+                Logger.Log($"{Name} Step 1 STOP");
                 LaundryDryerOptionForm form = (LaundryDryerOptionForm)mainForm;
 
                 AppConfigModel appConfig = Program.AppConfig;
-                Logger.Log($"{nameof(Dryer01LaundryItem)} Step 2 {JsonConvert.SerializeObject(appConfig)}");
+                Logger.Log($"{Name} Step 2 {JsonConvert.SerializeObject(appConfig)}");
                 bool isConnected = await machineService.ConnectAsync(appConfig.DryerMachineCom, appConfig.DryerMachineBaudRate, appConfig.DryerMachineData, appConfig.DryerMachineParity, appConfig.DryerMachineStopBits);
 
                 if (isConnected)
                 {
-                    Logger.Log($"{nameof(Dryer01LaundryItem)} Step 3");
+                    Logger.Log($"{Name} Step 3");
                     //Run stop program
                     machineService.ExecHexCommand(StopCommand);
                     System.Threading.Thread.Sleep(2000);
                     SetIsStop();
-                    Logger.Log($"{nameof(Dryer01LaundryItem)} Step 4 END");
+                    Logger.Log($"{Name} Step 4 END");
                 }
                 else
                 {
                     MessageBox.Show("Unable connect to device, please try agiain", "Warning!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    Logger.Log($"{nameof(Dryer01LaundryItem)} Can not connect device.");
+                    Logger.Log($"{Name} Can not connect device.");
                 }
             });
         }
@@ -240,9 +284,9 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.LaundryOptionItems
         {
             await Task.Run(async () =>
             {
-                Logger.Log($"{nameof(Dryer01LaundryItem)} Step 1 HealthCheck");
+                Logger.Log($"{Name} Step 1 HealthCheck");
                 AppConfigModel appConfig = Program.AppConfig;
-                Logger.Log($"{nameof(Dryer01LaundryItem)} Step 2 {JsonConvert.SerializeObject(appConfig)}");
+                Logger.Log($"{Name} Step 2 {JsonConvert.SerializeObject(appConfig)}");
                 bool isConnected = await machineService.ConnectAsync(appConfig.DryerMachineCom, appConfig.DryerMachineBaudRate, appConfig.DryerMachineData, appConfig.DryerMachineParity, appConfig.DryerMachineStopBits);
 
                 if (isConnected)
@@ -250,14 +294,20 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.LaundryOptionItems
                     // Run health check command
                     machineService.ExecHexCommand(HealthCheckCommand, (dtRecived) =>
                     {
-                        Logger.Log($"{nameof(Dryer01LaundryItem)} MachineService_DataReceived {dtRecived}");
+                        Logger.Log($"{Name} MachineService_DataReceived {dtRecived}");
                         if (!string.IsNullOrWhiteSpace(dtRecived))
                         {
                             bool isValidateCrc = machineService.ValidateCRCCommand(dtRecived);
+                            if (isValidateCrc == false)
+                            {
+                                OnHealthCheckError();
+                            }
+
                             HealthCheckCompleted?.Invoke(isValidateCrc);
                         }
                         else
                         {
+                            OnHealthCheckError();
                             HealthCheckCompleted?.Invoke(false);
                         }
                     });
@@ -267,14 +317,19 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.LaundryOptionItems
                         machineService.FakeInvokeDataReceived();
                     }
 
-                    Logger.Log($"{nameof(Dryer01LaundryItem)} Step 4 END");
+                    Logger.Log($"{Name} Step 4 END");
                 }
                 else
                 {
                     MessageBox.Show("Unable connect to device, please try agiain", "Warning!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    Logger.Log($"{nameof(Dryer01LaundryItem)} Can not connect device.");
+                    Logger.Log($"{Name} Can not connect device.");
                 }
             });
+        }
+
+        private void OnHealthCheckError()
+        {
+            emailService.SendEmailHealthCheckError(Name, HealthCheckCommand);
         }
     }
 }

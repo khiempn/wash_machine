@@ -57,6 +57,6 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.Machine
         /// <param name="hexSended"></param>
         /// <param name="hexRecived"></param>
         /// <returns></returns>
-        bool ValidateCommand(string hexSended, string hexRecived);
+        bool ValidateProgramCommand(string hexSended, string hexRecived);
     }
 }

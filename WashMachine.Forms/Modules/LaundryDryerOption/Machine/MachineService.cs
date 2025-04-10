@@ -387,9 +387,9 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.Machine
             });
         }
 
-        public bool ValidateCommand(string hexSended, string hexRecived)
+        public bool ValidateProgramCommand(string hexSended, string hexRecived)
         {
-            if (!string.IsNullOrWhiteSpace(hexSended))
+            if (!string.IsNullOrWhiteSpace(hexSended) && !string.IsNullOrWhiteSpace(hexRecived))
             {
                 return hexSended.Equals(hexRecived);
             }

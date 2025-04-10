@@ -5,6 +5,7 @@ using System.Windows.Forms;
 using WashMachine.Forms.Common.UI;
 using WashMachine.Forms.Modules.Login;
 using WashMachine.Forms.Modules.PaidBy;
+using WashMachine.Forms.Modules.PaidBy.Service.Model;
 
 namespace WashMachine.Forms.Modules.LaundryDryerOption.PaymentItems
 {
@@ -20,15 +21,15 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.PaymentItems
             mainForm = form;
             this.followType = followType;
             paymentItem = new Payment.PaymentItems.HkdPaymentItem();
-            paymentItem.PaymentCompletedCallBack += PaymentItem_PaymentCompleted;
+            paymentItem.OnPaymentCompleted += PaymentItem_PaymentCompleted;
         }
 
         private void RemoveRegisterEvents()
         {
-            paymentItem.PaymentCompletedCallBack -= PaymentItem_PaymentCompleted;
+            paymentItem.OnPaymentCompleted -= PaymentItem_PaymentCompleted;
         }
 
-        private async void PaymentItem_PaymentCompleted(Form form, Action done)
+        private async void PaymentItem_PaymentCompleted(Form form, Action done, OrderModel order)
         {
             try
             {
@@ -39,7 +40,7 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.PaymentItems
                     ProgressUI progressUI = new ProgressUI();
                     progressUI.SetParent(form);
                     progressUI.Show();
-                    await laundryDryerOptionForm.LaundryOptionItemSelected.Start();
+                    await laundryDryerOptionForm.LaundryOptionItemSelected.Start(order);
                     progressUI.Hide();
                     done.Invoke();
                 }
@@ -68,7 +69,11 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.PaymentItems
                             paymentItem.SetAmount(form.TimeOptionItemSelected.Amount);
                             if (followType == FollowType.TestMachineWithoutPayment)
                             {
-                                await form.LaundryOptionItemSelected.Start();
+                                await form.LaundryOptionItemSelected.Start(new OrderModel()
+                                {
+                                    Amount = form.TimeOptionItemSelected.Amount,
+                                    DeviceId = "Test-Device"
+                                });
                             }
                             else
                             {

@@ -111,7 +111,11 @@
     <Compile Include="Database\Tables\Machine\MachineModel.cs" />
     <Compile Include="Database\Tables\Machine\MachineService.cs" />
     <Compile Include="Logger.cs" />
+    <Compile Include="Modules\LaundryDryerOption\Api\IDryerApiService.cs" />
+    <Compile Include="Modules\LaundryDryerOption\Api\DryerApiService.cs" />
     <Compile Include="Modules\LaundryDryerOption\CardItemProperty.cs" />
+    <Compile Include="Modules\LaundryDryerOption\Email\EmailService.cs" />
+    <Compile Include="Modules\LaundryDryerOption\Email\IEmailService.cs" />
     <Compile Include="Modules\LaundryDryerOption\ILaundryItem.cs" />
     <Compile Include="Modules\LaundryDryerOption\LaundryOptionItems\Dryer01LaundryItem.cs" />
     <Compile Include="Modules\LaundryDryerOption\LaundryOptionItems\Dryer02LaundryItem.cs" />
@@ -136,7 +140,11 @@
     <Compile Include="Modules\LaundryDryerOption\TimeOptionItems\Minute30TimeOptionItem.cs" />
     <Compile Include="Modules\LaundryDryerOption\TimeOptionItems\Minute40TimeOptionItem.cs" />
     <Compile Include="Modules\LaundryDryerOption\TimeOptionItems\Minute60TimeOptionItem.cs" />
+    <Compile Include="Modules\LaundryWashOption\Api\WashApiService.cs" />
+    <Compile Include="Modules\LaundryWashOption\Api\IWashApiService.cs" />
     <Compile Include="Modules\LaundryWashOption\CardItemProperty.cs" />
+    <Compile Include="Modules\LaundryWashOption\Email\EmailService.cs" />
+    <Compile Include="Modules\LaundryWashOption\Email\IEmailService.cs" />
     <Compile Include="Modules\LaundryWashOption\ILaundryItem.cs" />
     <Compile Include="Modules\LaundryWashOption\LaundryWashOptionForm.cs">
       <SubType>Form</SubType>

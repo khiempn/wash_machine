@@ -8,8 +8,11 @@ using WashMachine.Forms.Common.UI;
 using WashMachine.Forms.Database.Context;
 using WashMachine.Forms.Database.Tables.Machine;
 using WashMachine.Forms.Modules.Laundry;
+using WashMachine.Forms.Modules.LaundryDryerOption.Email;
 using WashMachine.Forms.Modules.LaundryDryerOption.TempOptionItems;
 using WashMachine.Forms.Modules.LaundryDryerOption.TimeOptionItems;
+using WashMachine.Forms.Modules.LaundryWashOption.Api;
+using WashMachine.Forms.Modules.PaidBy.Service.Model;
 using WashMachine.Forms.Modules.Shop.Model;
 
 namespace WashMachine.Forms.Modules.LaundryDryerOption.LaundryOptionItems
@@ -17,14 +20,12 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.LaundryOptionItems
     public class Dryer04LaundryItem : ILaundryOptionItem
     {
         public string Name => nameof(Dryer04LaundryItem);
-
         public Dictionary<string, string> TemperatureCommands { get; set; } = new Dictionary<string, string>()
         {
             { nameof(HighTempOptionItem), "04 06 01 66 00 01 A9 BC" },
             { nameof(MidTempOptionItem), "04 06 01 66 00 02 E9 BD" },
             { nameof(LowTempOptionItem), "04 06 01 66 00 03 28 7D" },
         };
-
         public Dictionary<string, string> TimeCommands { get; set; } = new Dictionary<string, string>()
         {
             { nameof(Minute30TimeOptionItem), "04 06 01 67 00 1E B9 B4" },
@@ -32,20 +33,21 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.LaundryOptionItems
             { nameof(Minute50TimeOptionItem), "04 06 01 67 00 5A B9 87" },
             { nameof(Minute60TimeOptionItem), "04 06 01 67 00 78 39 9E" }
         };
-
         public string ImplementCommand { get; set; } = "04 06 01 68 00 01 C8 7F";
         public string StopCommand { get; set; }
         public string HealthCheckCommand { get; set; } = "04 03 01 5C 00 0A 04 76";
         public Action<object> HealthCheckCompleted { get; set; }
-
         Form mainForm;
-
         Machine.MachineService machineService;
+        EmailService emailService;
+        DryerApiService dryerApiService;
 
         public Dryer04LaundryItem(ILaundryItem laundryItem, Form parent)
         {
             mainForm = parent;
             machineService = new Machine.MachineService();
+            emailService = new EmailService();
+            dryerApiService = new DryerApiService();
             LoadConfig();
         }
 
@@ -75,7 +77,7 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.LaundryOptionItems
 
         public void Click()
         {
-           
+
         }
 
         public Control GetTemplate()
@@ -154,7 +156,7 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.LaundryOptionItems
             (control as CardButtonRoundedUI).IsDisabled = true;
         }
 
-        public async Task Start()
+        public async Task Start(OrderModel order)
         {
             await Task.Run(async () =>
             {
@@ -168,18 +170,48 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.LaundryOptionItems
                 if (isConnected)
                 {
                     Logger.Log($"{nameof(Dryer04LaundryItem)} Step 3");
-                    string tempCommand = TemperatureCommands[$"{form.TempOptionItemSelected.Name}"];
+
                     //Run temp program
-                    machineService.ExecHexCommand(tempCommand);
-                    System.Threading.Thread.Sleep(2000);
-                    string timeCommand = TimeCommands[$"{form.TimeOptionItemSelected.Name}"];
-                    //Run temp program
-                    machineService.ExecHexCommand(timeCommand);
-                    System.Threading.Thread.Sleep(2000);
-                    // Run implement as START
-                    machineService.ExecHexCommand(ImplementCommand);
-                    System.Threading.Thread.Sleep(2000);
-                    SetIsRunning();
+                    string tempCommand = TemperatureCommands[form.TempOptionItemSelected.Name];
+                    machineService.ExecHexCommand(tempCommand, (tempCommandRecived) =>
+                    {
+                        bool isValidate = machineService.ValidateProgramCommand(tempCommand, tempCommandRecived);
+
+                        if (isValidate == false)
+                        {
+                            OnStartError(order, tempCommand);
+                            return;
+                        }
+
+                        //Run temp program
+                        string timeCommand = TimeCommands[form.TimeOptionItemSelected.Name];
+                        machineService.ExecHexCommand(timeCommand, (timeCommandRecived) =>
+                        {
+                            isValidate = machineService.ValidateProgramCommand(timeCommand, timeCommandRecived);
+
+                            if (isValidate == false)
+                            {
+                                OnStartError(order, timeCommand);
+                                return;
+                            }
+
+                            // Run implement as START
+                            machineService.ExecHexCommand(ImplementCommand, (implementCommandRecived) =>
+                            {
+                                isValidate = machineService.ValidateProgramCommand(ImplementCommand, implementCommandRecived);
+
+                                if (isValidate == false)
+                                {
+                                    OnStartError(order, ImplementCommand);
+                                    return;
+                                }
+
+                                SetIsRunning();
+                            });
+
+                        });
+                    });
+
                     Logger.Log($"{nameof(Dryer04LaundryItem)} Step 4 END");
                 }
                 else
@@ -188,6 +220,12 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.LaundryOptionItems
                     Logger.Log($"{nameof(Dryer04LaundryItem)} Can not connect device.");
                 }
             });
+        }
+
+        private void OnStartError(OrderModel order, string command)
+        {
+            emailService.SendEmailStartError(order, Name, command);
+            dryerApiService.TrackingMachineError(order, Name, command);
         }
 
         public void SetIsRunning()
@@ -201,12 +239,18 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.LaundryOptionItems
             machine.Temp = form.TempOptionItemSelected.TypeId;
             machine.IsRunning = 1;
             AppDbContext.Machine.Update(machine);
+
+            machine = AppDbContext.Machine.Get(new MachineModel() { Name = Name });
+            dryerApiService.UpdateMachineInfo(machine);
         }
 
         public void SetIsStop()
         {
             MachineModel machine = AppDbContext.Machine.Get(new MachineModel() { Name = Name });
             AppDbContext.Machine.ResetMachine(machine);
+
+            machine = AppDbContext.Machine.Get(new MachineModel() { Name = Name });
+            dryerApiService.UpdateMachineInfo(machine);
         }
 
         public async Task Stop()
@@ -255,10 +299,16 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.LaundryOptionItems
                         if (!string.IsNullOrWhiteSpace(dtRecived))
                         {
                             bool isValidateCrc = machineService.ValidateCRCCommand(dtRecived);
+                            if (isValidateCrc == false)
+                            {
+                                OnHealthCheckError();
+                            }
+
                             HealthCheckCompleted?.Invoke(isValidateCrc);
                         }
                         else
                         {
+                            OnHealthCheckError();
                             HealthCheckCompleted?.Invoke(false);
                         }
                     });
@@ -276,6 +326,11 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption.LaundryOptionItems
                     Logger.Log($"{nameof(Dryer04LaundryItem)} Can not connect device.");
                 }
             });
+        }
+
+        private void OnHealthCheckError()
+        {
+            emailService.SendEmailHealthCheckError(Name, HealthCheckCommand);
         }
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using WashMachine.Forms.Modules.PaidBy.Service.Model;
 
 namespace WashMachine.Forms.Modules.LaundryDryerOption
 {
@@ -26,7 +27,7 @@ namespace WashMachine.Forms.Modules.LaundryDryerOption
         void Click();
         Control GetTemplate();
         void DisableItem(Control control);
-        Task Start();
+        Task Start(OrderModel order);
         void SetIsRunning();
         Task HealthCheck();
     }

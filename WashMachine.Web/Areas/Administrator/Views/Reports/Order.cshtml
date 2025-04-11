@@ -90,6 +90,7 @@
                                         <th>Transaction Date/Time</th>
                                         <th>Device ID</th>
                                         <th>Octopus ID</th>
+                                        <th>Buyer Account ID (For Eft)</th>
                                         <th>Usage</th>
                                         <th>Transaction Amount</th>
                                         <th>Status</th>
@@ -111,6 +112,7 @@
                                                 <td>@order.InsertTime.Value.ToString("MM/dd/yyyy hh:mm:ss tt")</td>
                                                 <td>@order.DeviceId</td>
                                                 <td>@order.OctopusNo</td>
+                                                <td>@order.BuyerAccountID</td>
                                                 <td>@(order.PaymentTypeName == "Octopus" ? "Deduct" : "Eft")</td>
                                                 <td>@order.Amount</td>
                                                 <td>

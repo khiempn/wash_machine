@@ -90,7 +90,7 @@
                                         <th>Payment Type Name</th>
                                         <th>Transaction Amount</th>
                                         <th>Octopus ID</th>
-                                        <th>Buyer Account ID</th>
+                                        <th>Buyer Account ID (For Eft)</th>
                                         <th>Error Date</th>
                                     </tr>
                                 </thead>
@@ -138,7 +138,7 @@
 
             $.ajax({
                 type: "POST",
-                url: "/administrator/reports/OrderExportToExcel",
+                url: "/administrator/reports/RunCommandErrorExportToExcel",
                 xhrFields: {
                     responseType: 'blob'
                 },
@@ -147,7 +147,7 @@
                     var a = document.createElement('a');
                     var url = window.URL.createObjectURL(data);
                     a.href = url;
-                    a.download = 'OrderReport.xlsx';
+                    a.download = 'RunCommandErrorReport.xlsx';
                     document.body.append(a);
                     a.click();
                     a.remove();

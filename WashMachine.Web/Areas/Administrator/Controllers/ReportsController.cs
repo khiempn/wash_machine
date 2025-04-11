@@ -253,6 +253,7 @@ namespace WashMachine.Web.Areas.Administrator.Controllers
             dataTable.Columns.Add("Transaction Date / Time", typeof(string));
             dataTable.Columns.Add("Device ID", typeof(string));
             dataTable.Columns.Add("Octopus ID", typeof(string));
+            dataTable.Columns.Add("Buyer Account ID (For Eft)", typeof(string));
             dataTable.Columns.Add("Usage", typeof(string));
             dataTable.Columns.Add("Transaction Amount", typeof(string));
             dataTable.Columns.Add("Status", typeof(string));
@@ -293,6 +294,7 @@ namespace WashMachine.Web.Areas.Administrator.Controllers
                     order.InsertTime.Value.ToString("MM/dd/yyyy hh:mm:ss tt"),
                     order.DeviceId,
                     order.OctopusNo,
+                    order.BuyerAccountID,
                     order.PaymentTypeName == "Octopus" ? "Deduct" : "Eft",
                     order.Amount,
                     status,
@@ -366,7 +368,7 @@ namespace WashMachine.Web.Areas.Administrator.Controllers
             }
         }
 
-        [HttpGet]
+        [HttpPost]
         public IActionResult RunCommandErrorExportToExcel(RunCommandErrorDataModel runCommandErrorData)
         {
             try
@@ -422,7 +424,7 @@ namespace WashMachine.Web.Areas.Administrator.Controllers
                 dataTable.Columns.Add("Payment Type Name", typeof(string));
                 dataTable.Columns.Add("Transaction Amount", typeof(string));
                 dataTable.Columns.Add("Octopus ID", typeof(string));
-                dataTable.Columns.Add("Buyer Account ID", typeof(string));
+                dataTable.Columns.Add("Buyer Account ID (For Eft)", typeof(string));
                 dataTable.Columns.Add("Error Date", typeof(string));
 
                 int index = 1;

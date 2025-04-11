@@ -24,6 +24,7 @@ namespace WashMachine.Repositories.Entities
         public virtual DbSet<Log> Log { get; set; }
         public virtual DbSet<EmailTemplate> EmailTemplate { get; set; }
         public virtual DbSet<MachineCommand> MachineCommand { get; set; }
+        public virtual DbSet<RunCommandError> RunCommandError { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -165,6 +166,14 @@ namespace WashMachine.Repositories.Entities
             modelBuilder.Entity<Log>(entity =>
             {
                 entity.Property(e => e.Time).HasColumnType("datetime");
+            });
+
+            modelBuilder.Entity<RunCommandError>(entity =>
+            {
+                entity.Property(e => e.Amount).HasColumnType("float");
+                entity.Property(e => e.OrderId).HasColumnType("int");
+                entity.Property(e => e.InsertTime).HasColumnType("datetime");
+                entity.Property(e => e.UpdateTime).HasColumnType("datetime");
             });
         }
     }

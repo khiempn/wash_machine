@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
 using System.Linq;
+using OfficeOpenXml.Style;
 
 namespace WashMachine.Web.Areas.Administrator.Controllers
 {
@@ -265,7 +266,7 @@ namespace WashMachine.Web.Areas.Administrator.Controllers
                 if (order.PaymentStatus == (int)(PaymentStatus.Completed))
                 {
                     status = "Completed";
-                                                        }
+                }
                 else if (order.PaymentStatus == (int)(PaymentStatus.Failed))
                 {
                     status = "Failed";
@@ -304,5 +305,153 @@ namespace WashMachine.Web.Areas.Administrator.Controllers
 
             return File(fileContents, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "OrdersReport.xlsx");
         }
+
+        [HttpGet]
+        public IActionResult RunCommandError(RunCommandErrorDataModel runCommandErrorData)
+        {
+            try
+            {
+                if (runCommandErrorData == null)
+                {
+                    runCommandErrorData = new RunCommandErrorDataModel();
+                }
+                ShopService shopService = _business.GetService<ShopService>();
+
+                var systemInfo = HttpContext.GetSystemInfo();
+
+                runCommandErrorData.Filter.ShopCodeList = shopService.GetShops().Select(s => s.Code).ToList();
+
+                if (systemInfo.User.IsAdmin == false)
+                {
+                    runCommandErrorData.Filter.ShopCodeList = runCommandErrorData.Filter.ShopCodeList.Where(w => w == systemInfo.User.ShopOwner?.Code).ToList();
+                    runCommandErrorData.Filter.ShopCode = systemInfo.User.ShopOwner?.Code;
+                }
+
+                DateTime? fromDate = null;
+                if (!string.IsNullOrWhiteSpace(runCommandErrorData.Filter.FromDate))
+                {
+                    fromDate = DateTime.Parse(runCommandErrorData.Filter.FromDate, new CultureInfo("en-CA"));
+                }
+
+                DateTime? toDate = null;
+                if (!string.IsNullOrWhiteSpace(runCommandErrorData.Filter.ToDate))
+                {
+                    toDate = DateTime.Parse(runCommandErrorData.Filter.ToDate, new CultureInfo("en-CA"));
+                }
+
+                RunCommandErrorService runCommandErrorService = _business.GetService<RunCommandErrorService>();
+                List<RunCommandErrorModel> runCommandErrors = runCommandErrorService.GetRunCommandErrors()
+                    .Where(w => w.PaymentTypeName != "Coupon")
+                    .Where(w => $"{w.PaymentTypeName} {w.ShopName} {w.ShopCode}".IndexOf(runCommandErrorData.Filter.SearchCriteria, StringComparison.OrdinalIgnoreCase) >= 0)
+                    .Where(w => fromDate == null || w.InsertTime >= fromDate.Value)
+                    .Where(w => toDate == null || w.InsertTime <= toDate.Value.AddHours(23).AddMinutes(59).AddSeconds(59))
+                    .Where(w => string.IsNullOrWhiteSpace(runCommandErrorData.Filter.ShopCode) || w.ShopCode.IndexOf(runCommandErrorData.Filter.ShopCode, StringComparison.OrdinalIgnoreCase) >= 0)
+                    .Where(w => string.IsNullOrWhiteSpace(runCommandErrorData.Filter.PaymentMethod) || w.PaymentTypeName.IndexOf(runCommandErrorData.Filter.PaymentMethod, StringComparison.OrdinalIgnoreCase) >= 0)
+                    .OrderByDescending(o => o.Id)
+                    .ToList();
+
+
+                if (systemInfo.User.IsAdmin == false)
+                {
+                    runCommandErrors = runCommandErrors.Where(w => w.ShopCode == systemInfo.User.ShopOwner?.Code).ToList();
+                }
+
+                runCommandErrorData.RunCommandErrors = runCommandErrors;
+                runCommandErrorData.Total = runCommandErrors.Count;
+                return View(runCommandErrorData);
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
+        [HttpGet]
+        public IActionResult RunCommandErrorExportToExcel(RunCommandErrorDataModel runCommandErrorData)
+        {
+            try
+            {
+                if (runCommandErrorData == null)
+                {
+                    runCommandErrorData = new RunCommandErrorDataModel();
+                }
+                ShopService shopService = _business.GetService<ShopService>();
+
+                var systemInfo = HttpContext.GetSystemInfo();
+
+                runCommandErrorData.Filter.ShopCodeList = shopService.GetShops().Select(s => s.Code).ToList();
+
+                if (systemInfo.User.IsAdmin == false)
+                {
+                    runCommandErrorData.Filter.ShopCodeList = runCommandErrorData.Filter.ShopCodeList.Where(w => w == systemInfo.User.ShopOwner?.Code).ToList();
+                    runCommandErrorData.Filter.ShopCode = systemInfo.User.ShopOwner?.Code;
+                }
+
+                DateTime? fromDate = null;
+                if (!string.IsNullOrWhiteSpace(runCommandErrorData.Filter.FromDate))
+                {
+                    fromDate = DateTime.Parse(runCommandErrorData.Filter.FromDate, new CultureInfo("en-CA"));
+                }
+
+                DateTime? toDate = null;
+                if (!string.IsNullOrWhiteSpace(runCommandErrorData.Filter.ToDate))
+                {
+                    toDate = DateTime.Parse(runCommandErrorData.Filter.ToDate, new CultureInfo("en-CA"));
+                }
+
+                RunCommandErrorService runCommandErrorService = _business.GetService<RunCommandErrorService>();
+                List<RunCommandErrorModel> runCommandErrors = runCommandErrorService.GetRunCommandErrors()
+                    .Where(w => w.PaymentTypeName != "Coupon")
+                    .Where(w => $"{w.PaymentTypeName} {w.ShopName} {w.ShopCode}".IndexOf(runCommandErrorData.Filter.SearchCriteria, StringComparison.OrdinalIgnoreCase) >= 0)
+                    .Where(w => fromDate == null || w.InsertTime >= fromDate.Value)
+                    .Where(w => toDate == null || w.InsertTime <= toDate.Value.AddHours(23).AddMinutes(59).AddSeconds(59))
+                    .Where(w => string.IsNullOrWhiteSpace(runCommandErrorData.Filter.ShopCode) || w.ShopCode.IndexOf(runCommandErrorData.Filter.ShopCode, StringComparison.OrdinalIgnoreCase) >= 0)
+                    .Where(w => string.IsNullOrWhiteSpace(runCommandErrorData.Filter.PaymentMethod) || w.PaymentTypeName.IndexOf(runCommandErrorData.Filter.PaymentMethod, StringComparison.OrdinalIgnoreCase) >= 0)
+                    .OrderByDescending(o => o.Id)
+                    .ToList();
+
+
+                DataTable dataTable = new DataTable();
+
+                dataTable.Columns.Add("No", typeof(int));
+                dataTable.Columns.Add("Receipt No", typeof(string));
+                dataTable.Columns.Add("Shop Code", typeof(string));
+                dataTable.Columns.Add("Shop Name", typeof(string));
+                dataTable.Columns.Add("Machine Name", typeof(string));
+                dataTable.Columns.Add("Command", typeof(string));
+                dataTable.Columns.Add("Payment Type Name", typeof(string));
+                dataTable.Columns.Add("Transaction Amount", typeof(string));
+                dataTable.Columns.Add("Octopus ID", typeof(string));
+                dataTable.Columns.Add("Buyer Account ID", typeof(string));
+                dataTable.Columns.Add("Error Date", typeof(string));
+
+                int index = 1;
+                foreach (RunCommandErrorModel runCommand in runCommandErrors)
+                {
+                    dataTable.Rows.Add(index,
+                        runCommand.OrderId.ToString().PadLeft(8, '0'),
+                        runCommand.ShopCode,
+                        runCommand.ShopName,
+                        runCommand.MachineName,
+                        runCommand.Command,
+                        runCommand.PaymentTypeName == "Octopus" ? "Deduct" : "Eft",
+                        runCommand.Amount,
+                        runCommand.OctopusNo,
+                        runCommand.BuyerAccountID,
+                        runCommand.InsertTime.ToString("MM/dd/yyyy hh:mm:ss tt")
+                    );
+                    index++;
+                }
+
+                byte[] fileContents = _exportExcelService.Export(dataTable);
+
+                return File(fileContents, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "RunCommandErrorReport.xlsx");
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
     }
 }

@@ -17,6 +17,7 @@ namespace WashMachine.Web.AppCode
             CreateMap<ShopCom, ShopComModel>();
             CreateMap<Log, LogModel>();
             CreateMap<MachineCommand, MachineCommandModel>();
+            CreateMap<RunCommandError, RunCommandErrorModel>();
         }
     }
 }

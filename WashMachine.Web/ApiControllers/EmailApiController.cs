@@ -235,5 +235,111 @@ namespace WashMachine.Web.ApiControllers
                 return new Respondent() { Success = false, Message = e.Message };
             }
         }
+
+        [HttpPost]
+        public Respondent SendEmailHealthCheckError([FromBody] MachineEmailModel model)
+        {
+            try
+            {
+                var shop = _dbContext.Shop.FirstOrDefault(c => c.Code == model.ShopCode);
+                if (shop == null)
+                {
+                    return new Respondent() { Success = false, Message = "Shop code is not existed." };
+                }
+
+                if (string.IsNullOrEmpty(shop.Email))
+                {
+                    return new Respondent() { Success = false, Message = "This shop has not an email." };
+                }
+
+                model.Name = shop.Name;
+                model.ShopName = shop.Name;
+
+                var service = _business.GetService<EmailService>();
+                EmailTemplateModel emailTemplate = service.GetEmailTemplate("HealthCheckError");
+                if (emailTemplate != null)
+                {
+                    var template = Template.Parse(emailTemplate.Template);
+                    var body = template.RenderViewModel(model);
+                    Business.Models.EmailModel emailModel = new Business.Models.EmailModel
+                    {
+                        Body = body,
+                        To = shop.Email,
+                        Subject = emailTemplate.Subject
+                    };
+
+                    var result = service.SendMail(emailModel);
+                    if (result)
+                    {
+                        return new Respondent() { Success = true, Message = string.Empty };
+                    }
+                    else
+                    {
+                        return new Respondent() { Success = false, Message = "Can not send email, please check your config." };
+                    }
+                }
+                else
+                {
+                    return new Respondent() { Success = false, Message = "Email template is not found." };
+                }
+            }
+            catch (Exception e)
+            {
+                return new Respondent() { Success = false, Message = e.Message };
+            }
+        }
+
+        [HttpPost]
+        public Respondent SendEmailStartError([FromBody] MachineEmailModel model)
+        {
+            try
+            {
+                var shop = _dbContext.Shop.FirstOrDefault(c => c.Code == model.ShopCode);
+                if (shop == null)
+                {
+                    return new Respondent() { Success = false, Message = "Shop code is not existed." };
+                }
+
+                if (string.IsNullOrEmpty(shop.Email))
+                {
+                    return new Respondent() { Success = false, Message = "This shop has not an email." };
+                }
+
+                model.Name = shop.Name;
+                model.ShopName = shop.Name;
+
+                var service = _business.GetService<EmailService>();
+                EmailTemplateModel emailTemplate = service.GetEmailTemplate("StartError");
+                if (emailTemplate != null)
+                {
+                    var template = Template.Parse(emailTemplate.Template);
+                    var body = template.RenderViewModel(model);
+                    Business.Models.EmailModel emailModel = new Business.Models.EmailModel
+                    {
+                        Body = body,
+                        To = shop.Email,
+                        Subject = emailTemplate.Subject
+                    };
+
+                    var result = service.SendMail(emailModel);
+                    if (result)
+                    {
+                        return new Respondent() { Success = true, Message = string.Empty };
+                    }
+                    else
+                    {
+                        return new Respondent() { Success = false, Message = "Can not send email, please check your config." };
+                    }
+                }
+                else
+                {
+                    return new Respondent() { Success = false, Message = "Email template is not found." };
+                }
+            }
+            catch (Exception e)
+            {
+                return new Respondent() { Success = false, Message = e.Message };
+            }
+        }
     }
 }

@@ -22,6 +22,7 @@ namespace WashMachine.Repositories.Entities
         public string DeviceId { get; set; }
         public string CardJson { get; set; }
         public string OctopusNo { get; set; }
+        public string BuyerAccountID { get; set; }
         public string Message { get; set; }
         public DateTime? InsertTime { get; set; }
         public DateTime? UpdateTime { get; set; }

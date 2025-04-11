@@ -20,4 +20,11 @@ namespace WashMachine.Web.Models
         public List<OrderModel> Orders { get; set; } = new List<OrderModel>();
         public int Total { get; set; }
     }
+
+    public class RunCommandErrorDataModel : ReportDataModel
+    {
+        public RunCommandErrorFilterModel Filter { get; set; } = new RunCommandErrorFilterModel();
+        public List<RunCommandErrorModel> RunCommandErrors { get; set; } = new List<RunCommandErrorModel>();
+        public int Total { get; set; }
+    }
 }

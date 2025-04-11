@@ -172,6 +172,7 @@ namespace WashMachine.Business.Services
                     DeviceId = orderModel.DeviceId,
                     CardJson = orderModel.CardJson,
                     OctopusNo = orderModel.OctopusNo,
+                    BuyerAccountID = orderModel.TransactionRecord.buyerAccountID,
                     Message = orderModel.Message,
                     InsertTime = currentTime,
                     UpdateTime = currentTime,

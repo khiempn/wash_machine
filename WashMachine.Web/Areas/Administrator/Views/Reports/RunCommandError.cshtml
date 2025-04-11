@@ -1,0 +1,165 @@
+﻿@using WashMachine.Business
+@using WashMachine.Business.Models
+@model RunCommandErrorDataModel
+@{
+    ViewData["Title"] = "Run Command Error";
+}
+<style>
+    #order_list_wrapper {
+        padding: 0px !important;
+    }
+</style>
+<div class="mannager-content">
+    <div class="row">
+        <div class="col-md-12">
+            <form id="filter_form" action="/administrator/reports/runcommanderror" method="get">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Search criteria</h5>
+                        <div class="row" style="margin-top: 15px;">
+                            <div class="col-md-12">
+                                <input class="form-control" name="Filter.@(nameof(Model.Filter.SearchCriteria))" maxlength="500" value="@Model.Filter.SearchCriteria" placeholder="Payment Method, Shop Name, Shop Code..." />
+                            </div>
+                        </div>
+                        <div class="row" style="margin-top: 15px;">
+                            <div class="col-md-6">
+                                <label for="FromDate">From Date</label>
+                                <input id="FromDate" name="Filter.@(nameof(Model.Filter.FromDate))" class="form-control datepicker" type="text" value="@Model.Filter.FromDate" placeholder="From date" autocomplete="off" />
+                            </div>
+                            <div class="col-md-6">
+                                <label for="FromDate">To Date</label>
+                                <input id="ToDate" name="Filter.@(nameof(Model.Filter.ToDate))" class="form-control datepicker" type="text" value="@Model.Filter.ToDate" placeholder="To date" autocomplete="off" />
+                            </div>
+                        </div>
+                        <div class="row" style="margin-top: 15px;">
+                            <div class="col-md-6">
+                                <label for="ShopCode">Shop Code</label>
+                                @Html.DropDownList($"Filter.{nameof(Model.Filter.ShopCode)}", Model.Filter.ShopCodeList.Select(s => new SelectListItem()
+                           {
+                               Text = s,
+                               Value = s,
+                               Selected = s.Equals(Model.Filter.ShopCode)
+                           }).ToList(), "---Select an option---", new { @class = "form-control" })
+                            </div>
+                            <div class="col-md-6">
+                                <label for="ShopCode">Payment Method</label>
+                                @Html.DropDownList($"Filter.{nameof(Model.Filter.PaymentMethod)}", new List<SelectListItem>(){
+                                new SelectListItem() { Value = "Alipay", Text = "Alipay", Selected = "Alipay".Equals(Model.Filter.PaymentMethod) },
+                                new SelectListItem() { Value = "Octopus", Text = "Octopus", Selected = "Octopus".Equals(Model.Filter.PaymentMethod) },
+                                new SelectListItem() { Value = "Payme", Text = "Payme", Selected = "Payme".Equals(Model.Filter.PaymentMethod) },
+                                }, "---Select an option---", new { @class = "form-control" })
+                            </div>
+                        </div>
+                        <div class="row" style="margin-top: 15px;">
+                            <div class="col-md-12">
+                                <div style="float:right;" class="pull-right">
+                                    <button type="button" onclick="clearFilter()" class="btn btn-secondary"><i class="fa fa-redo"></i> Clear </button>
+                                    <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i> Search </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5><i class="fas fa-cubes"></i> Run Command Errors</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Total: @(Model.Total)</h6>
+                        </div>
+                        <div class="col-md-6" style="text-align: right;">
+                            <button type="button" class="btn btn-success text-white" id="btn_export_excel"><i class="fas fa-file-excel"></i> Export </button>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12" style="overflow: auto;">
+                            <table class="table" id="run_command_error_list">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Receipt No</th>
+                                        <th>Shop Code</th>
+                                        <th>Shop Name</th>
+                                        <th>Machine Name</th>
+                                        <th>Command</th>
+                                        <th>Payment Type Name</th>
+                                        <th>Transaction Amount</th>
+                                        <th>Octopus ID</th>
+                                        <th>Buyer Account ID</th>
+                                        <th>Error Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @{
+                                        int index = 1;
+                                        foreach (RunCommandErrorModel runCommand in Model.RunCommandErrors)
+                                        {
+                                            <tr>
+                                                <td>@index</td>
+                                                <td>@runCommand.OrderId.ToString().PadLeft(8, '0')</td>
+                                                <td>@runCommand.ShopCode</td>
+                                                <td>@runCommand.ShopName</td>
+                                                <td>@runCommand.MachineName</td>
+                                                <td>@runCommand.Command</td>
+                                                <td>@(runCommand.PaymentTypeName == "Octopus" ? "Deduct" : "Eft")</td>
+                                                <td>@runCommand.Amount</td>
+                                                <td>@runCommand.OctopusNo</td>
+                                                <td>@runCommand.BuyerAccountID</td>
+                                                <td>@runCommand.InsertTime.ToString("MM/dd/yyyy hh:mm:ss tt")</td>
+                                            </tr>
+                                            index += 1;
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('#run_command_error_list').DataTable({
+            searching: false,
+            dom: 'rtip',
+            info: false
+        });
+
+        $('#btn_export_excel').click(function () {
+            var data = $('#filter_form').serializeArray();
+
+            $.ajax({
+                type: "POST",
+                url: "/administrator/reports/OrderExportToExcel",
+                xhrFields: {
+                    responseType: 'blob'
+                },
+                data: data,
+                success: function (data) {
+                    var a = document.createElement('a');
+                    var url = window.URL.createObjectURL(data);
+                    a.href = url;
+                    a.download = 'OrderReport.xlsx';
+                    document.body.append(a);
+                    a.click();
+                    a.remove();
+                    window.URL.revokeObjectURL(url);
+                }
+            });
+        });
+    });
+
+    function clearFilter() {
+        $('#filter_form input').val('');
+        $('#filter_form select').val('');
+        $('#filter_form').submit();
+    }
+</script>

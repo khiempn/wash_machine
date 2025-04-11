@@ -17,4 +17,10 @@
 
         public string FunctionName { get; set; }
     }
+
+    public class MachineEmailModel : ErrorMailModel
+    {
+        public string Command { get; set; }
+        public string MachineName { get; set; }
+    }
 }

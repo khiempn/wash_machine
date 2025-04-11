@@ -21,7 +21,7 @@ namespace WashMachine.Forms.Modules.LaundryWashOption.Api
         {
             Task.Run(() =>
             {
-                httpService.Post($"{Program.AppConfig.AppHost}/EmailApi/SetMachineInfo", new
+                httpService.Post($"{Program.AppConfig.AppHost}/Machine/SetMachineInfo", new
                 {
                     ShopCode = shopConfig.Code,
                     Time = DateTime.Now.ToString("MM/dd/yyyy hh:mm:ss tt"),
@@ -33,7 +33,7 @@ namespace WashMachine.Forms.Modules.LaundryWashOption.Api
         {
             Task.Run(() =>
             {
-                httpService.Post($"{Program.AppConfig.AppHost}/EmailApi/TrackingMachineError", new
+                httpService.Post($"{Program.AppConfig.AppHost}/Machine/TrackingMachineError", new
                 {
                     ShopCode = shopConfig.Code,
                     Time = DateTime.Now.ToString("MM/dd/yyyy hh:mm:ss tt"),

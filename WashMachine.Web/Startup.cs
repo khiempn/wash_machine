@@ -147,6 +147,7 @@ namespace WashMachine.Web
             services.AddScoped<IBusiness, LogService>();
             services.AddScoped<IBusiness, EmailService>();
             services.AddScoped<IBusiness, MachineCommadService>();
+            services.AddScoped<IBusiness, RunCommandErrorService>();
             services.AddTransient<ExportExcelService>();
         }
     }

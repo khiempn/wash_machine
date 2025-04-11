@@ -21,4 +21,11 @@ namespace WashMachine.Web.Models
         public string PaymentMethod { get; set; } = string.Empty;
         public List<string> ShopCodeList { get; set; } = new List<string>();
     }
+
+    public class RunCommandErrorFilterModel : ReportFilterModel
+    {
+        public string ShopCode { get; set; } = string.Empty;
+        public string PaymentMethod { get; set; } = string.Empty;
+        public List<string> ShopCodeList { get; set; } = new List<string>();
+    }
 }
